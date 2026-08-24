@@ -240,11 +240,39 @@ window.App = {
               <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
             </div>
 
+            <!-- UserInfo Claims -->
+            ${selected.userinfoCode ? `
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                👤 ${t('sectionUserinfo')}
+              </label>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.userinfoCode)}</code></pre>
+            </div>` : ''}
+
+            <!-- Token Refresh & Rotation -->
+            ${selected.refreshCode ? `
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                🔄 ${t('sectionRefresh')}
+              </label>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.refreshCode)}</code></pre>
+            </div>` : ''}
+
+            <!-- Logout & Token Revocation -->
+            ${selected.logoutCode ? `
+            <div class="space-y-2">
+              <label class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                🛡️ ${t('sectionLogout')}
+              </label>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.logoutCode)}</code></pre>
+            </div>` : ''}
+
             <!-- Storage & Callback -->
+            ${selected.callbackCode ? `
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionCallback')}</label>
               <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
-            </div>
+            </div>` : ''}
 
           </div>
         </div>
@@ -357,11 +385,39 @@ window.App = {
                 <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
               </div>
 
+              <!-- UserInfo Claims -->
+              ${selected.userinfoCode ? `
+              <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+                  👤 ${t('sectionUserinfo')}
+                </label>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.userinfoCode)}</code></pre>
+              </div>` : ''}
+
+              <!-- Token Refresh & Rotation -->
+              ${selected.refreshCode ? `
+              <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
+                  🔄 ${t('sectionRefresh')}
+                </label>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.refreshCode)}</code></pre>
+              </div>` : ''}
+
+              <!-- Logout & Token Revocation -->
+              ${selected.logoutCode ? `
+              <div class="space-y-2">
+                <label class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
+                  🛡️ ${t('sectionLogout')}
+                </label>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.logoutCode)}</code></pre>
+              </div>` : ''}
+
               <!-- Callback Handler -->
+              ${selected.callbackCode ? `
               <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionCallback')}</label>
                 <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
-              </div>
+              </div>` : ''}
 
             </div>
           </div>

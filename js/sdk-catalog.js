@@ -75,68 +75,39 @@ const oidcConfig = {
 export const userManager = new UserManager(oidcConfig);`,
     loginCode: `// 2. Trigger Login (Redirects with PKCE parameters)
 export async function login() {
-  // oidc-client-ts automatically:
-  // - Generates high-entropy code_verifier
-  // - Computes SHA-256 base64url code_challenge
-  // - Stores verifier + state in sessionStorage
-  // - Redirects browser to /authorize?response_type=code&code_challenge=...&code_challenge_method=S256
   await userManager.signinRedirect();
 }`,
-    callbackCode: `// 3. Callback Handler (e.g. callback.html or /callback route)
+    userinfoCode: `// 3. UserInfo Claims Query (oidc-client-ts)
+export async function fetchUserInfo() {
+  // Queries /userinfo using in-memory access token
+  const user = await userManager.getUser();
+  if (user) {
+    console.log('UserInfo Claims:', user.profile);
+    return user.profile;
+  }
+}`,
+    refreshCode: `// 4. Silent Token Refresh & Rotation (oidc-client-ts)
+export async function refreshTokens() {
+  // Executes token refresh in background via Refresh Token Rotation or hidden iframe
+  const refreshedUser = await userManager.signinSilent();
+  console.log('Rotated Access Token:', refreshedUser.access_token);
+  return refreshedUser;
+}`,
+    logoutCode: `// 5. Logout & Revoke (oidc-client-ts)
+export async function logout() {
+  // Automatically revokes tokens and redirects to IdP End Session Endpoint
+  await userManager.signoutRedirect();
+}`,
+    callbackCode: `// 6. Callback Handler (e.g. callback.html or /callback route)
 export async function handleCallback() {
   try {
-    // Automatically extracts ?code=...&state=...
-    // Retrieves stored code_verifier from sessionStorage
-    // Makes POST /token with code and code_verifier
-    // Validates ID Token signature, nonce, and audience
     const user = await userManager.signinCallback();
     console.log('Signed in user:', user.profile);
-    console.log('Access Token:', user.access_token);
-    console.log('ID Token:', user.id_token);
     return user;
   } catch (error) {
     console.error('OIDC Login failed:', error);
     throw error;
   }
-}`,
-    reactSnippet: `// 4. React Component with react-oidc-context
-import React from 'react';
-import { useAuth, AuthProvider } from 'react-oidc-context';
-
-const authConfig = {
-  authority: 'http://localhost:3000/mock-idp',
-  client_id: 'react-pkce-app',
-  redirect_uri: window.location.origin + '/callback',
-  response_type: 'code',
-  scope: 'openid profile email'
-};
-
-function UserProfile() {
-  const auth = useAuth();
-
-  if (auth.isLoading) return <div>Loading OIDC session...</div>;
-  if (auth.error) return <div>Authentication Error: {auth.error.message}</div>;
-
-  if (auth.isAuthenticated) {
-    return (
-      <div className="profile-card">
-        <h2>Welcome, {auth.user?.profile.name}!</h2>
-        <p>Email: {auth.user?.profile.email}</p>
-        <p>Access Token: {auth.user?.access_token.substring(0, 15)}...</p>
-        <button onClick={() => auth.signoutRedirect()}>Sign Out</button>
-      </div>
-    );
-  }
-
-  return <button onClick={() => auth.signinRedirect()}>Sign In with PKCE</button>;
-}
-
-export default function App() {
-  return (
-    <AuthProvider {...authConfig}>
-      <UserProfile />
-    </AuthProvider>
-  );
 }`
   },
 
@@ -195,50 +166,75 @@ async function generateCodeChallenge(verifier) {
 }`,
     loginCode: `// 2. Start Authorization Flow
 async function startPkceLogin() {
-  // A. Generate PKCE parameters
   const codeVerifier = generateRandomString(64);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
   const state = generateRandomString(32);
   const nonce = generateRandomString(32);
 
-  // B. Persist verifier and state in sessionStorage (Temporary storage for callback)
   sessionStorage.setItem('pkce_verifier', codeVerifier);
   sessionStorage.setItem('pkce_state', state);
-  sessionStorage.setItem('pkce_nonce', nonce);
 
-  // C. Build Authorization URL
   const authUrl = new URL('http://localhost:3000/mock-idp/authorize');
   authUrl.searchParams.set('client_id', 'vanilla-pkce-client');
   authUrl.searchParams.set('redirect_uri', window.location.origin + '/callback.html');
   authUrl.searchParams.set('response_type', 'code');
-  authUrl.searchParams.set('scope', 'openid profile email');
+  authUrl.searchParams.set('scope', 'openid profile email offline_access');
   authUrl.searchParams.set('state', state);
   authUrl.searchParams.set('nonce', nonce);
   authUrl.searchParams.set('code_challenge', codeChallenge);
   authUrl.searchParams.set('code_challenge_method', 'S256');
 
-  // D. Redirect user to Identity Provider
   window.location.href = authUrl.toString();
 }`,
-    callbackCode: `// 3. Process Callback on /callback.html
+    userinfoCode: `// 3. Fetch UserInfo with Access Token
+async function fetchUserInfo(accessToken) {
+  const res = await fetch('http://localhost:3000/mock-idp/userinfo', {
+    headers: { Authorization: \`Bearer \${accessToken}\` }
+  });
+  return await res.json();
+}`,
+    refreshCode: `// 4. Refresh Token Rotation (Vanilla JS Fetch)
+async function refreshTokens(refreshToken) {
+  const res = await fetch('http://localhost:3000/mock-idp/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: 'vanilla-pkce-client',
+      refresh_token: refreshToken
+    })
+  });
+  const newTokens = await res.json();
+  console.log('Rotated Tokens:', newTokens);
+  return newTokens;
+}`,
+    logoutCode: `// 5. Logout & Revoke in Vanilla JS
+async function logout(idToken, refreshToken) {
+  // Step 1: Revoke token
+  if (refreshToken) {
+    await fetch('http://localhost:3000/mock-idp/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ token: refreshToken, token_type_hint: 'refresh_token' })
+    });
+  }
+
+  // Step 2: Clear storage & redirect to IdP End Session
+  sessionStorage.clear();
+  window.location.href = \`http://localhost:3000/mock-idp/session/end?id_token_hint=\${idToken}&post_logout_redirect_uri=\${window.location.origin}\`;
+}`,
+    callbackCode: `// 6. Process Callback on /callback.html
 async function handleCallback() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
   const returnedState = params.get('state');
 
-  // Verify State to prevent CSRF
   const savedState = sessionStorage.getItem('pkce_state');
   if (!returnedState || returnedState !== savedState) {
     throw new Error('State mismatch! Possible CSRF attack detected.');
   }
 
-  // Retrieve saved code_verifier
   const codeVerifier = sessionStorage.getItem('pkce_verifier');
-  if (!codeVerifier) {
-    throw new Error('Missing code_verifier in session storage.');
-  }
-
-  // Exchange Code + Verifier for Tokens (POST /token)
   const tokenResponse = await fetch('http://localhost:3000/mock-idp/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -252,12 +248,8 @@ async function handleCallback() {
   });
 
   const tokens = await tokenResponse.json();
-  
-  // Clean up temporary PKCE keys
   sessionStorage.removeItem('pkce_verifier');
   sessionStorage.removeItem('pkce_state');
-
-  console.log('Received Tokens:', tokens);
   return tokens;
 }`
   },
@@ -292,39 +284,8 @@ async function handleCallback() {
       redirectHandler: 'Next.js Route Handler (/api/auth/callback/oidc)'
     },
     installCmd: 'npm install next-auth@beta @auth/core',
-    configCode: `// 1. auth.ts (Next.js 14 App Router: PKCE, UserInfo, Refresh Token Rotation & Logout)
+    configCode: `// 1. auth.ts (Next.js 14 App Router Root Configuration)
 import NextAuth from 'next-auth';
-
-// Helper to refresh expired Access Token via Refresh Token Rotation (RTR)
-async function refreshAccessToken(token: any) {
-  try {
-    const response = await fetch('http://localhost:3000/mock-idp/token', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'refresh_token',
-        client_id: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
-        client_secret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
-        refresh_token: token.refreshToken
-      })
-    });
-
-    const refreshedTokens = await response.json();
-    if (!response.ok) throw refreshedTokens;
-
-    return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      idToken: refreshedTokens.id_token ?? token.idToken,
-      // Store new rotated refresh token
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
-      expiresAt: Math.floor(Date.now() / 1000 + refreshedTokens.expires_in)
-    };
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-    return { ...token, error: 'RefreshAccessTokenError' };
-  }
-}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -332,87 +293,72 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       id: 'oidc-provider',
       name: 'Corporate OpenID Provider',
       type: 'oidc',
-      issuer: 'http://localhost:3000/mock-idp', // OIDC Discovery Issuer
+      issuer: 'http://localhost:3000/mock-idp',
       clientId: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
       clientSecret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
-      
-      // 1. Enforce PKCE S256 in Authorization Code Flow
       checks: ['pkce', 'state', 'nonce'],
-      
-      // 2. Request Scopes including offline_access for Refresh Tokens
       authorization: {
-        params: {
-          scope: 'openid profile email offline_access',
-          response_type: 'code'
-        }
-      },
-
-      // 3. UserInfo Endpoint: Auto-fetched with Access Token
-      userinfo: 'http://localhost:3000/mock-idp/userinfo',
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          roles: profile.roles || ['user']
-        };
+        params: { scope: 'openid profile email offline_access', response_type: 'code' }
       }
     }
   ],
-  callbacks: {
-    // Refresh Token Rotation (RTR) Callback
-    async jwt({ token, account, user }) {
-      // Initial sign-in: store tokens & expiration
-      if (account && user) {
-        return {
-          accessToken: account.access_token,
-          idToken: account.id_token,
-          refreshToken: account.refresh_token,
-          expiresAt: account.expires_at,
-          user
-        };
-      }
-
-      // Return token if access token has not expired yet (e.g. 1 min buffer)
-      if (Date.now() < (token.expiresAt as number) * 1000 - 60000) {
-        return token;
-      }
-
-      // Token has expired: rotate refresh token and get new access token
-      return await refreshAccessToken(token);
-    },
-    async session({ session, token }) {
-      session.user = token.user as any;
-      (session as any).error = token.error;
-      return session;
-    }
-  },
   session: { strategy: 'jwt' },
-  secret: process.env.AUTH_SECRET || 'random-super-secure-jwt-secret-key'
+  secret: process.env.AUTH_SECRET || 'super-secure-jwt-secret'
 });`,
-    loginCode: `// 2. app/api/auth/[...nextauth]/route.ts (Next.js Route Handlers)
-import { handlers } from '@/auth';
-export const { GET, POST } = handlers;
+    loginCode: `// 2. app/page.tsx (Server Action Login with PKCE S256)
+import { signIn } from '@/auth';
 
-// 3. Triggering Login from Client or Server Action (app/page.tsx)
-import { signIn, auth } from '@/auth';
-
-export default async function LoginPage() {
-  const session = await auth();
-
+export default function LoginPage() {
   return (
     <form action={async () => { 'use server'; await signIn('oidc-provider'); }}>
-      <button type="submit" className="btn-primary">
+      <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-bold">
         Sign In with OIDC + PKCE (S256)
       </button>
     </form>
   );
 }`,
-    callbackCode: `// 4. Secure Logout with Token Revocation (RFC 7009) & RP-Initiated End Session
-// app/actions/auth-actions.ts
-'use server';
+    userinfoCode: `// 3. UserInfo Claims Resolution & Profile Extraction
+// In auth.ts provider config:
+userinfo: 'http://localhost:3000/mock-idp/userinfo',
+profile(profile) {
+  // profile contains claims fetched with the Access Token from /userinfo
+  return {
+    id: profile.sub,
+    name: profile.name,
+    email: profile.email,
+    roles: profile.roles ?? ['user'],
+    picture: profile.picture
+  };
+}`,
+    refreshCode: `// 4. Refresh Token Rotation (RTR) in NextAuth JWT Callback
+async function refreshAccessToken(token: any) {
+  const res = await fetch('http://localhost:3000/mock-idp/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'refresh_token',
+      client_id: process.env.AUTH_OIDC_ID!,
+      client_secret: process.env.AUTH_OIDC_SECRET!,
+      refresh_token: token.refreshToken
+    })
+  });
+  const refreshed = await res.json();
+  if (!res.ok) throw refreshed;
 
+  return {
+    ...token,
+    accessToken: refreshed.access_token,
+    refreshToken: refreshed.refresh_token ?? token.refreshToken, // Rotated Refresh Token
+    expiresAt: Math.floor(Date.now() / 1000 + refreshed.expires_in)
+  };
+}
+
+// In callbacks.jwt:
+if (Date.now() >= (token.expiresAt as number) * 1000 - 60000) {
+  return await refreshAccessToken(token);
+}`,
+    logoutCode: `// 5. Logout with Token Revocation (RFC 7009) & SSO End Session
+'use server';
 import { auth, signOut } from '@/auth';
 
 export async function logoutWithRevoke() {
@@ -420,30 +366,36 @@ export async function logoutWithRevoke() {
   const refreshToken = (session as any)?.refreshToken;
   const idToken = (session as any)?.idToken;
 
-  // Step 1: Revoke Refresh Token on IdP Server (RFC 7009)
+  // Step A: Revoke refresh token on IdP server
   if (refreshToken) {
-    try {
-      await fetch('http://localhost:3000/mock-idp/revoke', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          token: refreshToken,
-          token_type_hint: 'refresh_token',
-          client_id: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
-          client_secret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret'
-        })
-      });
-    } catch (e) {
-      console.error('Token revocation failed:', e);
-    }
+    await fetch('http://localhost:3000/mock-idp/revoke', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        token: refreshToken,
+        token_type_hint: 'refresh_token',
+        client_id: process.env.AUTH_OIDC_ID!,
+        client_secret: process.env.AUTH_OIDC_SECRET!
+      })
+    });
   }
 
-  // Step 2: Clear local session cookies & redirect to IdP End Session Endpoint
-  const idpLogoutUrl = new URL('http://localhost:3000/mock-idp/session/end');
-  if (idToken) idpLogoutUrl.searchParams.set('id_token_hint', idToken);
-  idpLogoutUrl.searchParams.set('post_logout_redirect_uri', 'http://localhost:3000/');
+  // Step B: Clear local session & redirect to IdP End Session Endpoint
+  const idpLogout = new URL('http://localhost:3000/mock-idp/session/end');
+  if (idToken) idpLogout.searchParams.set('id_token_hint', idToken);
+  idpLogout.searchParams.set('post_logout_redirect_uri', 'http://localhost:3000/');
 
-  await signOut({ redirectTo: idpLogoutUrl.toString() });
+  await signOut({ redirectTo: idpLogout.toString() });
+}`,
+    callbackCode: `// 6. Server Component Session Protection (app/dashboard/page.tsx)
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  const session = await auth();
+  if (!session) redirect('/api/auth/signin');
+
+  return <div>Welcome, {session.user?.name}! (Protected via BFF HttpOnly Cookies)</div>;
 }`
   },
 
@@ -526,43 +478,77 @@ app.get('/login', (req, res) => {
 
   res.redirect(authorizationUrl);
 });`,
-    callbackCode: `// 3. Callback Route: Exchange Code + Verifier for Tokens
+    userinfoCode: `// 3. UserInfo Claims Endpoint (Node.js)
+app.get('/api/userinfo', async (req, res) => {
+  if (!req.session.accessToken) return res.status(401).json({ error: 'Unauthorized' });
+  try {
+    // Queries /userinfo using the Bearer access_token
+    const userinfo = await client.userinfo(req.session.accessToken);
+    res.json(userinfo);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});`,
+    refreshCode: `// 4. Refresh Token Rotation (Node.js openid-client)
+app.post('/api/refresh', async (req, res) => {
+  if (!req.session.refreshToken) return res.status(401).json({ error: 'No refresh token' });
+  try {
+    // Sends POST /token (grant_type=refresh_token) and gets rotated tokens
+    const tokenSet = await client.refresh(req.session.refreshToken);
+    req.session.accessToken = tokenSet.access_token;
+    req.session.refreshToken = tokenSet.refresh_token; // Store new rotated refresh token
+    res.json({ status: 'Tokens Rotated Successfully', expires_in: tokenSet.expires_in });
+  } catch (err) {
+    res.status(500).json({ error: 'Refresh Failed: ' + err.message });
+  }
+});`,
+    logoutCode: `// 5. Logout with Token Revocation (RFC 7009) & SSO End Session
+app.get('/logout', async (req, res) => {
+  const refreshToken = req.session.refreshToken;
+  const idToken = req.session.user;
+
+  // Step 1: Revoke token at IdP
+  if (refreshToken) {
+    try {
+      await client.revoke(refreshToken, 'refresh_token');
+    } catch (e) {
+      console.error('Revocation warning:', e);
+    }
+  }
+
+  // Step 2: Destroy local session & redirect to IdP End Session Endpoint
+  req.session.destroy(() => {
+    const endSessionUrl = client.endSessionUrl({
+      id_token_hint: idToken,
+      post_logout_redirect_uri: 'http://localhost:4000/'
+    });
+    res.redirect(endSessionUrl);
+  });
+});`,
+    callbackCode: `// 6. Callback Route: Exchange Code + Verifier for Tokens
 app.get('/auth/callback', async (req, res) => {
   try {
     const params = client.callbackParams(req);
-    
-    // Retrieve stored verifier from session
     const code_verifier = req.session.code_verifier;
     const state = req.session.state;
     const nonce = req.session.nonce;
 
-    // Exchange authorization code for tokens
-    // openid-client automatically:
-    // - Sends code + code_verifier to /token
-    // - Validates ID Token cryptographic signature against JWKS
-    // - Validates nonce, iss, aud, and exp claims
     const tokenSet = await client.callback('http://localhost:4000/auth/callback', params, {
       code_verifier,
       state,
       nonce
     });
 
-    console.log('ID Token Claims:', tokenSet.claims());
-    console.log('Access Token:', tokenSet.access_token);
-
-    // Store user session securely
     req.session.user = tokenSet.claims();
     req.session.accessToken = tokenSet.access_token;
     req.session.refreshToken = tokenSet.refresh_token;
 
-    // Clear one-time PKCE session values
     delete req.session.code_verifier;
     delete req.session.state;
     delete req.session.nonce;
 
     res.redirect('/dashboard');
   } catch (err) {
-    console.error('OIDC Callback Error:', err);
     res.status(500).send('Authentication Failed: ' + err.message);
   }
 });`
@@ -600,6 +586,7 @@ from fastapi import FastAPI, Request, Depends
 from fastapi.responses import RedirectResponse, JSONResponse
 from starlette.middleware.sessions import SessionMiddleware
 from authlib.integrations.starlette_client import OAuth
+import httpx
 import os
 
 app = FastAPI(title="Python OIDC PKCE Demo")
@@ -612,7 +599,7 @@ oauth.register(
     client_id='python-backend-client',
     client_secret='python-backend-secret',
     client_kwargs={
-        'scope': 'openid profile email',
+        'scope': 'openid profile email offline_access',
         'code_challenge_method': 'S256'  # Enforce PKCE S256!
     }
 )`,
@@ -620,37 +607,64 @@ oauth.register(
 @app.get("/login")
 async def login(request: Request):
     redirect_uri = request.url_for('auth_callback')
-    # Authlib automatically:
-    # 1. Generates code_verifier
-    # 2. Computes code_challenge = S256(code_verifier)
-    # 3. Saves code_verifier in request.session['_state_oidc_provider_...']
-    # 4. Redirects to /authorize with code_challenge & method
     return await oauth.oidc_provider.authorize_redirect(request, redirect_uri)`,
-    callbackCode: `# 3. Callback Route: Exchanges Code + Verifier & Validates JWT
+    userinfoCode: `# 3. UserInfo Endpoint Claims Fetching (Python)
+@app.get("/api/userinfo")
+async def get_userinfo(request: Request):
+    token = request.session.get('token')
+    if not token: return JSONResponse({"error": "Unauthorized"}, status_code=401)
+    
+    # Fetch profile claims from /userinfo endpoint
+    userinfo = await oauth.oidc_provider.userinfo(token=token)
+    return {"userinfo_claims": userinfo}`,
+    refreshCode: `# 4. Refresh Token Rotation (Python)
+@app.post("/api/refresh")
+async def refresh_token_endpoint(request: Request):
+    token = request.session.get('token', {})
+    refresh_token = token.get('refresh_token')
+    if not refresh_token: return JSONResponse({"error": "No refresh token"}, status_code=400)
+
+    # POST to /token endpoint with grant_type=refresh_token
+    async with httpx.AsyncClient() as client:
+        resp = await client.post("http://localhost:3000/mock-idp/token", data={
+            "grant_type": "refresh_token",
+            "client_id": "python-backend-client",
+            "client_secret": "python-backend-secret",
+            "refresh_token": refresh_token
+        })
+        new_tokens = resp.json()
+        request.session['token'] = new_tokens # Store rotated refresh token
+        return {"status": "Refreshed & Rotated", "tokens": new_tokens}`,
+    logoutCode: `# 5. Logout with Token Revocation (RFC 7009) & SSO End Session
+@app.get("/logout")
+async def logout(request: Request):
+    token = request.session.get('token', {})
+    refresh_token = token.get('refresh_token')
+    id_token = token.get('id_token')
+
+    # Step 1: Revoke token on IdP
+    if refresh_token:
+        async with httpx.AsyncClient() as client:
+            await client.post("http://localhost:3000/mock-idp/revoke", data={
+                "token": refresh_token,
+                "token_type_hint": "refresh_token",
+                "client_id": "python-backend-client",
+                "client_secret": "python-backend-secret"
+            })
+
+    # Step 2: Clear local session & redirect to IdP logout
+    request.session.clear()
+    return RedirectResponse(f"http://localhost:3000/mock-idp/session/end?id_token_hint={id_token}&post_logout_redirect_uri=http://localhost:8000/")`,
+    callbackCode: `# 6. Callback Route: Exchanges Code + Verifier & Validates JWT
 @app.get("/auth/callback")
 async def auth_callback(request: Request):
     try:
-        # Authlib automatically:
-        # - Reads code_verifier from request.session
-        # - Sends POST /token with code & code_verifier
-        # - Verifies ID Token signature using remote JWKS
-        # - Validates issuer, audience, and expiration
         token = await oauth.oidc_provider.authorize_access_token(request)
-        user_info = token.get('userinfo')
-        id_token_claims = token.get('id_token')
-
-        # Store user profile in session
-        request.session['user'] = user_info
-        return RedirectResponse(url="/profile")
+        request.session['token'] = token
+        request.session['user'] = token.get('userinfo')
+        return RedirectResponse("/dashboard")
     except Exception as e:
-        return JSONResponse(status_code=400, content={"error": str(e)})
-
-@app.get("/profile")
-async def profile(request: Request):
-    user = request.session.get('user')
-    if not user:
-        return RedirectResponse(url="/login")
-    return {"authenticated_user": user}`
+        return JSONResponse({"error": str(e)}, status_code=500)`
   },
 
   {
@@ -735,7 +749,40 @@ public class SecurityConfig {
         return http.build();
     }
 }`,
-    callbackCode: `// 3. Accessing Authenticated User Claims (UserController.java)
+    userinfoCode: `// 3. UserInfo Claims Extraction (Java Spring Security)
+@GetMapping("/api/userinfo")
+public Map<String, Object> getUserInfo(@AuthenticationPrincipal OidcUser principal) {
+    // Spring Security automatically fetches claims from /userinfo when configured
+    return principal.getUserInfo().getClaims();
+}`,
+    refreshCode: `// 4. Token Refresh via OAuth2AuthorizedClientManager (Java)
+@Autowired
+private OAuth2AuthorizedClientManager authorizedClientManager;
+
+public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {
+    OAuth2AuthorizeRequest authorizeRequest = OAuth2AuthorizeRequest
+        .withAuthorizedClient(client)
+        .principal(SecurityContextHolder.getContext().getAuthentication())
+        .build();
+
+    // Spring Security automatically triggers POST /token grant_type=refresh_token
+    OAuth2AuthorizedClient refreshedClient = this.authorizedClientManager.authorize(authorizeRequest);
+    return refreshedClient.getAccessToken();
+}`,
+    logoutCode: `// 5. OidcClientInitiatedLogoutSuccessHandler (Java Spring Boot 3)
+@Bean
+public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRepo) throws Exception {
+    OidcClientInitiatedLogoutSuccessHandler oidcLogoutHandler = 
+        new OidcClientInitiatedLogoutSuccessHandler(clientRepo);
+    oidcLogoutHandler.setPostLogoutRedirectUri("{baseUrl}/");
+
+    http.logout(logout -> logout
+        // Clears session & redirects to IdP End Session Endpoint with id_token_hint
+        .logoutSuccessHandler(oidcLogoutHandler)
+    );
+    return http.build();
+}`,
+    callbackCode: `// 6. Accessing Authenticated User Claims (UserController.java)
 package com.example.oidcdemo.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -749,10 +796,6 @@ public class UserController {
 
     @GetMapping("/api/me")
     public Map<String, Object> getCurrentUser(@AuthenticationPrincipal OidcUser principal) {
-        // Spring Security has already validated:
-        // - ID Token RS256 signature against Provider JWKS
-        // - Nonce matching
-        // - PKCE verifier roundtrip
         return Map.of(
             "subject", principal.getSubject(),
             "name", principal.getFullName(),
@@ -824,8 +867,8 @@ builder.Services.AddAuthentication(options =>
     options.Scope.Add("email");
     options.Scope.Add("offline_access");
 
-    options.SaveTokens = true; // Stores access_token, id_token, refresh_token in auth cookie
-    options.GetClaimsFromUserInfoEndpoint = true;
+    options.SaveTokens = true; // Stores tokens in encrypted cookie
+    options.GetClaimsFromUserInfoEndpoint = true; // Auto-fetches /userinfo
 });
 
 var app = builder.Build();
@@ -834,18 +877,55 @@ app.UseAuthorization();`,
     loginCode: `// 2. Challenge endpoint to trigger OIDC PKCE flow
 app.MapGet("/login", async (HttpContext ctx) =>
 {
-    // Redirects to IdP with code_challenge and state
     await ctx.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
     {
         RedirectUri = "/dashboard"
     });
 });`,
-    callbackCode: `// 3. Protected Dashboard Endpoint
+    userinfoCode: `// 3. UserInfo Claims in .NET 8
+// Since options.GetClaimsFromUserInfoEndpoint = true:
+app.MapGet("/api/userinfo", (ClaimsPrincipal user) =>
+{
+    return Results.Ok(new
+    {
+        Subject = user.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+        Name = user.Identity?.Name,
+        Email = user.FindFirst(ClaimTypes.Email)?.Value,
+        AllClaims = user.Claims.Select(c => new { c.Type, c.Value })
+    });
+});`,
+    refreshCode: `// 4. Token Refresh in ASP.NET Core (.NET 8)
+app.MapPost("/api/refresh", async (HttpContext ctx, IHttpClientFactory clientFactory) =>
+{
+    var refreshToken = await ctx.GetTokenAsync("refresh_token");
+    var client = clientFactory.CreateClient();
+
+    var response = await client.PostAsync("http://localhost:3000/mock-idp/token", new FormUrlEncodedContent(new Dictionary<string, string>
+    {
+        { "grant_type", "refresh_token" },
+        { "client_id", "dotnet-backend-client" },
+        { "client_secret", "dotnet-super-secret" },
+        { "refresh_token", refreshToken! }
+    }));
+
+    var tokens = await response.Content.ReadFromJsonAsync<JsonElement>();
+    return Results.Ok(tokens);
+});`,
+    logoutCode: `// 5. Logout & SignOutAsync (.NET 8)
+app.MapGet("/logout", async (HttpContext ctx) =>
+{
+    // Destroys local auth cookie and redirects to IdP End Session Endpoint
+    await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await ctx.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+    {
+        RedirectUri = "/"
+    });
+});`,
+    callbackCode: `// 6. Protected Dashboard Endpoint
 app.MapGet("/dashboard", [Microsoft.AspNetCore.Authorization.Authorize] async (HttpContext ctx) =>
 {
     var user = ctx.User;
     var accessToken = await ctx.GetTokenAsync("access_token");
-    var idToken = await ctx.GetTokenAsync("id_token");
 
     return Results.Ok(new
     {
@@ -942,35 +1022,54 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 	)
 	http.Redirect(w, r, url, http.StatusFound)
 }`,
-    callbackCode: `func handleCallback(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-	
-	// Retrieve code_verifier from cookie
-	cookie, err := r.Cookie("pkce_verifier")
+    userinfoCode: `// 3. UserInfo Claims Extraction (Go coreos/go-oidc)
+func handleUserInfo(w http.ResponseWriter, r *http.Request, token *oauth2.Token) {
+	userInfo, err := provider.UserInfo(ctx, oauth2.StaticTokenSource(token))
 	if err != nil {
-		http.Error(w, "Missing PKCE cookie", http.StatusBadRequest)
+		http.Error(w, "Failed to get userinfo: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	var claims map[string]interface{}
+	userInfo.Claims(&claims)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(claims)
+}`,
+    refreshCode: `// 4. Refresh Token Rotation (Go oauth2)
+func refreshToken(storedToken *oauth2.Token) (*oauth2.Token, error) {
+	tokenSource := oauth2Config.TokenSource(ctx, storedToken)
+	// TokenSource automatically sends POST /token with refresh_token if expired
+	newToken, err := tokenSource.Token()
+	if err != nil {
+		return nil, fmt.Errorf("token refresh failed: %w", err)
+	}
+	return newToken, nil
+}`,
+    logoutCode: `// 5. Logout & IdP End Session (Go)
+func handleLogout(w http.ResponseWriter, r *http.Request, rawIDToken string) {
+	// 1. Clear session cookies
+	http.SetCookie(w, &http.Cookie{Name: "session_token", Value: "", MaxAge: -1, Path: "/"})
+
+	// 2. Redirect to IdP End Session Endpoint
+	endSessionURL := fmt.Sprintf("http://localhost:3000/mock-idp/session/end?id_token_hint=%s&post_logout_redirect_uri=%s",
+		url.QueryEscape(rawIDToken),
+		url.QueryEscape("http://localhost:8080/"),
+	)
+	http.Redirect(w, r, endSessionURL, http.StatusFound)
+}`,
+    callbackCode: `// 6. Callback Handler: Verify RS256 Signature
+func handleCallback(w http.ResponseWriter, r *http.Request) {
+	code := r.URL.Query().Get("code")
+	cookie, _ := r.Cookie("pkce_verifier")
 	codeVerifier := cookie.Value
 
-	// Exchange Code + Verifier for TokenSet
-	token, err := oauth2Config.Exchange(
-		ctx,
-		code,
-		oauth2.SetAuthURLParam("code_verifier", codeVerifier),
-	)
+	token, err := oauth2Config.Exchange(ctx, code, oauth2.SetAuthURLParam("code_verifier", codeVerifier))
 	if err != nil {
 		http.Error(w, "Token exchange failed: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	// Extract & Verify ID Token Cryptographic Signature
-	rawIDToken, ok := token.Extra("id_token").(string)
-	if !ok {
-		http.Error(w, "No id_token field in oauth2 token", http.StatusInternalServerError)
-		return
-	}
-
+	rawIDToken, _ := token.Extra("id_token").(string)
 	idToken, err := verifier.Verify(ctx, rawIDToken)
 	if err != nil {
 		http.Error(w, "Failed to verify ID Token: "+err.Error(), http.StatusInternalServerError)
@@ -979,7 +1078,6 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
 
 	var claims map[string]interface{}
 	idToken.Claims(&claims)
-	log.Printf("Successfully logged in user: %v", claims["name"])
 	w.Write([]byte("Welcome, " + claims["name"].(string)))
 }`
   },
@@ -1080,29 +1178,68 @@ func login(from presentingViewController: UIViewController, completion: @escapin
         }
     }
 }`,
-    callbackCode: `// 2. AppDelegate / SceneDelegate Deep Link Handler
-// Handles redirect URI: com.example.pkceapp:/oauth2callback?code=...
+    userinfoCode: `// 3. Fetch UserInfo Claims in Swift
+func fetchUserInfo(completion: @escaping ([String: Any]?) -> Void) {
+    guard let authState = self.authState else { return }
+    authState.performAction { accessToken, idToken, error in
+        guard let token = accessToken else { return }
+        
+        var request = URLRequest(url: URL(string: "http://localhost:3000/mock-idp/userinfo")!)
+        request.setValue("Bearer \\(token)", forHTTPHeaderField: "Authorization")
+        
+        URLSession.shared.dataTask(with: request) { data, _, _ in
+            if let data = data, let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+                completion(json)
+            }
+        }.resume()
+    }
+}`,
+    refreshCode: `// 4. Automatic Token Refresh & Rotation in Swift
+func refreshTokens(completion: @escaping (Bool) -> Void) {
+    guard let authState = self.authState else { return }
+    
+    // AppAuth automatically checks expiration and sends POST /token with grant_type=refresh_token
+    authState.performAction(freshTokens: true) { accessToken, idToken, error in
+        if let accessToken = accessToken {
+            self.saveAuthStateToKeychain(authState) // Save new rotated tokens
+            print("Refreshed! New Access Token: \\(accessToken)")
+            completion(true)
+        } else {
+            print("Refresh failed: \\(error?.localizedDescription ?? "")")
+            completion(false)
+        }
+    }
+}`,
+    logoutCode: `// 5. Logout & Revoke in iOS
+func logout(presentingVC: UIViewController) {
+    guard let authState = self.authState, let config = authState.lastAuthorizationResponse.request.configuration else { return }
+    
+    // A. Revoke token on IdP
+    if let refreshToken = authState.lastTokenResponse?.refreshToken {
+        // POST to /revoke
+    }
+    
+    // B. Launch End Session Request
+    let endSessionReq = OIDEndSessionRequest(
+        configuration: config,
+        idTokenHint: authState.lastTokenResponse?.idToken ?? "",
+        postLogoutRedirectURL: URL(string: "com.example.pkceapp:/logoutcallback")!,
+        additionalParameters: nil
+    )
+    
+    let userAgent = OIDExternalUserAgentIOS(presenting: presentingVC)
+    OIDAuthorizationService.present(endSessionReq, externalUserAgent: userAgent) { _, _ in
+        // Clear Keychain
+        self.clearKeychain()
+    }
+}`,
+    callbackCode: `// 6. AppDelegate / SceneDelegate Deep Link Handler
 func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
     guard let url = URLContexts.first?.url else { return }
-    
-    // Forward callback URL to AppAuth
     if let authorizationFlow = OIDCManager.shared.currentAuthorizationFlow,
        authorizationFlow.resumeExternalUserAgentFlow(with: url) {
         OIDCManager.shared.currentAuthorizationFlow = nil
     }
-}
-
-// 3. Keychain Persistence
-func saveAuthStateToKeychain(_ authState: OIDAuthState) {
-    let data = try? NSKeyedArchiver.archivedData(withRootObject: authState, requiringSecureCoding: true)
-    let query: [String: Any] = [
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrAccount as String: "oidc_auth_state",
-        kSecValueData as String: data!,
-        kSecAttrAccessible as String: kSecAttrAccessibleAfterFirstUnlock
-    ]
-    SecItemDelete(query as CFDictionary)
-    SecItemAdd(query as CFDictionary, nil)
 }`
   },
 
@@ -1159,98 +1296,69 @@ dependencies {
     </application>
 </manifest>`,
     loginCode: `// 1. Initiate PKCE Login in MainActivity.kt
-package com.example.pkceapp
+fun startPkceLogin() {
+    val issuerUri = Uri.parse("http://10.0.2.2:3000/mock-idp")
+    
+    AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { serviceConfig, ex ->
+        if (serviceConfig == null) return@fetchFromIssuer
 
-import android.net.Uri
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import net.openid.appauth.*
-
-class MainActivity : ComponentActivity() {
-
-    private lateinit var authService: AuthorizationService
-    private var authState: AuthState = AuthState()
-
-    private val authLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        val intent = result.data
-        if (intent != null) {
-            val response = AuthorizationResponse.fromIntent(intent)
-            val exception = AuthorizationException.fromIntent(intent)
-            
-            authState.update(response, exception)
-            
-            if (response != null) {
-                // 2. Exchange Code + Verifier for Tokens (POST /token)
-                exchangeAuthorizationCode(response)
-            }
-        }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        authService = AuthorizationService(this)
-    }
-
-    fun startPkceLogin() {
-        val issuerUri = Uri.parse("http://10.0.2.2:3000/mock-idp") // Android Emulator localhost
-        
-        AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { serviceConfig, ex ->
-            if (serviceConfig == null) return@fetchFromIssuer
-
-            // AppAuth automatically:
-            // - Generates secure random code_verifier
-            // - Computes S256 code_challenge
-            val authRequest = AuthorizationRequest.Builder(
-                serviceConfig,
-                "android-mobile-app",
-                ResponseTypeValues.CODE,
-                Uri.parse("com.example.pkceapp://oauth2callback")
-            )
-            .setScopes(AuthorizationRequest.Scope.OPENID, "profile", "email")
-            .setCodeVerifier(CodeVerifierUtil.generateRandomCodeVerifier())
-            .build()
-
-            // Launch Chrome Custom Tab for interactive SSO
-            val authIntent = authService.getAuthorizationRequestIntent(authRequest)
-            authLauncher.launch(authIntent)
-        }
-    }`,
-    callbackCode: `    // 3. Token Exchange & Encrypted Storage
-    private fun exchangeAuthorizationCode(response: AuthorizationResponse) {
-        val tokenRequest = response.createTokenExchangeRequest()
-        
-        authService.performTokenRequest(tokenRequest) { tokenResponse, ex ->
-            authState.update(tokenResponse, ex)
-            if (tokenResponse != null) {
-                val idToken = authState.idToken
-                val accessToken = authState.accessToken
-                val refreshToken = authState.refreshToken
-                
-                // Store in Android Keystore / EncryptedSharedPreferences
-                saveAuthStateEncrypted(authState)
-            }
-        }
-    }
-
-    private fun saveAuthStateEncrypted(state: AuthState) {
-        val masterKey = androidx.security.crypto.MasterKey.Builder(this)
-            .setKeyScheme(androidx.security.crypto.MasterKey.KeyScheme.AES256_GCM)
-            .build()
-
-        val sharedPreferences = androidx.security.crypto.EncryptedSharedPreferences.create(
-            this,
-            "secure_auth_prefs",
-            masterKey,
-            androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        val authRequest = AuthorizationRequest.Builder(
+            serviceConfig,
+            "android-mobile-app",
+            ResponseTypeValues.CODE,
+            Uri.parse("com.example.pkceapp://oauth2callback")
         )
+        .setScopes(AuthorizationRequest.Scope.OPENID, "profile", "email", "offline_access")
+        .setCodeVerifier(CodeVerifierUtil.generateRandomCodeVerifier())
+        .build()
 
-        sharedPreferences.edit()
-            .putString("auth_state_json", state.jsonSerializeString())
-            .apply()
+        val authIntent = authService.getAuthorizationRequestIntent(authRequest)
+        authLauncher.launch(authIntent)
+    }
+}`,
+    userinfoCode: `// 3. UserInfo Claims Request in Kotlin
+fun fetchUserInfo(accessToken: String, onResult: (JSONObject) -> Unit) {
+    Thread {
+        val url = URL("http://10.0.2.2:3000/mock-idp/userinfo")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.setRequestProperty("Authorization", "Bearer $accessToken")
+        val response = conn.inputStream.bufferedReader().readText()
+        onResult(JSONObject(response))
+    }.start()
+}`,
+    refreshCode: `// 4. Token Refresh with Rotation in Android Kotlin
+fun performTokenRefresh() {
+    // AppAuth automatically executes POST /token (grant_type=refresh_token)
+    val refreshReq = authState.createTokenRefreshRequest()
+    authService.performTokenRequest(refreshReq) { tokenResponse, ex ->
+        authState.update(tokenResponse, ex)
+        if (tokenResponse != null) {
+            // Save newly rotated refresh token to EncryptedSharedPreferences
+            saveAuthStateEncrypted(authState)
+        }
+    }
+}`,
+    logoutCode: `// 5. Logout & End Session in Kotlin
+fun logout(endSessionLauncher: ActivityResultLauncher<Intent>) {
+    val endSessionReq = EndSessionRequest.Builder(authState.authorizationServiceConfiguration!!)
+        .setIdTokenHint(authState.idToken)
+        .setPostLogoutRedirectUri(Uri.parse("com.example.pkceapp://logoutcallback"))
+        .build()
+
+    val intent = authService.getEndSessionRequestIntent(endSessionReq)
+    endSessionLauncher.launch(intent)
+    
+    // Clear EncryptedSharedPreferences
+    clearSecureStorage()
+}`,
+    callbackCode: `// 6. Token Exchange & Encrypted Storage
+private fun exchangeAuthorizationCode(response: AuthorizationResponse) {
+    val tokenRequest = response.createTokenExchangeRequest()
+    authService.performTokenRequest(tokenRequest) { tokenResponse, ex ->
+        authState.update(tokenResponse, ex)
+        if (tokenResponse != null) {
+            saveAuthStateEncrypted(authState)
+        }
     }
 }`
   },
@@ -1285,7 +1393,7 @@ class MainActivity : ComponentActivity() {
       redirectHandler: 'Native Deep Linking (custom URL scheme)'
     },
     installCmd: 'npm install react-native-app-auth react-native-keychain',
-    configCode: `import { authorize, refresh } from 'react-native-app-auth';
+    configCode: `import { authorize, refresh, revoke } from 'react-native-app-auth';
 import * as Keychain from 'react-native-keychain';
 
 const oidcConfig = {
@@ -1297,31 +1405,39 @@ const oidcConfig = {
 };`,
     loginCode: `export async function loginWithPkce() {
   try {
-    // Native bridge invokes AppAuth-iOS / AppAuth-Android
     const authResult = await authorize(oidcConfig);
-    
-    // Save tokens securely in iOS Keychain / Android KeyStore
-    await Keychain.setGenericPassword(
-      'oidc_tokens',
-      JSON.stringify({
-        accessToken: authResult.accessToken,
-        idToken: authResult.idToken,
-        refreshToken: authResult.refreshToken,
-        expiresAt: authResult.accessTokenExpirationDate
-      })
-    );
-
+    await Keychain.setGenericPassword('oidc_tokens', JSON.stringify(authResult));
     return authResult;
   } catch (error) {
     console.error('Login Failed', error);
   }
 }`,
-    callbackCode: `export async function getStoredUserTokens() {
-  const credentials = await Keychain.getGenericPassword();
-  if (credentials) {
-    return JSON.parse(credentials.password);
+    userinfoCode: `// 3. UserInfo in React Native
+export async function getUserInfo(accessToken) {
+  const res = await fetch('http://localhost:3000/mock-idp/userinfo', {
+    headers: { Authorization: \`Bearer \${accessToken}\` }
+  });
+  return await res.json();
+}`,
+    refreshCode: `// 4. Refresh Token Rotation in React Native
+export async function rotateRefreshToken(storedRefreshToken) {
+  const refreshed = await refresh(oidcConfig, {
+    refreshToken: storedRefreshToken
+  });
+  // Update secure Keychain storage with rotated refresh token
+  await Keychain.setGenericPassword('oidc_tokens', JSON.stringify(refreshed));
+  return refreshed;
+}`,
+    logoutCode: `// 5. Logout & Revoke in React Native
+export async function logoutAndRevoke(refreshToken) {
+  if (refreshToken) {
+    await revoke(oidcConfig, { tokenToRevoke: refreshToken, sendClientId: true });
   }
-  return null;
+  await Keychain.resetGenericPassword();
+}`,
+    callbackCode: `export async function getStoredUserTokens() {
+  const creds = await Keychain.getGenericPassword();
+  return creds ? JSON.parse(creds.password) : null;
 }`
   },
 
@@ -1354,9 +1470,12 @@ const oidcConfig = {
     installCmd: `// pubspec.yaml
 dependencies:
   flutter_appauth: ^6.0.7
-  flutter_secure_storage: ^9.0.0`,
+  flutter_secure_storage: ^9.0.0
+  http: ^1.2.0`,
     configCode: `import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AuthService {
   final FlutterAppAuth _appAuth = const FlutterAppAuth();
@@ -1367,36 +1486,80 @@ class AuthService {
   static const String _redirectUrl = 'com.example.flutterapp://oauthredirect';
   static const List<String> _scopes = ['openid', 'profile', 'email', 'offline_access'];`,
     loginCode: `  Future<AuthorizationTokenResponse?> login() async {
-    try {
-      // Automatically triggers OIDC Discovery, PKCE S256, and System Browser
-      final AuthorizationTokenResponse? result = await _appAuth.authorizeAndExchangeCode(
-        AuthorizationTokenRequest(
-          _clientId,
-          _redirectUrl,
-          issuer: _issuer,
-          scopes: _scopes,
-          promptValues: ['login'],
-        ),
-      );
+    final result = await _appAuth.authorizeAndExchangeCode(
+      AuthorizationTokenRequest(
+        _clientId,
+        _redirectUrl,
+        issuer: _issuer,
+        scopes: _scopes,
+      ),
+    );
 
-      if (result != null) {
-        // Securely store tokens
-        await _storage.write(key: 'access_token', value: result.accessToken);
-        await _storage.write(key: 'id_token', value: result.idToken);
-        await _storage.write(key: 'refresh_token', value: result.refreshToken);
-      }
-      return result;
-    } catch (e) {
-      print('Flutter Login error: $e');
-      return null;
+    if (result != null) {
+      await _storage.write(key: 'access_token', value: result.accessToken);
+      await _storage.write(key: 'id_token', value: result.idToken);
+      await _storage.write(key: 'refresh_token', value: result.refreshToken);
     }
+    return result;
+  }`,
+    userinfoCode: `  // 3. UserInfo Claims in Flutter
+  Future<Map<String, dynamic>?> fetchUserInfo() async {
+    final accessToken = await _storage.read(key: 'access_token');
+    if (accessToken == null) return null;
+
+    final response = await http.get(
+      Uri.parse('$_issuer/userinfo'),
+      headers: {'Authorization': 'Bearer $accessToken'},
+    );
+    return jsonDecode(response.body);
+  }`,
+    refreshCode: `  // 4. Refresh Token Rotation in Flutter
+  Future<TokenResponse?> rotateRefreshToken() async {
+    final storedRefreshToken = await _storage.read(key: 'refresh_token');
+    if (storedRefreshToken == null) return null;
+
+    final response = await _appAuth.token(
+      TokenRequest(
+        _clientId,
+        _redirectUrl,
+        issuer: _issuer,
+        grantType: 'refresh_token',
+        refreshToken: storedRefreshToken,
+      ),
+    );
+
+    if (response != null) {
+      await _storage.write(key: 'access_token', value: response.accessToken);
+      await _storage.write(key: 'refresh_token', value: response.refreshToken); // Rotated token
+    }
+    return response;
+  }`,
+    logoutCode: `  // 5. Logout & Revoke in Flutter
+  Future<void> logout() async {
+    final idToken = await _storage.read(key: 'id_token');
+    final refreshToken = await _storage.read(key: 'refresh_token');
+
+    // Revoke Refresh Token on IdP
+    if (refreshToken != null) {
+      await http.post(
+        Uri.parse('$_issuer/revoke'),
+        body: {'token': refreshToken, 'token_type_hint': 'refresh_token'},
+      );
+    }
+
+    // End Session SSO
+    await _appAuth.endSession(
+      EndSessionRequest(
+        idTokenHint: idToken,
+        postLogoutRedirectUrl: 'com.example.flutterapp://logoutredirect',
+        issuer: _issuer,
+      ),
+    );
+
+    await _storage.deleteAll();
   }`,
     callbackCode: `  Future<String?> getAccessToken() async {
     return await _storage.read(key: 'access_token');
-  }
-
-  Future<void> logout() async {
-    await _storage.deleteAll();
   }
 }`
   }

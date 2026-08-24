@@ -114,7 +114,10 @@ window.i18n = {
       sectionInstall: '1. أمر تثبيت الحزم (Dependencies)',
       sectionConfig: '2. الإعداد والتهيئة (Configuration & Setup)',
       sectionLogin: '3. بدء تسجيل الدخول عبر PKCE (Login Trigger)',
-      sectionCallback: '4. معالجة Callback والتحقق من التوكنات',
+      sectionUserinfo: '4. استعلام نقطة بيانات المستخدم (UserInfo Endpoint)',
+      sectionRefresh: '5. تجديد التوكنات وتدويرها (Refresh Token Rotation - RTR)',
+      sectionLogout: '6. تسجيل الخروج وإبطال التوكنات (Logout with Revocation - RFC 7009)',
+      sectionCallback: 'معالجة Callback وتخزين التوكنات المشفر (Token Storage)',
 
       // Tools
       toolsTitle: '🧰 أدوات المطورين ومصفوفة الأمان لـ OIDC & PKCE',
@@ -255,10 +258,13 @@ window.i18n = {
       secClientType: 'Client Type:',
       secPkceEnforcement: 'PKCE Enforcement:',
       secStorage: 'Recommended Token Storage:',
-      sectionInstall: '1. Dependencies',
+      sectionInstall: '1. Dependencies & Package Installation',
       sectionConfig: '2. Configuration & Initialization',
-      sectionLogin: '3. Execute PKCE Login Flow',
-      sectionCallback: '4. Secure Token Storage & Verification',
+      sectionLogin: '3. Execute PKCE Login Flow (S256)',
+      sectionUserinfo: '4. UserInfo Endpoint & Profile Claims',
+      sectionRefresh: '5. Refresh Token Rotation (RTR)',
+      sectionLogout: '6. Logout & Token Revocation (RFC 7009)',
+      sectionCallback: 'Callback Handler & Secure Token Storage',
 
       // Tools
       toolsTitle: '🧰 OIDC & PKCE Developer Tools & Threat Matrix',
