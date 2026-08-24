@@ -284,23 +284,45 @@ window.MobileSimulator = {
           </div>
         </div>
 
-        <!-- Center Column: Visual Phone Frame Simulator -->
+        <!-- Center Column: Photorealistic Smartphone Frame Simulator -->
         <div class="lg:col-span-4 flex justify-center">
-          <div class="relative w-[320px] h-[640px] bg-slate-950 rounded-[44px] p-3.5 shadow-2xl border-4 border-slate-700 shadow-indigo-950/40 ring-1 ring-slate-600/50 select-none">
+          <div class="relative w-[320px] h-[640px] bg-slate-900 rounded-[48px] p-3.5 shadow-2xl border-[5px] border-slate-700/90 shadow-indigo-950/60 ring-2 ring-slate-800/80 select-none">
             
+            <!-- Hardware Side Buttons: Left (Volume Up & Down) -->
+            <div class="absolute -left-[8px] top-24 w-[3px] h-9 bg-slate-600 rounded-l-md border-l border-slate-500"></div>
+            <div class="absolute -left-[8px] top-36 w-[3px] h-9 bg-slate-600 rounded-l-md border-l border-slate-500"></div>
+            
+            <!-- Hardware Side Button: Right (Power / Sleep Button) -->
+            <div class="absolute -right-[8px] top-28 w-[3px] h-14 bg-slate-600 rounded-r-md border-r border-slate-500"></div>
+
             <!-- Dynamic Island / Speaker Notch -->
-            <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-30 flex items-center justify-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800"></div>
-              <div class="w-2 h-2 rounded-full bg-indigo-950"></div>
+            <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-6 bg-black rounded-full z-30 flex items-center justify-between px-2.5 shadow-md">
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-950 border border-slate-800 flex items-center justify-center">
+                <div class="w-1 h-1 rounded-full bg-indigo-900"></div>
+              </div>
+              <div class="w-2 h-2 rounded-full bg-slate-900 border border-slate-800"></div>
             </div>
 
-            <!-- Phone Screen Content -->
-            <div id="mobile-screen-content" class="w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 rounded-[34px] overflow-hidden relative flex flex-col justify-between pt-10 pb-4 px-4 text-white">
+            <!-- Realistic Status Bar: Time & Connectivity Icons -->
+            <div class="absolute top-6 left-7 text-[10px] font-bold text-white font-mono z-30">9:41</div>
+            <div class="absolute top-6 right-7 flex items-center gap-1.5 text-[10px] text-white z-30">
+              <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+              <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M17.778 8.222c-4.296-4.296-11.26-4.296-15.556 0A1 1 0 01.808 6.808c5.076-5.077 13.308-5.077 18.384 0a1 1 0 01-1.414 1.414zM14.95 11.05a7 7 0 00-9.9 0 1 1 0 01-1.414-1.414 9 9 0 0112.728 0 1 1 0 01-1.414 1.414zm-2.829 2.828a3 3 0 00-4.242 0 1 1 0 01-1.415-1.414 5 5 0 017.072 0 1 1 0 01-1.415 1.414zM10 16a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+              <div class="w-4 h-2 rounded-sm border border-white p-0.5 flex items-center">
+                <div class="w-full h-full bg-emerald-400 rounded-2xs"></div>
+              </div>
+            </div>
+
+            <!-- Phone Screen Content with Glass Reflection -->
+            <div id="mobile-screen-content" class="w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 rounded-[36px] overflow-hidden relative flex flex-col justify-between pt-14 pb-5 px-4 text-white">
               <!-- Rendered dynamically -->
             </div>
 
+            <!-- Glass Sheen Overlay -->
+            <div class="pointer-events-none absolute inset-3.5 bg-gradient-to-tr from-transparent via-white/[0.03] to-white/[0.08] rounded-[36px]"></div>
+
             <!-- Home indicator bar -->
-            <div class="absolute bottom-5 left-1/2 -translate-x-1/2 w-28 h-1 bg-slate-600 rounded-full"></div>
+            <div class="absolute bottom-5 left-1/2 -translate-x-1/2 w-28 h-1 bg-slate-500 rounded-full z-30"></div>
           </div>
         </div>
 
