@@ -292,8 +292,39 @@ async function handleCallback() {
       redirectHandler: 'Next.js Route Handler (/api/auth/callback/oidc)'
     },
     installCmd: 'npm install next-auth@beta @auth/core',
-    configCode: `// 1. auth.ts (Next.js 14 App Router Root Configuration)
+    configCode: `// 1. auth.ts (Next.js 14 App Router: PKCE, UserInfo, Refresh Token Rotation & Logout)
 import NextAuth from 'next-auth';
+
+// Helper to refresh expired Access Token via Refresh Token Rotation (RTR)
+async function refreshAccessToken(token: any) {
+  try {
+    const response = await fetch('http://localhost:3000/mock-idp/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
+        client_secret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
+        refresh_token: token.refreshToken
+      })
+    });
+
+    const refreshedTokens = await response.json();
+    if (!response.ok) throw refreshedTokens;
+
+    return {
+      ...token,
+      accessToken: refreshedTokens.access_token,
+      idToken: refreshedTokens.id_token ?? token.idToken,
+      // Store new rotated refresh token
+      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken,
+      expiresAt: Math.floor(Date.now() / 1000 + refreshedTokens.expires_in)
+    };
+  } catch (error) {
+    console.error('Error refreshing access token:', error);
+    return { ...token, error: 'RefreshAccessTokenError' };
+  }
+}
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -301,29 +332,62 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       id: 'oidc-provider',
       name: 'Corporate OpenID Provider',
       type: 'oidc',
-      issuer: 'http://localhost:3000/mock-idp', // OIDC Issuer URL
+      issuer: 'http://localhost:3000/mock-idp', // OIDC Discovery Issuer
       clientId: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
       clientSecret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
       
-      // Enforce PKCE S256 in Authorization Code Flow
+      // 1. Enforce PKCE S256 in Authorization Code Flow
       checks: ['pkce', 'state', 'nonce'],
       
+      // 2. Request Scopes including offline_access for Refresh Tokens
       authorization: {
         params: {
           scope: 'openid profile email offline_access',
           response_type: 'code'
         }
       },
+
+      // 3. UserInfo Endpoint: Auto-fetched with Access Token
+      userinfo: 'http://localhost:3000/mock-idp/userinfo',
       profile(profile) {
         return {
           id: profile.sub,
           name: profile.name,
           email: profile.email,
-          image: profile.picture
+          image: profile.picture,
+          roles: profile.roles || ['user']
         };
       }
     }
   ],
+  callbacks: {
+    // Refresh Token Rotation (RTR) Callback
+    async jwt({ token, account, user }) {
+      // Initial sign-in: store tokens & expiration
+      if (account && user) {
+        return {
+          accessToken: account.access_token,
+          idToken: account.id_token,
+          refreshToken: account.refresh_token,
+          expiresAt: account.expires_at,
+          user
+        };
+      }
+
+      // Return token if access token has not expired yet (e.g. 1 min buffer)
+      if (Date.now() < (token.expiresAt as number) * 1000 - 60000) {
+        return token;
+      }
+
+      // Token has expired: rotate refresh token and get new access token
+      return await refreshAccessToken(token);
+    },
+    async session({ session, token }) {
+      session.user = token.user as any;
+      (session as any).error = token.error;
+      return session;
+    }
+  },
   session: { strategy: 'jwt' },
   secret: process.env.AUTH_SECRET || 'random-super-secure-jwt-secret-key'
 });`,
@@ -331,51 +395,55 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 import { handlers } from '@/auth';
 export const { GET, POST } = handlers;
 
-// 3. Triggering Login from Client or Server Component (e.g. app/page.tsx)
-import { signIn, signOut, auth } from '@/auth';
+// 3. Triggering Login from Client or Server Action (app/page.tsx)
+import { signIn, auth } from '@/auth';
 
-export default async function HomePage() {
-  const session = await auth(); // Server-side session verification!
-
-  if (session?.user) {
-    return (
-      <div className="card">
-        <h2>Welcome, {session.user.name}!</h2>
-        <p>Email: {session.user.email}</p>
-        <form action={async () => { 'use server'; await signOut(); }}>
-          <button type="submit">Sign Out</button>
-        </form>
-      </div>
-    );
-  }
+export default async function LoginPage() {
+  const session = await auth();
 
   return (
     <form action={async () => { 'use server'; await signIn('oidc-provider'); }}>
-      <button type="submit">Sign In with OIDC + PKCE</button>
+      <button type="submit" className="btn-primary">
+        Sign In with OIDC + PKCE (S256)
+      </button>
     </form>
   );
 }`,
-    callbackCode: `// 4. Server Component Session Access & API Route Protection (app/dashboard/page.tsx)
-import { auth } from '@/auth';
-import { redirect } from 'next/navigation';
+    callbackCode: `// 4. Secure Logout with Token Revocation (RFC 7009) & RP-Initiated End Session
+// app/actions/auth-actions.ts
+'use server';
 
-export default async function DashboardPage() {
-  // auth() runs exclusively on the server (Zero JS bundle overhead)
-  // Tokens are read from encrypted HttpOnly cookies - JavaScript cannot access them!
+import { auth, signOut } from '@/auth';
+
+export async function logoutWithRevoke() {
   const session = await auth();
+  const refreshToken = (session as any)?.refreshToken;
+  const idToken = (session as any)?.idToken;
 
-  if (!session) {
-    redirect('/api/auth/signin');
+  // Step 1: Revoke Refresh Token on IdP Server (RFC 7009)
+  if (refreshToken) {
+    try {
+      await fetch('http://localhost:3000/mock-idp/revoke', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          token: refreshToken,
+          token_type_hint: 'refresh_token',
+          client_id: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
+          client_secret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret'
+        })
+      });
+    } catch (e) {
+      console.error('Token revocation failed:', e);
+    }
   }
 
-  return (
-    <main className="p-6">
-      <h1 className="text-xl font-bold">Secure Dashboard (BFF Pattern)</h1>
-      <pre className="bg-slate-900 text-emerald-400 p-4 rounded-xl">
-        {JSON.stringify(session, null, 2)}
-      </pre>
-    </main>
-  );
+  // Step 2: Clear local session cookies & redirect to IdP End Session Endpoint
+  const idpLogoutUrl = new URL('http://localhost:3000/mock-idp/session/end');
+  if (idToken) idpLogoutUrl.searchParams.set('id_token_hint', idToken);
+  idpLogoutUrl.searchParams.set('post_logout_redirect_uri', 'http://localhost:3000/');
+
+  await signOut({ redirectTo: idpLogoutUrl.toString() });
 }`
   },
 
