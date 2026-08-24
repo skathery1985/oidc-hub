@@ -225,19 +225,19 @@ window.App = {
             <!-- Installation -->
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionInstall')}</label>
-              <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
+              <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.highlightCode(selected.installCmd)}</code></pre>
             </div>
 
             <!-- Configuration / Manifest -->
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionConfig')}</label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.configCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.configCode)}</code></pre>
             </div>
 
             <!-- Login Code -->
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionLogin')}</label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.loginCode)}</code></pre>
             </div>
 
             <!-- UserInfo Claims -->
@@ -246,7 +246,7 @@ window.App = {
               <label class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                 👤 ${t('sectionUserinfo')}
               </label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.userinfoCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.userinfoCode)}</code></pre>
             </div>` : ''}
 
             <!-- Token Refresh & Rotation -->
@@ -255,7 +255,7 @@ window.App = {
               <label class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                 🔄 ${t('sectionRefresh')}
               </label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.refreshCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.refreshCode)}</code></pre>
             </div>` : ''}
 
             <!-- Logout & Token Revocation -->
@@ -264,14 +264,14 @@ window.App = {
               <label class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                 🛡️ ${t('sectionLogout')}
               </label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.logoutCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.logoutCode)}</code></pre>
             </div>` : ''}
 
             <!-- Storage & Callback -->
             ${selected.callbackCode ? `
             <div class="space-y-2">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionCallback')}</label>
-              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
+              <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.callbackCode)}</code></pre>
             </div>` : ''}
 
           </div>
@@ -370,19 +370,19 @@ window.App = {
                     ${t('copyCmd')}
                   </button>
                 </div>
-                <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
+                <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-emerald-400 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.highlightCode(selected.installCmd)}</code></pre>
               </div>
 
               <!-- Configuration -->
               <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionConfig')}</label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.configCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.configCode)}</code></pre>
               </div>
 
               <!-- Login Handler -->
               <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionLogin')}</label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.loginCode)}</code></pre>
               </div>
 
               <!-- UserInfo Claims -->
@@ -391,7 +391,7 @@ window.App = {
                 <label class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                   👤 ${t('sectionUserinfo')}
                 </label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.userinfoCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-cyan-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.userinfoCode)}</code></pre>
               </div>` : ''}
 
               <!-- Token Refresh & Rotation -->
@@ -400,7 +400,7 @@ window.App = {
                 <label class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                   🔄 ${t('sectionRefresh')}
                 </label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.refreshCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.refreshCode)}</code></pre>
               </div>` : ''}
 
               <!-- Logout & Token Revocation -->
@@ -409,14 +409,14 @@ window.App = {
                 <label class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 flex items-center gap-1.5">
                   🛡️ ${t('sectionLogout')}
                 </label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.logoutCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-rose-300 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.logoutCode)}</code></pre>
               </div>` : ''}
 
               <!-- Callback Handler -->
               ${selected.callbackCode ? `
               <div class="space-y-2">
                 <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionCallback')}</label>
-                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
+                <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.callbackCode)}</code></pre>
               </div>` : ''}
 
             </div>
@@ -433,6 +433,47 @@ window.App = {
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;');
+  },
+
+  highlightCode(str) {
+    if (!str) return '';
+    const escaped = this.escapeHtml(str);
+
+    return escaped.split('\n').map(line => {
+      // 1. XML comments
+      if (line.includes('&lt;!--') && line.includes('--&gt;')) {
+        return line.replace(/(&lt;!--.*?--&gt;)/g, '<span class="code-comment">$1</span>');
+      }
+
+      // 2. Double-slash comments (avoiding URLs like http:// or https://)
+      const slashMatch = line.match(/(?<!:)\/\/.*$/);
+      if (slashMatch) {
+        const comment = slashMatch[0];
+        const idx = slashMatch.index;
+        return line.substring(0, idx) + '<span class="code-comment">' + comment + '</span>';
+      }
+
+      // 3. Hash comments (Python / YAML / Shell)
+      const hashMatch = line.match(/^(\s*)#(.*)$/);
+      if (hashMatch) {
+        return hashMatch[1] + '<span class="code-comment">#' + hashMatch[2] + '</span>';
+      }
+      const inlineHash = line.match(/\s+#.*$/);
+      if (inlineHash) {
+        const idx = inlineHash.index;
+        return line.substring(0, idx) + '<span class="code-comment">' + inlineHash[0] + '</span>';
+      }
+
+      // 4. Block comments
+      if (line.includes('/*') && line.includes('*/')) {
+        return line.replace(/(\/\*.*?\*\/)/g, '<span class="code-comment">$1</span>');
+      }
+      if (line.trim().startsWith('*') || line.trim().startsWith('/*') || line.trim().endsWith('*/')) {
+        return '<span class="code-comment">' + line + '</span>';
+      }
+
+      return line;
+    }).join('\n');
   }
 };
 
