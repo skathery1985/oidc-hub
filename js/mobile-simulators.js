@@ -440,7 +440,7 @@ window.MobileSimulator = {
             ${getAppLogo()}
           </div>
           <h2 class="text-lg font-extrabold text-white tracking-tight">${getAppTitle()}</h2>
-          <p class="text-xs text-slate-400 mt-1">Single Sign-On with PKCE</p>
+          <p class="text-xs text-slate-400 mt-1">${t('mobileSsoSubtitle')}</p>
           
           <div class="w-full mt-10 space-y-3">
             <button id="mobile-btn-login" class="w-full py-3 px-4 rounded-xl ${isFlutter ? 'bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-sky-500/25' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25'} text-white font-semibold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
@@ -469,7 +469,7 @@ window.MobileSimulator = {
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
               </div>
               <h3 class="text-sm font-bold text-white">${t('mobileAuthorizeTitle')}</h3>
-              <p class="text-[11px] text-slate-400 mt-1">Application <strong class="text-sky-300 font-mono" dir="ltr">${this.getClientId()}</strong> requests profile access.</p>
+              <p class="text-[11px] text-slate-400 mt-1">${t('mobileConsentDescPrefix')} <strong class="text-sky-300 font-mono" dir="ltr">${this.getClientId()}</strong> ${t('mobileConsentDescSuffix')}</p>
               
               <div class="mt-4 p-2 bg-indigo-950/40 rounded-lg border border-indigo-800 text-[10px] text-left text-indigo-300 font-mono" dir="ltr">
                 <div>&bull; PKCE: <span class="text-emerald-400">S256 Active</span></div>
