@@ -184,9 +184,9 @@ window.App = {
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center justify-between">
-                    <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.name}</span>
+                    <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.shortName || sdk.name}</span>
                   </div>
-                  <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" dir="ltr">${sdk.framework} &bull; <span class="text-sky-600 dark:text-sky-400 font-mono">${sdk.language}</span></div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate" dir="ltr">${sdk.framework} &bull; <span class="text-sky-600 dark:text-sky-400 font-mono">${sdk.language}</span></div>
                 </div>
               </div>
             </div>
@@ -322,10 +322,10 @@ window.App = {
                   </div>
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
-                      <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.name}</span>
+                      <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.shortName || sdk.name}</span>
                       ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold flex-shrink-0">${t('certifiedBadge')}</span>` : ''}
                     </div>
-                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-600 dark:text-indigo-400 font-mono">${sdk.language}</span></div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 truncate" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-600 dark:text-indigo-400 font-mono">${sdk.language}</span></div>
                   </div>
                 </div>
               </div>
