@@ -142,6 +142,7 @@ window.MobileSimulator = {
       this.state.step = 'exchanging';
       this.renderPhoneScreen();
 
+      try {
         let data;
         try {
           const res = await fetch('/mock-idp/token', {
