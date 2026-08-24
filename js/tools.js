@@ -27,17 +27,17 @@ window.DevTools = {
       <div class="space-y-6">
         
         <!-- Tab Navigation -->
-        <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-4">
-          <button onclick="window.DevTools.setTab('calculator')" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'calculator' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+        <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 sm:pb-4">
+          <button onclick="window.DevTools.setTab('calculator')" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'calculator' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:white'}">
             ${t('tabCalc')}
           </button>
-          <button onclick="window.DevTools.setTab('jwt')" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'jwt' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+          <button onclick="window.DevTools.setTab('jwt')" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'jwt' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:white'}">
             ${t('tabJwt')}
           </button>
-          <button onclick="window.DevTools.setTab('discovery')" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'discovery' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+          <button onclick="window.DevTools.setTab('discovery')" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'discovery' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:white'}">
             ${t('tabDisco')}
           </button>
-          <button onclick="window.DevTools.setTab('security')" class="px-4 py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'security' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+          <button onclick="window.DevTools.setTab('security')" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-semibold transition-all ${this.activeTab === 'security' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:white'}">
             ${t('tabThreat')}
           </button>
         </div>
@@ -79,7 +79,7 @@ window.DevTools = {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         <div class="lg:col-span-6 space-y-4">
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
             <div class="flex items-center justify-between mb-3">
               <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('calcVerifierLabel')}</label>
               <button onclick="document.getElementById('calc-verifier-input').value = window.PKCEEngine.generateCodeVerifier(64); window.DevTools.recalculatePkce();" class="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-semibold flex items-center gap-1">
@@ -90,12 +90,12 @@ window.DevTools = {
 
             <textarea id="calc-verifier-input" dir="ltr" rows="3" oninput="window.DevTools.recalculatePkce()" class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs font-mono text-amber-700 dark:text-amber-300 focus:outline-none focus:border-indigo-500">${window.PKCEEngine.generateCodeVerifier(64)}</textarea>
 
-            <div id="calc-verifier-validation" class="mt-2 text-xs flex items-center justify-between">
+            <div id="calc-verifier-validation" class="mt-2 text-xs flex items-center justify-between flex-wrap gap-1">
               <!-- Validation status -->
             </div>
           </div>
 
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-3">${t('calcChallengeLabel')}</h3>
             <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
               <div class="text-[11px] text-slate-500 dark:text-slate-400" dir="ltr">Formula: <code class="text-emerald-600 dark:text-emerald-400">BASE64URL(SHA256(ASCII(code_verifier)))</code></div>
@@ -107,7 +107,7 @@ window.DevTools = {
         </div>
 
         <div class="lg:col-span-6 space-y-4">
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl space-y-4">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl space-y-4">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('calcStepsTitle')}</h3>
             
             <div class="space-y-3 text-xs font-mono">
@@ -191,20 +191,20 @@ window.DevTools = {
     const t = (k) => window.i18n.t(k);
     return `
       <div class="space-y-6">
-        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
           <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-2">${t('jwtPasteLabel')}</label>
           <textarea id="jwt-input-field" dir="ltr" rows="4" oninput="window.DevTools.decodeJwtInput()" placeholder="eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..." class="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl p-3 text-xs font-mono text-cyan-700 dark:text-cyan-300 focus:outline-none focus:border-indigo-500"></textarea>
         </div>
 
         <div id="jwt-decoded-container" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div class="lg:col-span-4 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-md dark:shadow-xl">
+          <div class="lg:col-span-4 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-md dark:shadow-xl">
             <h4 class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400 mb-3">${t('jwtHeader')}</h4>
-            <pre id="jwt-header-display" class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-rose-300 overflow-x-auto" dir="ltr">Paste a token above to inspect...</pre>
+            <pre id="jwt-header-display" class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-rose-300 overflow-x-auto break-all" dir="ltr">Paste a token above to inspect...</pre>
           </div>
 
-          <div class="lg:col-span-8 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-md dark:shadow-xl">
+          <div class="lg:col-span-8 bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 shadow-md dark:shadow-xl">
             <h4 class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400 mb-3">${t('jwtPayload')}</h4>
-            <pre id="jwt-payload-display" class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-purple-300 overflow-x-auto" dir="ltr">Paste a token above to inspect...</pre>
+            <pre id="jwt-payload-display" class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-purple-300 overflow-x-auto custom-scrollbar break-all" dir="ltr">Paste a token above to inspect...</pre>
           </div>
         </div>
       </div>
@@ -218,12 +218,15 @@ window.DevTools = {
     if (!token) return;
 
     const decoded = window.PKCEEngine.decodeJwt(token);
-    const headerEl = document.getElementById('jwt-header-display');
-    const payloadEl = document.getElementById('jwt-payload-display');
+    const headerDisplay = document.getElementById('jwt-header-display');
+    const payloadDisplay = document.getElementById('jwt-payload-display');
 
-    if (decoded && headerEl && payloadEl) {
-      headerEl.textContent = JSON.stringify(decoded.header, null, 2);
-      payloadEl.textContent = JSON.stringify(decoded.payload, null, 2);
+    if (decoded) {
+      if (headerDisplay) headerDisplay.textContent = JSON.stringify(decoded.header, null, 2);
+      if (payloadDisplay) payloadDisplay.textContent = JSON.stringify(decoded.payload, null, 2);
+    } else {
+      if (headerDisplay) headerDisplay.textContent = 'Invalid JWT format';
+      if (payloadDisplay) payloadDisplay.textContent = 'Invalid JWT format';
     }
   },
 
@@ -234,76 +237,68 @@ window.DevTools = {
     const t = (k) => window.i18n.t(k);
     return `
       <div class="space-y-6">
-        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
-          <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block mb-2">${t('discoveryInputLabel')}</label>
-          <div class="flex items-center gap-2">
-            <input type="text" id="discovery-issuer-input" dir="ltr" value="http://localhost:3000/mock-idp" placeholder="https://accounts.google.com or https://your-tenant.auth0.com" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 font-mono">
-            <button onclick="window.DevTools.runDiscoveryCheck()" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all">
-              ${t('discoveryInspectBtn')}
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl space-y-4">
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 block">${t('discoInspectTitle')}</label>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <input type="text" id="disco-url-input" dir="ltr" value="${window.location.origin}/mock-idp" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs font-mono text-slate-900 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+            <button onclick="window.DevTools.inspectDiscovery()" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+              ${t('discoInspectBtn')}
             </button>
           </div>
         </div>
 
-        <div id="discovery-results" class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
-          <div class="text-xs text-slate-500 dark:text-slate-400 italic">${window.i18n.currentLang === 'ar' ? 'اضغط على زر الفحص لاختبار بيانات المزود.' : 'Click "Inspect Provider Metadata" to test the issuer.'}</div>
-        </div>
+        <div id="disco-results-area"></div>
       </div>
     `;
   },
 
-  async runDiscoveryCheck() {
-    const input = document.getElementById('discovery-issuer-input');
-    const results = document.getElementById('discovery-results');
+  async inspectDiscovery() {
+    const input = document.getElementById('disco-url-input');
+    const results = document.getElementById('disco-results-area');
     if (!input || !results) return;
 
-    results.innerHTML = `<div class="text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-2"><div class="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div> Fetching OIDC Discovery Metadata...</div>`;
+    const url = input.value.trim();
+    results.innerHTML = `<div class="p-6 text-center text-xs text-slate-500"><div class="inline-block animate-spin w-5 h-5 border-2 border-indigo-500 border-t-transparent rounded-full mb-2"></div><br>Analyzing OpenID Connect Discovery document...</div>`;
 
     try {
       let data;
-      try {
-        const res = await fetch(`/api/discovery/analyze?issuer=${encodeURIComponent(input.value.trim())}`);
+      const isMockOrLocal = url.includes('/mock-idp') || url.includes('localhost') || url.includes('github.io');
+      if (isMockOrLocal && window.VirtualOP) {
+        data = {
+          issuer: window.VirtualOP.discovery.issuer,
+          authorization_endpoint: window.VirtualOP.discovery.authorization_endpoint,
+          token_endpoint: window.VirtualOP.discovery.token_endpoint,
+          jwks_uri: window.VirtualOP.discovery.jwks_uri,
+          userinfo_endpoint: window.VirtualOP.discovery.userinfo_endpoint,
+          raw: window.VirtualOP.discovery
+        };
+      } else {
+        const res = await fetch(`/api/discovery/analyze?issuer=${encodeURIComponent(url)}`);
         data = await res.json();
-      } catch (fetchErr) {
-        if (window.VirtualOP) {
-          const meta = window.VirtualOP.getDiscoveryMetadata();
-          data = {
-            issuer: meta.issuer,
-            authorization_endpoint: meta.authorization_endpoint,
-            token_endpoint: meta.token_endpoint,
-            userinfo_endpoint: meta.userinfo_endpoint,
-            jwks_uri: meta.jwks_uri,
-            supportsS256: true,
-            raw: meta
-          };
-        } else {
-          throw fetchErr;
-        }
-      }
-
-      if (data.error) {
-        results.innerHTML = `<div class="text-xs text-rose-600 dark:text-rose-400 font-medium">${data.error}</div>`;
-        return;
       }
 
       results.innerHTML = `
-        <div class="space-y-4">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl space-y-4">
           <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
-            <span class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">PKCE Compliance Check</span>
-            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${data.supportsS256 ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-rose-50 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800'}" dir="ltr">
-              ${data.supportsS256 ? '✓ S256 PKCE Supported' : '✗ S256 PKCE Missing'}
-            </span>
+            <h4 class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              Discovery Document Endpoints
+            </h4>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-mono" dir="ltr">Valid OIDC Provider</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">Authorization Endpoint:</span> <span class="text-indigo-600 dark:text-indigo-300">${data.authorization_endpoint || 'N/A'}</span></div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">Token Endpoint:</span> <span class="text-emerald-600 dark:text-emerald-300">${data.token_endpoint || 'N/A'}</span></div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">JWKS URI:</span> <span class="text-amber-600 dark:text-amber-300">${data.jwks_uri || 'N/A'}</span></div>
-            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">UserInfo Endpoint:</span> <span class="text-cyan-600 dark:text-cyan-300">${data.userinfo_endpoint || 'N/A'}</span></div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">Issuer:</span> <span class="text-indigo-600 dark:text-indigo-300 break-all">${data.issuer}</span></div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">Auth Endpoint:</span> <span class="text-sky-600 dark:text-sky-300 break-all">${data.authorization_endpoint || 'N/A'}</span></div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">Token Endpoint:</span> <span class="text-emerald-600 dark:text-emerald-300 break-all">${data.token_endpoint || 'N/A'}</span></div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800" dir="ltr"><span class="text-slate-500 dark:text-slate-400">JWKS URI:</span> <span class="text-amber-600 dark:text-amber-300 break-all">${data.jwks_uri || 'N/A'}</span></div>
+            <div class="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 md:col-span-2" dir="ltr"><span class="text-slate-500 dark:text-slate-400">UserInfo Endpoint:</span> <span class="text-cyan-600 dark:text-cyan-300 break-all">${data.userinfo_endpoint || 'N/A'}</span></div>
           </div>
 
           <div class="mt-3">
             <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">Raw JSON Metadata</div>
-            <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-slate-200 max-h-60 overflow-y-auto custom-scrollbar" dir="ltr"><code>${JSON.stringify(data.raw, null, 2)}</code></pre>
+            <pre class="bg-slate-900 p-3 rounded-xl text-xs font-mono text-slate-200 max-h-60 overflow-y-auto custom-scrollbar break-all" dir="ltr"><code>${JSON.stringify(data.raw, null, 2)}</code></pre>
           </div>
         </div>
       `;
@@ -321,7 +316,7 @@ window.DevTools = {
       <div class="space-y-6">
         
         <!-- Why PKCE Replaced Implicit Flow -->
-        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl space-y-3">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl space-y-3">
           <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <span class="p-1 rounded bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300">⚡</span>
             ${t('whyPkceTitle')}
@@ -335,17 +330,17 @@ window.DevTools = {
         </div>
 
         <!-- Token Storage Security Comparison Table -->
-        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
           <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-4">${t('storageMatrixTitle')}</h3>
-          <div class="overflow-x-auto">
-            <table class="w-full text-start text-xs">
+          <div class="overflow-x-auto custom-scrollbar -mx-2 sm:mx-0">
+            <table class="w-full text-start text-xs min-w-[620px]">
               <thead class="bg-slate-50 dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
                 <tr>
-                  <th class="p-3">${t('tblPlatform')}</th>
-                  <th class="p-3">${t('tblStorage')}</th>
-                  <th class="p-3">${t('tblXss')}</th>
-                  <th class="p-3">${t('tblCsrf')}</th>
-                  <th class="p-3">${t('tblBestPractice')}</th>
+                  <th class="p-3 text-start">${t('tblPlatform')}</th>
+                  <th class="p-3 text-start">${t('tblStorage')}</th>
+                  <th class="p-3 text-start">${t('tblXss')}</th>
+                  <th class="p-3 text-start">${t('tblCsrf')}</th>
+                  <th class="p-3 text-start">${t('tblBestPractice')}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800/60 font-mono text-slate-700 dark:text-slate-300">

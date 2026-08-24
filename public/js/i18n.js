@@ -371,7 +371,7 @@ window.i18n = {
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       const tabKey = btn.getAttribute('data-tab');
       if (tabMap[tabKey]) {
-        btn.textContent = this.t(tabMap[tabKey]);
+        btn.innerHTML = `<span class="tab-text">${this.t(tabMap[tabKey])}</span>`;
       }
     });
 

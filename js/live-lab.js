@@ -281,11 +281,11 @@ window.LiveLab = {
             </div>
 
             <!-- Provider Mode Toggle -->
-            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 self-start md:self-auto">
-              <button onclick="window.LiveLab.setProviderMode('mock')" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all ${isMock ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
+            <div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 w-full sm:w-auto justify-center sm:justify-start">
+              <button onclick="window.LiveLab.setProviderMode('mock')" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all ${isMock ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
                 ${t('providerMock')}
               </button>
-              <button onclick="window.LiveLab.setProviderMode('custom')" class="px-4 py-2 rounded-lg text-xs font-semibold transition-all ${!isMock ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
+              <button onclick="window.LiveLab.setProviderMode('custom')" class="flex-1 sm:flex-initial px-4 py-2 rounded-lg text-xs font-semibold transition-all ${!isMock ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'}">
                 ${t('providerCustom')}
               </button>
             </div>
@@ -294,7 +294,7 @@ window.LiveLab = {
           <!-- Configuration Details Panel -->
           <div class="mt-5">
             ${isMock ? `
-              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs">
                 <div class="p-3 bg-slate-50 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800/80">
                   <div class="text-slate-500 dark:text-slate-400 uppercase tracking-wider text-[10px] font-semibold">${t('issuerUrl')}</div>
                   <div class="font-mono text-indigo-600 dark:text-indigo-400 truncate mt-0.5" dir="ltr" title="${this.state.issuer}">${this.state.issuer}</div>
@@ -314,9 +314,9 @@ window.LiveLab = {
               </div>
             ` : `
               <div class="space-y-4">
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   <input type="text" id="custom-issuer-input" dir="ltr" placeholder="https://your-tenant.auth0.com or https://keycloak/realms/myrealm" value="${this.state.issuer.startsWith('http://localhost') ? '' : this.state.issuer}" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:border-indigo-500 font-mono">
-                  <button onclick="window.LiveLab.fetchCustomDiscovery(document.getElementById('custom-issuer-input').value)" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
+                  <button onclick="window.LiveLab.fetchCustomDiscovery(document.getElementById('custom-issuer-input').value)" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     ${t('fetchDiscoveryBtn')}
                   </button>
@@ -344,16 +344,16 @@ window.LiveLab = {
         <div class="space-y-6">
 
           <!-- STEP 1: PKCE Cryptographic Parameter Generation -->
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl transition-all ${this.state.currentStep >= 1 ? 'ring-1 ring-indigo-500/30' : ''}">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl transition-all ${this.state.currentStep >= 1 ? 'ring-1 ring-indigo-500/30' : ''}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-200 dark:border-indigo-500/30">1</span>
+                <span class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold text-sm border border-indigo-200 dark:border-indigo-500/30 flex-shrink-0">1</span>
                 <div>
                   <h3 class="text-sm font-bold text-slate-900 dark:text-white">${t('step1Title')}</h3>
                   <p class="text-xs text-slate-500 dark:text-slate-400">${t('step1Desc')}</p>
                 </div>
               </div>
-              <button onclick="window.LiveLab.generateNewPkce().then(() => window.LiveLab.render())" class="px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 transition-all flex items-center gap-1.5">
+              <button onclick="window.LiveLab.generateNewPkce().then(() => window.LiveLab.render())" class="self-start sm:self-auto px-3.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 transition-all flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                 ${t('regeneratePkce')}
               </button>
@@ -361,7 +361,7 @@ window.LiveLab = {
 
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
               <!-- Code Verifier -->
-              <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div class="bg-slate-50 dark:bg-slate-950 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
                 <div class="flex items-center justify-between text-xs">
                   <span class="font-semibold text-slate-700 dark:text-slate-300">${t('verifierLabel')}</span>
                   <span class="px-2 py-0.5 rounded bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 font-mono text-[10px] border border-indigo-200 dark:border-indigo-800" dir="ltr">${this.state.verifier.length} chars (RFC 43-128)</span>
@@ -373,7 +373,7 @@ window.LiveLab = {
               </div>
 
               <!-- Code Challenge -->
-              <div class="bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+              <div class="bg-slate-50 dark:bg-slate-950 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
                 <div class="flex items-center justify-between text-xs">
                   <span class="font-semibold text-slate-700 dark:text-slate-300">${t('challengeLabel')}</span>
                   <span class="px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 font-mono text-[10px] border border-emerald-200 dark:border-emerald-800" dir="ltr">Method: S256</span>
@@ -385,17 +385,17 @@ window.LiveLab = {
               </div>
             </div>
 
-            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono text-slate-600 dark:text-slate-400">
+            <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono text-slate-600 dark:text-slate-400">
               <div class="p-2 bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-200 dark:border-slate-800/60 truncate" dir="ltr"><span class="text-slate-500 dark:text-slate-400">${t('stateLabel')}</span> <span class="text-slate-800 dark:text-slate-300">${this.state.state}</span></div>
               <div class="p-2 bg-slate-50 dark:bg-slate-950/60 rounded-lg border border-slate-200 dark:border-slate-800/60 truncate" dir="ltr"><span class="text-slate-500 dark:text-slate-400">${t('nonceLabel')}</span> <span class="text-slate-800 dark:text-slate-300">${this.state.nonce}</span></div>
             </div>
           </div>
 
           <!-- STEP 2: Build & Launch Authorization Request -->
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
             <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
               <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-sm border border-purple-200 dark:border-purple-500/30">2</span>
+                <span class="w-8 h-8 rounded-xl bg-purple-50 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-sm border border-purple-200 dark:border-purple-500/30 flex-shrink-0">2</span>
                 <div>
                   <h3 class="text-sm font-bold text-slate-900 dark:text-white">${t('step2Title')}</h3>
                   <p class="text-xs text-slate-500 dark:text-slate-400">${t('step2Desc')}</p>
@@ -404,7 +404,7 @@ window.LiveLab = {
             </div>
 
             <!-- Authorization URL Preview -->
-            <div class="mt-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+            <div class="mt-4 bg-slate-50 dark:bg-slate-950 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
               <div class="text-xs font-semibold text-slate-700 dark:text-slate-300">${t('authUrlLabel')}</div>
               <div class="p-3 bg-white dark:bg-slate-900 rounded-lg text-xs font-mono text-cyan-700 dark:text-cyan-300 break-all border border-slate-200 dark:border-slate-800 select-all leading-relaxed" dir="ltr">
                 ${this.state.authUrl}
@@ -412,38 +412,38 @@ window.LiveLab = {
             </div>
 
             <!-- Launch Options -->
-            <div class="mt-4 flex flex-wrap items-center gap-3">
-              <button onclick="window.LiveLab.launchPopupAuth()" class="py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center gap-2">
+            <div class="mt-4 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+              <button onclick="window.LiveLab.launchPopupAuth()" class="py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold text-xs rounded-xl shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                 ${t('launchPopupBtn')}
               </button>
 
-              <a href="${this.state.authUrl}" target="_blank" class="py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 transition-all flex items-center gap-2">
+              <a href="${this.state.authUrl}" target="_blank" class="py-3 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-xl border border-slate-300 dark:border-slate-700 transition-all flex items-center justify-center gap-2">
                 ${t('openNewTabBtn')}
               </a>
             </div>
           </div>
 
           <!-- STEP 3: Handle Callback & Authorization Code -->
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl ${this.state.authCode ? 'ring-1 ring-emerald-500/30' : ''}">
-            <div class="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl ${this.state.authCode ? 'ring-1 ring-emerald-500/30' : ''}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
               <div class="flex items-center gap-3">
-                <span class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm border border-amber-200 dark:border-amber-500/30">3</span>
+                <span class="w-8 h-8 rounded-xl bg-amber-50 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-sm border border-amber-200 dark:border-amber-500/30 flex-shrink-0">3</span>
                 <div>
                   <h3 class="text-sm font-bold text-slate-900 dark:text-white">${t('step3Title')}</h3>
                   <p class="text-xs text-slate-500 dark:text-slate-400">${t('step3Desc')}</p>
                 </div>
               </div>
-              <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${this.state.authCode ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">
+              <span class="self-start sm:self-auto px-2.5 py-1 rounded-full text-xs font-semibold ${this.state.authCode ? 'bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}">
                 ${this.state.authCode ? t('codeCaptured') : t('waitingForCode')}
               </span>
             </div>
 
             <div class="mt-4">
               <label class="text-xs text-slate-600 dark:text-slate-400 font-semibold uppercase tracking-wider block mb-1">${t('authCodeLabel')}</label>
-              <div class="flex items-center gap-2">
+              <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 <input type="text" id="auth-code-input" dir="ltr" value="${this.state.authCode}" placeholder="Launch Step 2 to receive code..." oninput="window.LiveLab.state.authCode = this.value;" class="flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-4 py-2.5 text-xs text-amber-700 dark:text-amber-300 font-mono focus:outline-none focus:border-indigo-500">
-                <button onclick="window.LiveLab.executeTokenExchange()" class="py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                <button onclick="window.LiveLab.executeTokenExchange()" class="py-2.5 px-5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                   ${t('exchangeBtn')}
                 </button>

@@ -258,8 +258,8 @@ window.App = {
     main.innerHTML = `
       <div class="space-y-6">
         <!-- Title banner -->
-        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl">
-          <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+        <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl">
+          <h2 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             ${categoryFilter === 'spa' ? t('spaTitle') : t('backendTitle')}
           </h2>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">
@@ -281,7 +281,7 @@ window.App = {
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center justify-between">
                       <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.name}</span>
-                      ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold">${t('certifiedBadge')}</span>` : ''}
+                      ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold flex-shrink-0">${t('certifiedBadge')}</span>` : ''}
                     </div>
                     <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-600 dark:text-indigo-400 font-mono">${sdk.language}</span></div>
                   </div>
@@ -292,23 +292,23 @@ window.App = {
 
           <!-- Right SDK Details & Blueprint Guide -->
           <div class="lg:col-span-8 space-y-6">
-            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl space-y-6">
+            <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 shadow-md dark:shadow-xl space-y-6">
               
               <!-- Header -->
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 dark:border-slate-800">
                 <div class="flex items-center gap-3.5">
-                  <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2.5 border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0">
+                  <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 sm:p-2.5 border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0">
                     ${window.BRAND_LOGOS && selected.logoKey ? window.BRAND_LOGOS[selected.logoKey] : ''}
                   </div>
                   <div>
-                    <div class="flex items-center gap-2">
-                      <h3 class="text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
                       <span class="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-full border border-indigo-200 dark:border-indigo-500/30">${selected.badge}</span>
                     </div>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${selected.description}</p>
                   </div>
                 </div>
-                <a href="${selected.github}" target="_blank" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-2 self-start transition-all">
+                <a href="${selected.github}" target="_blank" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-2 self-start sm:self-auto transition-all">
                   GitHub Repo
                 </a>
               </div>
