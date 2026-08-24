@@ -1,0 +1,687 @@
+/**
+ * Mobile AppAuth Interactive Simulators (iOS Swift, Android Kotlin, Flutter Dart & React Native)
+ * Simulates real native OAuth 2.0 / OIDC Authorization Code Flow with PKCE RFC 8252
+ */
+
+window.MobileSimulator = {
+  currentPlatform: 'flutter', // 'ios' | 'android' | 'flutter' | 'react-native'
+  state: {
+    step: 'idle', // 'idle', 'generating_pkce', 'browser_open', 'redirecting', 'exchanging', 'logged_in'
+    verifier: null,
+    challenge: null,
+    code: null,
+    tokens: null,
+    user: null
+  },
+
+  init() {
+    this.renderSimulatorFrame();
+    this.attachEventListeners();
+  },
+
+  setPlatform(platform) {
+    this.currentPlatform = platform;
+    this.reset();
+    this.renderSimulatorFrame();
+  },
+
+  reset() {
+    this.state = {
+      step: 'idle',
+      verifier: null,
+      challenge: null,
+      code: null,
+      tokens: null,
+      user: null
+    };
+    this.renderPhoneScreen();
+  },
+
+  attachEventListeners() {
+    const container = document.getElementById('mobile-simulator-root');
+    if (!container) return;
+
+    container.addEventListener('click', (e) => {
+      if (e.target.closest('#mobile-btn-login')) {
+        this.startLogin();
+      } else if (e.target.closest('#mobile-btn-consent-approve')) {
+        this.approveConsent();
+      } else if (e.target.closest('#mobile-btn-consent-cancel')) {
+        this.cancelConsent();
+      } else if (e.target.closest('#mobile-btn-logout')) {
+        this.reset();
+      }
+    });
+  },
+
+  async startLogin() {
+    this.state.step = 'generating_pkce';
+    this.renderPhoneScreen();
+
+    // 1. Generate PKCE
+    this.state.verifier = window.PKCEEngine.generateCodeVerifier(64);
+    this.state.challenge = await window.PKCEEngine.generateCodeChallenge(this.state.verifier);
+    this.state.state = window.PKCEEngine.generateRandomString(16);
+
+    const platformLabel = this.getPlatformLabel();
+    this.logStep(`[${platformLabel}] Generated PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`);
+
+    // 2. Open System Browser
+    setTimeout(() => {
+      this.state.step = 'browser_open';
+      this.renderPhoneScreen();
+    }, 400);
+  },
+
+  getRedirectScheme() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'com.example.flutterapp://oauthredirect';
+      case 'ios':
+        return 'com.example.pkceapp:/oauth2callback';
+      case 'android':
+        return 'com.example.pkceapp://oauth2callback';
+      case 'react-native':
+        return 'com.example.rnapp://oauthredirect';
+      default:
+        return 'com.example.app://oauthredirect';
+    }
+  },
+
+  getClientId() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'flutter-mobile-client';
+      case 'ios':
+        return 'ios-mobile-app';
+      case 'android':
+        return 'android-mobile-app';
+      case 'react-native':
+        return 'react-native-client';
+      default:
+        return 'mobile-app';
+    }
+  },
+
+  getPlatformLabel() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'FLUTTER / DART';
+      case 'ios':
+        return 'IOS / SWIFT';
+      case 'android':
+        return 'ANDROID / KOTLIN';
+      case 'react-native':
+        return 'REACT NATIVE';
+      default:
+        return 'MOBILE';
+    }
+  },
+
+  async approveConsent() {
+    this.state.step = 'redirecting';
+    this.renderPhoneScreen();
+
+    const mockCode = 'authcode_mob_' + Math.random().toString(36).substring(2, 12);
+    this.state.code = mockCode;
+    const redirectScheme = this.getRedirectScheme();
+    const platformLabel = this.getPlatformLabel();
+
+    this.logStep(`[${platformLabel}] User consented. System browser redirects to deep link: ${redirectScheme}?code=${mockCode}`);
+
+    setTimeout(async () => {
+      this.state.step = 'exchanging';
+      this.renderPhoneScreen();
+
+      // Real token exchange call to our mock OP with PKCE verifier!
+      try {
+        const issuer = window.location.origin + '/mock-idp';
+        const res = await fetch('/mock-idp/token', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            grant_type: 'authorization_code',
+            client_id: this.getClientId(),
+            redirect_uri: redirectScheme,
+            code: mockCode,
+            code_verifier: this.state.verifier
+          })
+        });
+
+        const data = await res.json();
+        
+        let idTokenDecoded = null;
+        if (data.id_token) {
+          idTokenDecoded = window.PKCEEngine.decodeJwt(data.id_token);
+        }
+
+        this.state.tokens = data;
+        this.state.user = idTokenDecoded ? idTokenDecoded.payload : {
+          name: 'Alex Morgan',
+          email: 'alex.morgan@corp.example.com',
+          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+          roles: ['mobile_user', 'admin']
+        };
+
+        const storageType = this.currentPlatform === 'flutter' 
+          ? 'FlutterSecureStorage (iOS Keychain & Android KeyStore)'
+          : this.currentPlatform === 'ios'
+          ? 'iOS Secure Keychain (SecItemAdd)'
+          : this.currentPlatform === 'android'
+          ? 'Android KeyStore (EncryptedSharedPreferences)'
+          : 'react-native-keychain';
+
+        this.logStep(`[${platformLabel}] Token exchange successful! Saved tokens to ${storageType}.`);
+
+        this.state.step = 'logged_in';
+        this.renderPhoneScreen();
+      } catch (err) {
+        console.error(err);
+      }
+    }, 800);
+  },
+
+  cancelConsent() {
+    this.logStep(`[${this.getPlatformLabel()}] User cancelled login.`);
+    this.reset();
+  },
+
+  logStep(msg) {
+    const consoleEl = document.getElementById('mobile-live-console');
+    if (consoleEl) {
+      const line = document.createElement('div');
+      line.className = 'text-xs font-mono py-1 border-b border-slate-800 flex items-start gap-2';
+      line.innerHTML = `<span class="text-indigo-400 font-bold">${new Date().toLocaleTimeString()}</span> <span class="text-slate-300">${msg}</span>`;
+      consoleEl.prepend(line);
+    }
+  },
+
+  renderSimulatorFrame() {
+    const root = document.getElementById('mobile-simulator-root');
+    if (!root) return;
+
+    const plat = this.currentPlatform;
+
+    root.innerHTML = `
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        
+        <!-- Left Column: Controls & Platform Switcher -->
+        <div class="lg:col-span-4 space-y-6">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Select Mobile SDK Platform</h3>
+            <div class="grid grid-cols-2 gap-2">
+              
+              <!-- Flutter Option -->
+              <button onclick="window.MobileSimulator.setPlatform('flutter')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'flutter' ? 'border-sky-500 bg-sky-500/10 text-white font-medium shadow-lg shadow-sky-500/10' : 'border-slate-800 bg-slate-800/40 text-slate-400 hover:bg-slate-800'}">
+                <svg class="w-6 h-6 text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>
+                <span class="text-xs font-semibold">Flutter (Dart)</span>
+              </button>
+
+              <!-- iOS Option -->
+              <button onclick="window.MobileSimulator.setPlatform('ios')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'ios' ? 'border-indigo-500 bg-indigo-500/10 text-white font-medium shadow-lg shadow-indigo-500/10' : 'border-slate-800 bg-slate-800/40 text-slate-400 hover:bg-slate-800'}">
+                <svg class="w-6 h-6 text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.14.65-2.73 1.35-.53.61-.98 1.68-.93 2.7.07 0 .15.01.23.01.83 0 1.81-.44 2.42-1.19z"/></svg>
+                <span class="text-xs font-semibold">iOS (Swift)</span>
+              </button>
+
+              <!-- Android Option -->
+              <button onclick="window.MobileSimulator.setPlatform('android')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'android' ? 'border-emerald-500 bg-emerald-500/10 text-white font-medium shadow-lg shadow-emerald-500/10' : 'border-slate-800 bg-slate-800/40 text-slate-400 hover:bg-slate-800'}">
+                <svg class="w-6 h-6 text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4572c.1557-.2699.0634-.6139-.2064-.7696-.2698-.1557-.6138-.0633-.7695.2064l-2.0238 3.5053c-1.3917-.635-2.9298-.9873-4.5778-.9873s-3.1861.3523-4.5778.9873L5.2984 5.3013c-.1557-.2697-.4997-.3621-.7695-.2064-.2698.1557-.3621.4997-.2064.7696l1.996 3.4572C2.7161 11.2933.2721 15.6174 0 20.6725h24c-.2721-5.0551-2.7161-9.3792-6.1185-11.3511"/></svg>
+                <span class="text-xs font-semibold">Android (Kotlin)</span>
+              </button>
+
+              <!-- React Native Option -->
+              <button onclick="window.MobileSimulator.setPlatform('react-native')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'react-native' ? 'border-cyan-500 bg-cyan-500/10 text-white font-medium shadow-lg shadow-cyan-500/10' : 'border-slate-800 bg-slate-800/40 text-slate-400 hover:bg-slate-800'}">
+                <svg class="w-6 h-6 text-cyan-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/></svg>
+                <span class="text-xs font-semibold">React Native</span>
+              </button>
+
+            </div>
+
+            <!-- Platform specs -->
+            <div class="mt-4 pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
+              <div class="flex justify-between"><span class="text-slate-400">RFC Standard:</span> <span class="font-mono text-indigo-400">RFC 8252 & RFC 7636</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">SDK / Package:</span> <span class="font-mono text-sky-400">${this.getSdkPackageName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Browser Agent:</span> <span class="font-mono text-cyan-400">${this.getBrowserAgentName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Deep Link:</span> <span class="font-mono text-amber-400 text-[11px] truncate max-w-[180px]">${this.getRedirectScheme()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Secure Storage:</span> <span class="font-mono text-emerald-400 text-[11px] truncate max-w-[180px]">${this.getStorageEngineName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Client Secret:</span> <span class="text-rose-400 font-bold">None (Public Client)</span></div>
+            </div>
+          </div>
+
+          <!-- Step Trace Log -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Execution Trace</h3>
+              <button onclick="document.getElementById('mobile-live-console').innerHTML=''" class="text-[11px] text-slate-400 hover:text-slate-200">Clear</button>
+            </div>
+            <div id="mobile-live-console" class="h-44 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
+              <div class="text-xs text-slate-400 italic">Click 'Sign in with SSO' in the mobile phone simulator to start.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center Column: Visual Phone Frame Simulator -->
+        <div class="lg:col-span-4 flex justify-center">
+          <div class="relative w-[320px] h-[640px] bg-slate-950 rounded-[44px] p-3.5 shadow-2xl border-4 border-slate-700 shadow-indigo-950/40 ring-1 ring-slate-600/50 select-none">
+            
+            <!-- Dynamic Island / Speaker Notch -->
+            <div class="absolute top-5 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-full z-30 flex items-center justify-center gap-2">
+              <div class="w-2.5 h-2.5 rounded-full bg-slate-900 border border-slate-800"></div>
+              <div class="w-2 h-2 rounded-full bg-indigo-950"></div>
+            </div>
+
+            <!-- Phone Screen Content -->
+            <div id="mobile-screen-content" class="w-full h-full bg-gradient-to-b from-slate-900 to-slate-950 rounded-[34px] overflow-hidden relative flex flex-col justify-between pt-10 pb-4 px-4">
+              <!-- Rendered dynamically -->
+            </div>
+
+            <!-- Home indicator bar -->
+            <div class="absolute bottom-5 left-1/2 -translate-x-1/2 w-28 h-1 bg-slate-600 rounded-full"></div>
+          </div>
+        </div>
+
+        <!-- Right Column: Live Code Inspector -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              Live Code (${this.getPlatformTitle()})
+            </h3>
+            <pre class="bg-slate-950 p-4 rounded-xl text-[11px] font-mono text-slate-300 overflow-x-auto border border-slate-800 h-[520px] custom-scrollbar"><code>${this.getCodeSnippet()}</code></pre>
+          </div>
+        </div>
+
+      </div>
+    `;
+
+    this.renderPhoneScreen();
+  },
+
+  getSdkPackageName() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'flutter_appauth: ^6.0.7';
+      case 'ios':
+        return 'AppAuth-iOS (SPM / CocoaPods)';
+      case 'android':
+        return 'net.openid:appauth:0.11.1';
+      case 'react-native':
+        return 'react-native-app-auth';
+      default:
+        return 'AppAuth';
+    }
+  },
+
+  getBrowserAgentName() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'ASWebAuth (iOS) & Custom Tabs (Android)';
+      case 'ios':
+        return 'ASWebAuthenticationSession';
+      case 'android':
+        return 'Chrome Custom Tabs';
+      case 'react-native':
+        return 'Native ASWebAuth / Custom Tabs Bridge';
+      default:
+        return 'System Browser';
+    }
+  },
+
+  getStorageEngineName() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'flutter_secure_storage (AES/Keychain)';
+      case 'ios':
+        return 'iOS Secure Keychain';
+      case 'android':
+        return 'EncryptedSharedPreferences (KeyStore)';
+      case 'react-native':
+        return 'react-native-keychain';
+      default:
+        return 'Secure Storage';
+    }
+  },
+
+  getPlatformTitle() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'Flutter / Dart';
+      case 'ios':
+        return 'Swift / AppAuth-iOS';
+      case 'android':
+        return 'Kotlin / AppAuth-Android';
+      case 'react-native':
+        return 'React Native / TypeScript';
+      default:
+        return 'Mobile Code';
+    }
+  },
+
+  renderPhoneScreen() {
+    const screen = document.getElementById('mobile-screen-content');
+    if (!screen) return;
+
+    const plat = this.currentPlatform;
+    const isFlutter = plat === 'flutter';
+
+    if (this.state.step === 'idle' || this.state.step === 'generating_pkce') {
+      screen.innerHTML = `
+        <div class="flex flex-col items-center justify-center flex-1 text-center px-2">
+          <div class="w-16 h-16 rounded-2xl ${isFlutter ? 'bg-gradient-to-tr from-sky-500 to-indigo-600 shadow-sky-500/30' : 'bg-gradient-to-tr from-indigo-500 to-purple-600 shadow-indigo-500/30'} flex items-center justify-center shadow-lg mb-4">
+            ${isFlutter ? `
+              <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>
+            ` : `
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+            `}
+          </div>
+          <h2 class="text-lg font-bold text-white">${isFlutter ? 'Flutter AppAuth' : 'Enterprise Mobile'}</h2>
+          <p class="text-xs text-slate-400 mt-1">Single Sign-On with PKCE</p>
+          
+          <div class="w-full mt-10 space-y-3">
+            <button id="mobile-btn-login" class="w-full py-3 px-4 rounded-xl ${isFlutter ? 'bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-sky-500/25' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25'} text-white font-semibold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+              Sign In with SSO
+            </button>
+            <div class="text-[10px] text-slate-400">Powered by ${this.getSdkPackageName()}</div>
+          </div>
+        </div>
+      `;
+    } else if (this.state.step === 'browser_open') {
+      screen.innerHTML = `
+        <!-- Simulated System Browser Modal -->
+        <div class="absolute inset-0 bg-slate-900/95 backdrop-blur-md z-20 flex flex-col p-3 animate-slide-up">
+          <!-- Browser Top URL Bar -->
+          <div class="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400">
+            <button id="mobile-btn-consent-cancel" class="text-indigo-400 font-medium">Cancel</button>
+            <div class="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-full border border-slate-800 font-mono text-[10px] text-slate-300">
+              <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
+              localhost:3000
+            </div>
+            <div class="w-8"></div>
+          </div>
+
+          <!-- Browser Consent Content -->
+          <div class="flex-1 flex flex-col justify-between py-4 text-center">
+            <div>
+              <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+              </div>
+              <h3 class="text-sm font-bold text-white">Authorize Sign-In</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Application <strong class="text-sky-300 font-mono">${this.getClientId()}</strong> requests profile access.</p>
+              
+              <div class="mt-4 p-2 bg-indigo-950/40 rounded-lg border border-indigo-800 text-[10px] text-left text-indigo-300 font-mono">
+                <div>&bull; PKCE: <span class="text-emerald-400">S256 Active</span></div>
+                <div class="truncate">&bull; Challenge: ${this.state.challenge.substring(0, 15)}...</div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <button id="mobile-btn-consent-approve" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md transition-all">
+                Approve & Continue
+              </button>
+              <button id="mobile-btn-consent-cancel" class="w-full py-2 rounded-xl bg-slate-800 text-slate-300 text-xs">
+                Deny
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    } else if (this.state.step === 'redirecting' || this.state.step === 'exchanging') {
+      screen.innerHTML = `
+        <div class="flex flex-col items-center justify-center flex-1 text-center">
+          <div class="w-12 h-12 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+          <h3 class="text-sm font-bold text-white">${this.state.step === 'redirecting' ? 'Deep Link Callback...' : 'Verifying PKCE & Exchanging Tokens...'}</h3>
+          <p class="text-[10px] text-slate-400 mt-1 font-mono break-all">${this.getRedirectScheme()}</p>
+        </div>
+      `;
+    } else if (this.state.step === 'logged_in') {
+      const user = this.state.user || {};
+      screen.innerHTML = `
+        <div class="flex flex-col h-full justify-between pt-2">
+          <div>
+            <!-- Status Pill -->
+            <div class="flex items-center justify-between mb-4">
+              <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Authenticated
+              </span>
+              <span class="text-[10px] font-mono text-sky-400">${isFlutter ? 'FlutterSecureStorage' : 'KeyStore'}</span>
+            </div>
+
+            <!-- Profile Info -->
+            <div class="flex items-center gap-3 p-3 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-md">
+              <img src="${user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" class="w-12 h-12 rounded-full object-cover border border-sky-500">
+              <div class="truncate">
+                <h3 class="text-xs font-bold text-white truncate">${user.name || 'Alex Morgan'}</h3>
+                <p class="text-[10px] text-slate-400 truncate">${user.email || 'alex.morgan@corp.example.com'}</p>
+                <div class="text-[9px] text-sky-400 font-mono mt-0.5">${user.roles ? user.roles.join(', ') : 'admin'}</div>
+              </div>
+            </div>
+
+            <!-- Secure Tokens in Keyring -->
+            <div class="mt-3 p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5 text-[10px]">
+              <div class="text-slate-400 font-semibold uppercase tracking-wider text-[9px]">${this.getStorageEngineName()}</div>
+              <div class="text-slate-300 font-mono truncate"><span class="text-slate-400">ID Token:</span> ${this.state.tokens?.id_token ? this.state.tokens.id_token.substring(0, 18) + '...' : 'jwt_rs256_valid'}</div>
+              <div class="text-slate-300 font-mono truncate"><span class="text-slate-400">Access Token:</span> ${this.state.tokens?.access_token ? this.state.tokens.access_token.substring(0, 18) + '...' : 'at_bearer_valid'}</div>
+            </div>
+          </div>
+
+          <button id="mobile-btn-logout" class="w-full py-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-medium transition-all">
+            Sign Out (Clear Storage)
+          </button>
+        </div>
+      `;
+    }
+  },
+
+  getCodeSnippet() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return this.getFlutterDartCode();
+      case 'ios':
+        return this.getIosSwiftCode();
+      case 'android':
+        return this.getAndroidKotlinCode();
+      case 'react-native':
+        return this.getReactNativeCode();
+      default:
+        return '';
+    }
+  },
+
+  getFlutterDartCode() {
+    return `// ==========================================
+// Flutter 3.x + flutter_appauth + flutter_secure_storage
+// RFC 8252 (OAuth for Native Apps) & RFC 7636 (PKCE S256)
+// ==========================================
+
+// 1. pubspec.yaml dependencies:
+// dependencies:
+//   flutter:
+//     sdk: flutter
+//   flutter_appauth: ^6.0.7
+//   flutter_secure_storage: ^9.0.0
+
+import 'package:flutter/material.dart';
+import 'package:flutter_appauth/flutter_appauth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+class AuthService {
+  final FlutterAppAuth _appAuth = const FlutterAppAuth();
+  final FlutterSecureStorage _storage = const FlutterSecureStorage();
+
+  static const String _issuer = 'http://localhost:3000/mock-idp';
+  static const String _clientId = 'flutter-mobile-client';
+  static const String _redirectUrl = 'com.example.flutterapp://oauthredirect';
+  static const List<String> _scopes = ['openid', 'profile', 'email', 'offline_access'];
+
+  /// Initiates PKCE Login with ASWebAuthenticationSession (iOS) & Chrome Custom Tabs (Android)
+  Future<AuthorizationTokenResponse?> login() async {
+    try {
+      // flutter_appauth automatically:
+      // - Queries /.well-known/openid-configuration
+      // - Generates high-entropy code_verifier
+      // - Computes S256 code_challenge
+      // - Launches secure system browser
+      // - Intercepts deep link callback
+      // - Executes POST /token with code & verifier
+      final AuthorizationTokenResponse? result = await _appAuth.authorizeAndExchangeCode(
+        AuthorizationTokenRequest(
+          _clientId,
+          _redirectUrl,
+          issuer: _issuer,
+          scopes: _scopes,
+          promptValues: ['login'],
+        ),
+      );
+
+      if (result != null) {
+        // Persist tokens securely in Hardware Keystore / Keychain
+        await _storage.write(key: 'access_token', value: result.accessToken);
+        await _storage.write(key: 'id_token', value: result.idToken);
+        await _storage.write(key: 'refresh_token', value: result.refreshToken);
+      }
+      return result;
+    } catch (e) {
+      debugPrint('Flutter PKCE Login Error: \$e');
+      return null;
+    }
+  }
+
+  /// Token Refresh using Refresh Token Rotation
+  Future<TokenResponse?> refreshToken() async {
+    final String? refreshToken = await _storage.read(key: 'refresh_token');
+    if (refreshToken == null) return null;
+
+    final TokenResponse? response = await _appAuth.token(
+      TokenRequest(
+        _clientId,
+        _redirectUrl,
+        issuer: _issuer,
+        refreshToken: refreshToken,
+        grantType: 'refresh_token',
+      ),
+    );
+
+    if (response != null) {
+      await _storage.write(key: 'access_token', value: response.accessToken);
+      if (response.refreshToken != null) {
+        await _storage.write(key: 'refresh_token', value: response.refreshToken);
+      }
+    }
+    return response;
+  }
+
+  Future<void> logout() async {
+    await _storage.deleteAll();
+  }
+}`;
+  },
+
+  getIosSwiftCode() {
+    return `// Swift 5.9 + AppAuth-iOS (RFC 8252 / RFC 7636)
+import UIKit
+import AppAuth
+import AuthenticationServices
+
+class OIDCAuthManager {
+    static let shared = OIDCAuthManager()
+    let issuer = URL(string: "http://localhost:3000/mock-idp")!
+    let clientID = "ios-mobile-app"
+    let redirectURI = URL(string: "com.example.pkceapp:/oauth2callback")!
+    
+    var authState: OIDAuthState?
+
+    func startPKCELogin(presentingVC: UIViewController) {
+        // 1. OIDC Discovery
+        OIDAuthorizationService.discoverConfiguration(forIssuer: issuer) { config, error in
+            guard let config = config else { return }
+
+            // 2. PKCE S256 Request (No client secret)
+            let request = OIDAuthorizationRequest(
+                configuration: config,
+                clientId: self.clientID,
+                clientSecret: nil, // Public client!
+                scopes: [OIDScopeOpenID, OIDScopeProfile, OIDScopeEmail],
+                redirectURL: self.redirectURI,
+                responseType: OIDResponseTypeCode,
+                additionalParameters: [
+                    "code_challenge_method": "S256"
+                ]
+            )
+
+            // 3. ASWebAuthenticationSession
+            OIDAuthState.authState(byPresenting: request, presenting: presentingVC) { state, err in
+                if let state = state {
+                    self.authState = state
+                    self.saveToKeychain(state)
+                }
+            }
+        }
+    }
+}`;
+  },
+
+  getAndroidKotlinCode() {
+    return `// Kotlin + AppAuth-Android (RFC 8252 / RFC 7636)
+package com.example.pkceapp
+
+import android.net.Uri
+import net.openid.appauth.*
+import androidx.security.crypto.EncryptedSharedPreferences
+
+class AuthRepository(private val context: Context) {
+    private val authService = AuthorizationService(context)
+    private var authState = AuthState()
+
+    fun performPKCELogin(launcher: ActivityResultLauncher<Intent>) {
+        val issuerUri = Uri.parse("http://10.0.2.2:3000/mock-idp")
+        
+        AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { config, _ ->
+            if (config == null) return@fetchFromIssuer
+
+            // 1. Build PKCE S256 Auth Request
+            val request = AuthorizationRequest.Builder(
+                config,
+                "android-mobile-app",
+                ResponseTypeValues.CODE,
+                Uri.parse("com.example.pkceapp://oauth2callback")
+            )
+            .setScopes("openid", "profile", "email")
+            .setCodeVerifier(CodeVerifierUtil.generateRandomCodeVerifier())
+            .build()
+
+            // 2. Launch Chrome Custom Tab
+            val intent = authService.getAuthorizationRequestIntent(request)
+            launcher.launch(intent)
+        }
+    }
+}`;
+  },
+
+  getReactNativeCode() {
+    return `// React Native + react-native-app-auth
+import { authorize, refresh } from 'react-native-app-auth';
+import * as Keychain from 'react-native-keychain';
+
+const oidcConfig = {
+  issuer: 'http://localhost:3000/mock-idp',
+  clientId: 'react-native-client',
+  redirectUrl: 'com.example.rnapp://oauthredirect',
+  scopes: ['openid', 'profile', 'email', 'offline_access'],
+  usePKCE: true // Enforce PKCE S256
+};
+
+export async function loginWithPkce() {
+  try {
+    const authResult = await authorize(oidcConfig);
+    await Keychain.setGenericPassword(
+      'oidc_tokens',
+      JSON.stringify(authResult)
+    );
+    return authResult;
+  } catch (error) {
+    console.error('Login Failed', error);
+  }
+}`;
+  }
+};

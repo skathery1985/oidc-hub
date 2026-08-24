@@ -1,0 +1,30 @@
+{
+  "name": "oidc-pkce-hub",
+  "version": "1.0.0",
+  "description": "Interactive OIDC Authorization Code Flow with PKCE Playground & Multi-Language Certified SDK Demos",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "oidc",
+    "pkce",
+    "oauth2",
+    "openid-connect",
+    "appauth",
+    "oidc-client-ts",
+    "authlib",
+    "spring-security",
+    "aspnetcore"
+  ],
+  "author": "Antigravity",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "jsonwebtoken": "^9.0.2",
+    "openid-client": "^6.8.7"
+  }
+}
