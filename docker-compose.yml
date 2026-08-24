@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  oidc-hub:
+    build: .
+    container_name: oidc-pkce-hub
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
