@@ -1,5 +1,6 @@
 /**
  * Main Application Orchestrator & UI Router
+ * Fully localized with Arabic (RTL) [Default] and English (LTR).
  */
 
 window.App = {
@@ -9,6 +10,8 @@ window.App = {
   eventSource: null,
 
   init() {
+    // Initialize default language (Arabic RTL)
+    window.i18n.setLanguage(window.i18n.currentLang);
     this.initSseStream();
     this.setupNavigation();
     this.renderActiveTab();
@@ -54,12 +57,18 @@ window.App = {
         this.switchTab(tab);
       });
     });
+
+    const langBtn = document.getElementById('lang-toggle-btn');
+    if (langBtn) {
+      langBtn.addEventListener('click', () => {
+        window.i18n.toggleLanguage();
+      });
+    }
   },
 
   switchTab(tab) {
     this.currentTab = tab;
     
-    // Update tab button styles
     document.querySelectorAll('.nav-tab-btn').forEach(btn => {
       const isCurrent = btn.getAttribute('data-tab') === tab;
       if (isCurrent) {
@@ -78,6 +87,8 @@ window.App = {
     const main = document.getElementById('main-content-area');
     if (!main) return;
 
+    const t = (k) => window.i18n.t(k);
+
     if (this.currentTab === 'live-lab') {
       main.innerHTML = `<div id="live-lab-root"></div>`;
       window.LiveLab.init();
@@ -86,10 +97,10 @@ window.App = {
         <div class="space-y-8">
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              📱 Mobile (iOS, Android & Flutter) AppAuth Simulators & SDKs
+              ${t('mobileSimTitle')}
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              RFC 8252 (OAuth 2.0 for Native Apps) & OpenID Foundation standard AppAuth implementations for <strong>Flutter</strong>, <strong>iOS (Swift)</strong>, <strong>Android (Kotlin)</strong>, and <strong>React Native</strong>.
+              ${t('mobileSimSubtitle')}
             </p>
           </div>
           
@@ -100,9 +111,9 @@ window.App = {
           <div class="pt-6 border-t border-slate-800">
             <div class="mb-4">
               <h3 class="text-base font-bold text-white flex items-center gap-2">
-                📦 Mobile & Cross-Platform SDK Configuration Blueprints
+                ${t('mobileBlueprintsTitle')}
               </h3>
-              <p class="text-xs text-slate-400">Complete setup, manifest permissions, deep linking, and secure keyrings for mobile platforms.</p>
+              <p class="text-xs text-slate-400">${t('mobileBlueprintsDesc')}</p>
             </div>
             <div id="mobile-catalog-cards">
               ${this.renderMobileSdkCards()}
@@ -120,10 +131,10 @@ window.App = {
         <div class="space-y-6">
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
             <h2 class="text-xl font-bold text-white flex items-center gap-2">
-              🧰 OIDC & PKCE Developer Tools & Threat Matrix
+              ${t('toolsTitle')}
             </h2>
             <p class="text-xs text-slate-400 mt-1">
-              Interactive cryptographic bitwise calculator, live JWT inspector, remote OIDC discovery analyzer, and architecture threat models.
+              ${t('toolsSubtitle')}
             </p>
           </div>
           <div id="tools-root"></div>
@@ -134,6 +145,7 @@ window.App = {
   },
 
   renderMobileSdkCards() {
+    const t = (k) => window.i18n.t(k);
     const mobileSdks = window.SDK_CATALOG.filter(s => s.category === 'mobile');
     const selected = mobileSdks.find(s => s.id === this.selectedMobileSdkId) || mobileSdks.find(s => s.id === 'mobile-flutter-appauth') || mobileSdks[0];
     this.selectedMobileSdkId = selected.id;
@@ -143,13 +155,14 @@ window.App = {
         
         <!-- Left Selector -->
         <div class="lg:col-span-4 space-y-3">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">${t('availableSdks')}</h4>
           ${mobileSdks.map(sdk => `
             <div onclick="window.App.selectedMobileSdkId = '${sdk.id}'; document.getElementById('mobile-catalog-cards').innerHTML = window.App.renderMobileSdkCards()" class="p-4 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-sky-500 bg-sky-950/30 shadow-lg shadow-sky-950/30' : 'border-slate-800 bg-slate-900/60 hover:bg-slate-900'}">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-sm text-white">${sdk.name}</span>
                 <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold">${sdk.badge}</span>
               </div>
-              <div class="text-xs text-slate-400 mt-1">${sdk.framework} &bull; <span class="text-sky-400 font-mono">${sdk.language}</span></div>
+              <div class="text-xs text-slate-400 mt-1" dir="ltr">${sdk.framework} &bull; <span class="text-sky-400 font-mono">${sdk.language}</span></div>
             </div>
           `).join('')}
         </div>
@@ -173,33 +186,33 @@ window.App = {
 
             <!-- Security Specs -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
-              <div><span class="text-slate-400">Client Type:</span> <span class="font-mono text-sky-400 font-bold">${selected.securityModel.type}</span></div>
-              <div><span class="text-slate-400">PKCE Enforcement:</span> <span class="font-mono text-emerald-400 font-bold">${selected.securityModel.pkceEnforced}</span></div>
-              <div class="col-span-2"><span class="text-slate-400">Token Storage:</span> <span class="font-mono text-amber-300">${selected.securityModel.tokenStorage}</span></div>
+              <div><span class="text-slate-400">${t('secClientType')}</span> <span class="font-mono text-sky-400 font-bold" dir="ltr">${selected.securityModel.type}</span></div>
+              <div><span class="text-slate-400">${t('secPkceEnforcement')}</span> <span class="font-mono text-emerald-400 font-bold" dir="ltr">${selected.securityModel.pkceEnforced}</span></div>
+              <div class="col-span-2"><span class="text-slate-400">${t('secStorage')}</span> <span class="font-mono text-amber-300" dir="ltr">${selected.securityModel.tokenStorage}</span></div>
             </div>
 
             <!-- Installation -->
             <div class="space-y-2">
-              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">1. Dependencies</label>
-              <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionInstall')}</label>
+              <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
             </div>
 
             <!-- Configuration / Manifest -->
             <div class="space-y-2">
-              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">2. Configuration & Platform Deep Links</label>
-              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar"><code>${this.escapeHtml(selected.configCode)}</code></pre>
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionConfig')}</label>
+              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.configCode)}</code></pre>
             </div>
 
             <!-- Login Code -->
             <div class="space-y-2">
-              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">3. Execute PKCE Login Flow</label>
-              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionLogin')}</label>
+              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
             </div>
 
             <!-- Storage & Callback -->
             <div class="space-y-2">
-              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">4. Secure Token Storage & Verification</label>
-              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
+              <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionCallback')}</label>
+              <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
             </div>
 
           </div>
@@ -213,6 +226,7 @@ window.App = {
     const main = document.getElementById('main-content-area');
     if (!main) return;
 
+    const t = (k) => window.i18n.t(k);
     const filtered = window.SDK_CATALOG.filter(s => s.category === categoryFilter);
     const selected = filtered.find(s => s.id === this.selectedSdkId) || filtered[0];
     this.selectedSdkId = selected.id;
@@ -222,12 +236,10 @@ window.App = {
         <!-- Title banner -->
         <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-xl">
           <h2 class="text-xl font-bold text-white flex items-center gap-2">
-            ${categoryFilter === 'spa' ? '🌐 Certified Single Page Application (SPA) SDKs' : '🖥️ Certified Non-SPA / Traditional Backend SDKs'}
+            ${categoryFilter === 'spa' ? t('spaTitle') : t('backendTitle')}
           </h2>
           <p class="text-xs text-slate-400 mt-1">
-            ${categoryFilter === 'spa' 
-              ? 'Public browser clients without server secrets. Enforces S256 PKCE to prevent authorization code interception.' 
-              : 'Confidential & SSR server-side clients. Uses PKCE S256 with HttpOnly secure sessions and JWKS signature verification.'}
+            ${categoryFilter === 'spa' ? t('spaSubtitle') : t('backendSubtitle')}
           </p>
         </div>
 
@@ -235,14 +247,14 @@ window.App = {
           
           <!-- Left SDK Selector Column -->
           <div class="lg:col-span-4 space-y-3">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Available Certified SDKs</h3>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">${t('availableSdks')}</h3>
             ${filtered.map(sdk => `
               <div onclick="window.App.selectedSdkId = '${sdk.id}'; window.App.renderSdkCatalogView('${categoryFilter}')" class="p-4 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-indigo-500 bg-indigo-950/30 shadow-lg shadow-indigo-950/30' : 'border-slate-800 bg-slate-900/60 hover:bg-slate-900'}">
                 <div class="flex items-center justify-between">
                   <span class="font-bold text-sm text-white">${sdk.name}</span>
-                  ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold">Certified</span>` : ''}
+                  ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold">${t('certifiedBadge')}</span>` : ''}
                 </div>
-                <div class="text-xs text-slate-400 mt-1">${sdk.framework} &bull; <span class="text-indigo-400 font-mono">${sdk.language}</span></div>
+                <div class="text-xs text-slate-400 mt-1" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-400 font-mono">${sdk.language}</span></div>
               </div>
             `).join('')}
           </div>
@@ -267,44 +279,38 @@ window.App = {
 
               <!-- Security Specs Summary -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-950 p-4 rounded-xl border border-slate-800">
-                <div><span class="text-slate-400">Client Type:</span> <span class="font-mono text-indigo-400 font-bold">${selected.securityModel.type}</span></div>
-                <div><span class="text-slate-400">PKCE Enforcement:</span> <span class="font-mono text-emerald-400 font-bold">${selected.securityModel.pkceEnforced}</span></div>
-                <div class="col-span-2"><span class="text-slate-400">Token Storage:</span> <span class="font-mono text-amber-300">${selected.securityModel.tokenStorage}</span></div>
+                <div><span class="text-slate-400">${t('secClientType')}</span> <span class="font-mono text-indigo-400 font-bold" dir="ltr">${selected.securityModel.type}</span></div>
+                <div><span class="text-slate-400">${t('secPkceEnforcement')}</span> <span class="font-mono text-emerald-400 font-bold" dir="ltr">${selected.securityModel.pkceEnforced}</span></div>
+                <div class="col-span-2"><span class="text-slate-400">${t('secStorage')}</span> <span class="font-mono text-amber-300" dir="ltr">${selected.securityModel.tokenStorage}</span></div>
               </div>
 
               <!-- Installation -->
               <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300">1. Installation Command</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionInstall')}</label>
                   <button onclick="navigator.clipboard.writeText('${selected.installCmd.replace(/`/g, '\\`').replace(/\n/g, ' ')}')" class="text-xs text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1">
-                    Copy Command
+                    ${t('copyCmd')}
                   </button>
                 </div>
-                <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
+                <pre class="bg-slate-950 p-3 rounded-xl text-xs font-mono text-emerald-300 border border-slate-800 overflow-x-auto" dir="ltr"><code>${this.escapeHtml(selected.installCmd)}</code></pre>
               </div>
 
               <!-- Configuration -->
               <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300">2. Configuration & Initialization</label>
-                </div>
-                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar"><code>${this.escapeHtml(selected.configCode)}</code></pre>
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionConfig')}</label>
+                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.configCode)}</code></pre>
               </div>
 
               <!-- Login Handler -->
               <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300">3. Trigger Login with PKCE</label>
-                </div>
-                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionLogin')}</label>
+                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.loginCode)}</code></pre>
               </div>
 
               <!-- Callback Handler -->
               <div class="space-y-2">
-                <div class="flex items-center justify-between">
-                  <label class="text-xs font-bold uppercase tracking-wider text-slate-300">4. Callback & Token Exchange</label>
-                </div>
-                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
+                <label class="text-xs font-bold uppercase tracking-wider text-slate-300">${t('sectionCallback')}</label>
+                <pre class="bg-slate-950 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-64 custom-scrollbar" dir="ltr"><code>${this.escapeHtml(selected.callbackCode)}</code></pre>
               </div>
 
             </div>

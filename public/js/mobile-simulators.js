@@ -1,10 +1,11 @@
 /**
  * Mobile AppAuth Interactive Simulators (iOS Swift, Android Kotlin, Flutter Dart & React Native)
  * Simulates real native OAuth 2.0 / OIDC Authorization Code Flow with PKCE RFC 8252
+ * Localized with Arabic (RTL) [Default] and English (LTR).
  */
 
 window.MobileSimulator = {
-  currentPlatform: 'flutter', // 'ios' | 'android' | 'flutter' | 'react-native'
+  currentPlatform: 'flutter', // 'flutter' | 'ios' | 'android' | 'react-native'
   state: {
     step: 'idle', // 'idle', 'generating_pkce', 'browser_open', 'redirecting', 'exchanging', 'logged_in'
     verifier: null,
@@ -64,7 +65,12 @@ window.MobileSimulator = {
     this.state.state = window.PKCEEngine.generateRandomString(16);
 
     const platformLabel = this.getPlatformLabel();
-    this.logStep(`[${platformLabel}] Generated PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`);
+    const isAr = window.i18n.currentLang === 'ar';
+    const msg = isAr 
+      ? `[${platformLabel}] تم توليد PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`
+      : `[${platformLabel}] Generated PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`;
+    
+    this.logStep(msg);
 
     // 2. Open System Browser
     setTimeout(() => {
@@ -126,14 +132,17 @@ window.MobileSimulator = {
     this.state.code = mockCode;
     const redirectScheme = this.getRedirectScheme();
     const platformLabel = this.getPlatformLabel();
+    const isAr = window.i18n.currentLang === 'ar';
 
-    this.logStep(`[${platformLabel}] User consented. System browser redirects to deep link: ${redirectScheme}?code=${mockCode}`);
+    const redirectMsg = isAr
+      ? `[${platformLabel}] تمت موافقة المستخدم. متصفح النظام يعيد التوجيه عبر Deep Link: ${redirectScheme}?code=${mockCode}`
+      : `[${platformLabel}] User consented. System browser redirects to deep link: ${redirectScheme}?code=${mockCode}`;
+    this.logStep(redirectMsg);
 
     setTimeout(async () => {
       this.state.step = 'exchanging';
       this.renderPhoneScreen();
 
-      // Real token exchange call to our mock OP with PKCE verifier!
       try {
         const issuer = window.location.origin + '/mock-idp';
         const res = await fetch('/mock-idp/token', {
@@ -171,7 +180,10 @@ window.MobileSimulator = {
           ? 'Android KeyStore (EncryptedSharedPreferences)'
           : 'react-native-keychain';
 
-        this.logStep(`[${platformLabel}] Token exchange successful! Saved tokens to ${storageType}.`);
+        const successMsg = isAr
+          ? `[${platformLabel}] اكتمل تبادل التوكنات بنجاح! تم حفظ التوكنات في ${storageType}.`
+          : `[${platformLabel}] Token exchange successful! Saved tokens to ${storageType}.`;
+        this.logStep(successMsg);
 
         this.state.step = 'logged_in';
         this.renderPhoneScreen();
@@ -182,7 +194,8 @@ window.MobileSimulator = {
   },
 
   cancelConsent() {
-    this.logStep(`[${this.getPlatformLabel()}] User cancelled login.`);
+    const isAr = window.i18n.currentLang === 'ar';
+    this.logStep(isAr ? `[${this.getPlatformLabel()}] قام المستخدم بإلغاء تسجيل الدخول.` : `[${this.getPlatformLabel()}] User cancelled login.`);
     this.reset();
   },
 
@@ -191,7 +204,7 @@ window.MobileSimulator = {
     if (consoleEl) {
       const line = document.createElement('div');
       line.className = 'text-xs font-mono py-1 border-b border-slate-800 flex items-start gap-2';
-      line.innerHTML = `<span class="text-indigo-400 font-bold">${new Date().toLocaleTimeString()}</span> <span class="text-slate-300">${msg}</span>`;
+      line.innerHTML = `<span class="text-indigo-400 font-bold" dir="ltr">${new Date().toLocaleTimeString()}</span> <span class="text-slate-300">${msg}</span>`;
       consoleEl.prepend(line);
     }
   },
@@ -200,6 +213,7 @@ window.MobileSimulator = {
     const root = document.getElementById('mobile-simulator-root');
     if (!root) return;
 
+    const t = (k) => window.i18n.t(k);
     const plat = this.currentPlatform;
 
     root.innerHTML = `
@@ -208,7 +222,7 @@ window.MobileSimulator = {
         <!-- Left Column: Controls & Platform Switcher -->
         <div class="lg:col-span-4 space-y-6">
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">Select Mobile SDK Platform</h3>
+            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3">${t('mobileSelectPlatform')}</h3>
             <div class="grid grid-cols-2 gap-2">
               
               <!-- Flutter Option -->
@@ -239,23 +253,23 @@ window.MobileSimulator = {
 
             <!-- Platform specs -->
             <div class="mt-4 pt-4 border-t border-slate-800 space-y-2 text-xs text-slate-300">
-              <div class="flex justify-between"><span class="text-slate-400">RFC Standard:</span> <span class="font-mono text-indigo-400">RFC 8252 & RFC 7636</span></div>
-              <div class="flex justify-between"><span class="text-slate-400">SDK / Package:</span> <span class="font-mono text-sky-400">${this.getSdkPackageName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-400">Browser Agent:</span> <span class="font-mono text-cyan-400">${this.getBrowserAgentName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-400">Deep Link:</span> <span class="font-mono text-amber-400 text-[11px] truncate max-w-[180px]">${this.getRedirectScheme()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-400">Secure Storage:</span> <span class="font-mono text-emerald-400 text-[11px] truncate max-w-[180px]">${this.getStorageEngineName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-400">Client Secret:</span> <span class="text-rose-400 font-bold">None (Public Client)</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">RFC Standard:</span> <span class="font-mono text-indigo-400" dir="ltr">RFC 8252 & RFC 7636</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">SDK / Package:</span> <span class="font-mono text-sky-400" dir="ltr">${this.getSdkPackageName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Browser Agent:</span> <span class="font-mono text-cyan-400" dir="ltr">${this.getBrowserAgentName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Deep Link:</span> <span class="font-mono text-amber-400 text-[11px] truncate max-w-[180px]" dir="ltr">${this.getRedirectScheme()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Secure Storage:</span> <span class="font-mono text-emerald-400 text-[11px] truncate max-w-[180px]" dir="ltr">${this.getStorageEngineName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Client Secret:</span> <span class="text-rose-400 font-bold" dir="ltr">None (Public Client)</span></div>
             </div>
           </div>
 
           <!-- Step Trace Log -->
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 shadow-xl">
             <div class="flex items-center justify-between mb-2">
-              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">Execution Trace</h3>
-              <button onclick="document.getElementById('mobile-live-console').innerHTML=''" class="text-[11px] text-slate-400 hover:text-slate-200">Clear</button>
+              <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-400">${t('mobileTraceTitle')}</h3>
+              <button onclick="document.getElementById('mobile-live-console').innerHTML=''" class="text-[11px] text-slate-400 hover:text-slate-200">${t('mobileClearTrace')}</button>
             </div>
             <div id="mobile-live-console" class="h-44 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
-              <div class="text-xs text-slate-400 italic">Click 'Sign in with SSO' in the mobile phone simulator to start.</div>
+              <div class="text-xs text-slate-400 italic">${t('mobileTracePlaceholder')}</div>
             </div>
           </div>
         </div>
@@ -285,9 +299,9 @@ window.MobileSimulator = {
           <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
               <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-              Live Code (${this.getPlatformTitle()})
+              ${t('mobileLiveCode')} (${this.getPlatformTitle()})
             </h3>
-            <pre class="bg-slate-950 p-4 rounded-xl text-[11px] font-mono text-slate-300 overflow-x-auto border border-slate-800 h-[520px] custom-scrollbar"><code>${this.getCodeSnippet()}</code></pre>
+            <pre class="bg-slate-950 p-4 rounded-xl text-[11px] font-mono text-slate-300 overflow-x-auto border border-slate-800 h-[520px] custom-scrollbar" dir="ltr"><code>${this.getCodeSnippet()}</code></pre>
           </div>
         </div>
 
@@ -330,7 +344,7 @@ window.MobileSimulator = {
   getStorageEngineName() {
     switch (this.currentPlatform) {
       case 'flutter':
-        return 'flutter_secure_storage (AES/Keychain)';
+        return 'FlutterSecureStorage (AES/Keychain)';
       case 'ios':
         return 'iOS Secure Keychain';
       case 'android':
@@ -361,6 +375,7 @@ window.MobileSimulator = {
     const screen = document.getElementById('mobile-screen-content');
     if (!screen) return;
 
+    const t = (k) => window.i18n.t(k);
     const plat = this.currentPlatform;
     const isFlutter = plat === 'flutter';
 
@@ -380,9 +395,9 @@ window.MobileSimulator = {
           <div class="w-full mt-10 space-y-3">
             <button id="mobile-btn-login" class="w-full py-3 px-4 rounded-xl ${isFlutter ? 'bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-sky-500/25' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25'} text-white font-semibold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-              Sign In with SSO
+              ${t('mobileSignInBtn')}
             </button>
-            <div class="text-[10px] text-slate-400">Powered by ${this.getSdkPackageName()}</div>
+            <div class="text-[10px] text-slate-400" dir="ltr">Powered by ${this.getSdkPackageName()}</div>
           </div>
         </div>
       `;
@@ -392,8 +407,8 @@ window.MobileSimulator = {
         <div class="absolute inset-0 bg-slate-900/95 backdrop-blur-md z-20 flex flex-col p-3 animate-slide-up">
           <!-- Browser Top URL Bar -->
           <div class="flex items-center justify-between pb-2 border-b border-slate-800 text-[11px] text-slate-400">
-            <button id="mobile-btn-consent-cancel" class="text-indigo-400 font-medium">Cancel</button>
-            <div class="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-full border border-slate-800 font-mono text-[10px] text-slate-300">
+            <button id="mobile-btn-consent-cancel" class="text-indigo-400 font-medium">${t('mobileDenyBtn')}</button>
+            <div class="flex items-center gap-1 bg-slate-950 px-2 py-0.5 rounded-full border border-slate-800 font-mono text-[10px] text-slate-300" dir="ltr">
               <svg class="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>
               localhost:3000
             </div>
@@ -406,10 +421,10 @@ window.MobileSimulator = {
               <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto mb-2">
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
               </div>
-              <h3 class="text-sm font-bold text-white">Authorize Sign-In</h3>
-              <p class="text-[11px] text-slate-400 mt-1">Application <strong class="text-sky-300 font-mono">${this.getClientId()}</strong> requests profile access.</p>
+              <h3 class="text-sm font-bold text-white">${t('mobileAuthorizeTitle')}</h3>
+              <p class="text-[11px] text-slate-400 mt-1">Application <strong class="text-sky-300 font-mono" dir="ltr">${this.getClientId()}</strong> requests profile access.</p>
               
-              <div class="mt-4 p-2 bg-indigo-950/40 rounded-lg border border-indigo-800 text-[10px] text-left text-indigo-300 font-mono">
+              <div class="mt-4 p-2 bg-indigo-950/40 rounded-lg border border-indigo-800 text-[10px] text-left text-indigo-300 font-mono" dir="ltr">
                 <div>&bull; PKCE: <span class="text-emerald-400">S256 Active</span></div>
                 <div class="truncate">&bull; Challenge: ${this.state.challenge.substring(0, 15)}...</div>
               </div>
@@ -417,10 +432,10 @@ window.MobileSimulator = {
 
             <div class="space-y-2">
               <button id="mobile-btn-consent-approve" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-md transition-all">
-                Approve & Continue
+                ${t('mobileApproveBtn')}
               </button>
               <button id="mobile-btn-consent-cancel" class="w-full py-2 rounded-xl bg-slate-800 text-slate-300 text-xs">
-                Deny
+                ${t('mobileDenyBtn')}
               </button>
             </div>
           </div>
@@ -430,8 +445,8 @@ window.MobileSimulator = {
       screen.innerHTML = `
         <div class="flex flex-col items-center justify-center flex-1 text-center">
           <div class="w-12 h-12 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-          <h3 class="text-sm font-bold text-white">${this.state.step === 'redirecting' ? 'Deep Link Callback...' : 'Verifying PKCE & Exchanging Tokens...'}</h3>
-          <p class="text-[10px] text-slate-400 mt-1 font-mono break-all">${this.getRedirectScheme()}</p>
+          <h3 class="text-sm font-bold text-white">${this.state.step === 'redirecting' ? t('mobileDeepLinkCallback') : t('mobileVerifyingPkce')}</h3>
+          <p class="text-[10px] text-slate-400 mt-1 font-mono break-all" dir="ltr">${this.getRedirectScheme()}</p>
         </div>
       `;
     } else if (this.state.step === 'logged_in') {
@@ -442,9 +457,9 @@ window.MobileSimulator = {
             <!-- Status Pill -->
             <div class="flex items-center justify-between mb-4">
               <span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
-                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Authenticated
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> ${t('mobileAuthenticated')}
               </span>
-              <span class="text-[10px] font-mono text-sky-400">${isFlutter ? 'FlutterSecureStorage' : 'KeyStore'}</span>
+              <span class="text-[10px] font-mono text-sky-400" dir="ltr">${isFlutter ? 'FlutterSecureStorage' : 'KeyStore'}</span>
             </div>
 
             <!-- Profile Info -->
@@ -452,21 +467,21 @@ window.MobileSimulator = {
               <img src="${user.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" class="w-12 h-12 rounded-full object-cover border border-sky-500">
               <div class="truncate">
                 <h3 class="text-xs font-bold text-white truncate">${user.name || 'Alex Morgan'}</h3>
-                <p class="text-[10px] text-slate-400 truncate">${user.email || 'alex.morgan@corp.example.com'}</p>
-                <div class="text-[9px] text-sky-400 font-mono mt-0.5">${user.roles ? user.roles.join(', ') : 'admin'}</div>
+                <p class="text-[10px] text-slate-400 truncate" dir="ltr">${user.email || 'alex.morgan@corp.example.com'}</p>
+                <div class="text-[9px] text-sky-400 font-mono mt-0.5" dir="ltr">${user.roles ? user.roles.join(', ') : 'admin'}</div>
               </div>
             </div>
 
             <!-- Secure Tokens in Keyring -->
             <div class="mt-3 p-2.5 bg-slate-950 rounded-xl border border-slate-800 space-y-1.5 text-[10px]">
               <div class="text-slate-400 font-semibold uppercase tracking-wider text-[9px]">${this.getStorageEngineName()}</div>
-              <div class="text-slate-300 font-mono truncate"><span class="text-slate-400">ID Token:</span> ${this.state.tokens?.id_token ? this.state.tokens.id_token.substring(0, 18) + '...' : 'jwt_rs256_valid'}</div>
-              <div class="text-slate-300 font-mono truncate"><span class="text-slate-400">Access Token:</span> ${this.state.tokens?.access_token ? this.state.tokens.access_token.substring(0, 18) + '...' : 'at_bearer_valid'}</div>
+              <div class="text-slate-300 font-mono truncate" dir="ltr"><span class="text-slate-400">ID Token:</span> ${this.state.tokens?.id_token ? this.state.tokens.id_token.substring(0, 18) + '...' : 'jwt_rs256_valid'}</div>
+              <div class="text-slate-300 font-mono truncate" dir="ltr"><span class="text-slate-400">Access Token:</span> ${this.state.tokens?.access_token ? this.state.tokens.access_token.substring(0, 18) + '...' : 'at_bearer_valid'}</div>
             </div>
           </div>
 
           <button id="mobile-btn-logout" class="w-full py-2.5 rounded-xl border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 text-xs font-medium transition-all">
-            Sign Out (Clear Storage)
+            ${t('mobileSignOutBtn')}
           </button>
         </div>
       `;
@@ -494,13 +509,6 @@ window.MobileSimulator = {
 // RFC 8252 (OAuth for Native Apps) & RFC 7636 (PKCE S256)
 // ==========================================
 
-// 1. pubspec.yaml dependencies:
-// dependencies:
-//   flutter:
-//     sdk: flutter
-//   flutter_appauth: ^6.0.7
-//   flutter_secure_storage: ^9.0.0
-
 import 'package:flutter/material.dart';
 import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -517,13 +525,6 @@ class AuthService {
   /// Initiates PKCE Login with ASWebAuthenticationSession (iOS) & Chrome Custom Tabs (Android)
   Future<AuthorizationTokenResponse?> login() async {
     try {
-      // flutter_appauth automatically:
-      // - Queries /.well-known/openid-configuration
-      // - Generates high-entropy code_verifier
-      // - Computes S256 code_challenge
-      // - Launches secure system browser
-      // - Intercepts deep link callback
-      // - Executes POST /token with code & verifier
       final AuthorizationTokenResponse? result = await _appAuth.authorizeAndExchangeCode(
         AuthorizationTokenRequest(
           _clientId,
@@ -592,11 +593,9 @@ class OIDCAuthManager {
     var authState: OIDAuthState?
 
     func startPKCELogin(presentingVC: UIViewController) {
-        // 1. OIDC Discovery
         OIDAuthorizationService.discoverConfiguration(forIssuer: issuer) { config, error in
             guard let config = config else { return }
 
-            // 2. PKCE S256 Request (No client secret)
             let request = OIDAuthorizationRequest(
                 configuration: config,
                 clientId: self.clientID,
@@ -609,7 +608,6 @@ class OIDCAuthManager {
                 ]
             )
 
-            // 3. ASWebAuthenticationSession
             OIDAuthState.authState(byPresenting: request, presenting: presentingVC) { state, err in
                 if let state = state {
                     self.authState = state
@@ -639,7 +637,6 @@ class AuthRepository(private val context: Context) {
         AuthorizationServiceConfiguration.fetchFromIssuer(issuerUri) { config, _ ->
             if (config == null) return@fetchFromIssuer
 
-            // 1. Build PKCE S256 Auth Request
             val request = AuthorizationRequest.Builder(
                 config,
                 "android-mobile-app",
@@ -650,7 +647,6 @@ class AuthRepository(private val context: Context) {
             .setCodeVerifier(CodeVerifierUtil.generateRandomCodeVerifier())
             .build()
 
-            // 2. Launch Chrome Custom Tab
             val intent = authService.getAuthorizationRequestIntent(request)
             launcher.launch(intent)
         }
