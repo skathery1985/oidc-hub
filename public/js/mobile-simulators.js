@@ -236,27 +236,27 @@ window.MobileSimulator = {
             <div class="grid grid-cols-2 gap-2">
               
               <!-- Flutter Option -->
-              <button onclick="window.MobileSimulator.setPlatform('flutter')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'flutter' ? 'border-sky-500 bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-white font-medium shadow-md shadow-sky-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <svg class="w-6 h-6 text-sky-500 dark:text-sky-400" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>
-                <span class="text-xs font-semibold">Flutter (Dart)</span>
+              <button onclick="window.MobileSimulator.setPlatform('flutter')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'flutter' ? 'border-sky-500 bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-white font-medium shadow-md shadow-sky-500/10 ring-2 ring-sky-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.flutter : '<svg class="w-8 h-8 text-sky-500" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>'}
+                <span class="text-xs font-bold">Flutter (Dart)</span>
               </button>
 
               <!-- iOS Option -->
-              <button onclick="window.MobileSimulator.setPlatform('ios')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'ios' ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-white font-medium shadow-md shadow-indigo-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <svg class="w-6 h-6 text-indigo-500 dark:text-indigo-400" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.14.65-2.73 1.35-.53.61-.98 1.68-.93 2.7.07 0 .15.01.23.01.83 0 1.81-.44 2.42-1.19z"/></svg>
-                <span class="text-xs font-semibold">iOS (Swift)</span>
+              <button onclick="window.MobileSimulator.setPlatform('ios')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'ios' ? 'border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-medium shadow-md ring-2 ring-slate-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.ios : '<svg class="w-8 h-8 text-slate-800 dark:text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.14.65-2.73 1.35-.53.61-.98 1.68-.93 2.7.07 0 .15.01.23.01.83 0 1.81-.44 2.42-1.19z"/></svg>'}
+                <span class="text-xs font-bold">iOS (Swift)</span>
               </button>
 
               <!-- Android Option -->
-              <button onclick="window.MobileSimulator.setPlatform('android')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'android' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-white font-medium shadow-md shadow-emerald-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <svg class="w-6 h-6 text-emerald-500 dark:text-emerald-400" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4572c.1557-.2699.0634-.6139-.2064-.7696-.2698-.1557-.6138-.0633-.7695.2064l-2.0238 3.5053c-1.3917-.635-2.9298-.9873-4.5778-.9873s-3.1861.3523-4.5778.9873L5.2984 5.3013c-.1557-.2697-.4997-.3621-.7695-.2064-.2698.1557-.3621.4997-.2064.7696l1.996 3.4572C2.7161 11.2933.2721 15.6174 0 20.6725h24c-.2721-5.0551-2.7161-9.3792-6.1185-11.3511"/></svg>
-                <span class="text-xs font-semibold">Android (Kotlin)</span>
+              <button onclick="window.MobileSimulator.setPlatform('android')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'android' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-white font-medium shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.android : '<svg class="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4572c.1557-.2699.0634-.6139-.2064-.7696-.2698-.1557-.6138-.0633-.7695.2064l-2.0238 3.5053c-1.3917-.635-2.9298-.9873-4.5778-.9873s-3.1861.3523-4.5778.9873L5.2984 5.3013c-.1557-.2697-.4997-.3621-.7695-.2064-.2698.1557-.3621.4997-.2064.7696l1.996 3.4572C2.7161 11.2933.2721 15.6174 0 20.6725h24c-.2721-5.0551-2.7161-9.3792-6.1185-11.3511"/></svg>'}
+                <span class="text-xs font-bold">Android (Kotlin)</span>
               </button>
 
               <!-- React Native Option -->
-              <button onclick="window.MobileSimulator.setPlatform('react-native')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'react-native' ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-white font-medium shadow-md shadow-cyan-500/10' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                <svg class="w-6 h-6 text-cyan-500 dark:text-cyan-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/></svg>
-                <span class="text-xs font-semibold">React Native</span>
+              <button onclick="window.MobileSimulator.setPlatform('react-native')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'react-native' ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-white font-medium shadow-md shadow-cyan-500/10 ring-2 ring-cyan-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
+                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.react : '<svg class="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/></svg>'}
+                <span class="text-xs font-bold">React Native</span>
               </button>
 
             </div>
@@ -390,16 +390,33 @@ window.MobileSimulator = {
     const isFlutter = plat === 'flutter';
 
     if (this.state.step === 'idle' || this.state.step === 'generating_pkce') {
+      const getAppLogo = () => {
+        if (!window.BRAND_LOGOS) return '';
+        switch (plat) {
+          case 'flutter': return window.BRAND_LOGOS.flutter;
+          case 'ios': return window.BRAND_LOGOS.ios;
+          case 'android': return window.BRAND_LOGOS.android;
+          case 'react-native': return window.BRAND_LOGOS.react;
+          default: return '';
+        }
+      };
+
+      const getAppTitle = () => {
+        switch (plat) {
+          case 'flutter': return 'Flutter AppAuth';
+          case 'ios': return 'iOS Swift AppAuth';
+          case 'android': return 'Android AppAuth';
+          case 'react-native': return 'React Native Auth';
+          default: return 'Enterprise Mobile';
+        }
+      };
+
       screen.innerHTML = `
         <div class="flex flex-col items-center justify-center flex-1 text-center px-2">
-          <div class="w-16 h-16 rounded-2xl ${isFlutter ? 'bg-gradient-to-tr from-sky-500 to-indigo-600 shadow-sky-500/30' : 'bg-gradient-to-tr from-indigo-500 to-purple-600 shadow-indigo-500/30'} flex items-center justify-center shadow-lg mb-4">
-            ${isFlutter ? `
-              <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>
-            ` : `
-              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            `}
+          <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl flex items-center justify-center shadow-indigo-950/50 mb-4 p-3 ring-1 ring-slate-600/50">
+            ${getAppLogo()}
           </div>
-          <h2 class="text-lg font-bold text-white">${isFlutter ? 'Flutter AppAuth' : 'Enterprise Mobile'}</h2>
+          <h2 class="text-lg font-extrabold text-white tracking-tight">${getAppTitle()}</h2>
           <p class="text-xs text-slate-400 mt-1">Single Sign-On with PKCE</p>
           
           <div class="w-full mt-10 space-y-3">
@@ -407,7 +424,7 @@ window.MobileSimulator = {
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
               ${t('mobileSignInBtn')}
             </button>
-            <div class="text-[10px] text-slate-400" dir="ltr">Powered by ${this.getSdkPackageName()}</div>
+            <div class="text-[10px] text-slate-400 font-mono" dir="ltr">Powered by ${this.getSdkPackageName()}</div>
           </div>
         </div>
       `;

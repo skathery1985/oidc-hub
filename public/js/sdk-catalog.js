@@ -3,6 +3,19 @@
  * Covers OpenID Foundation Certified libraries across SPA, Non-SPA, iOS, Android, and Cross-Platform.
  */
 
+window.BRAND_LOGOS = {
+  flutter: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z" fill="#02569B"/><path d="M11.694 21.612L15.378 24h7.308l-6.314-6.394-6.372 4.006z" fill="#0175C2"/><path d="M8.01 17.91l3.684 3.702 3.68-3.682-3.68-3.702-3.684 3.682z" fill="#29B6F6"/></svg>`,
+  ios: `<svg class="w-8 h-8 flex-shrink-0 text-slate-800 dark:text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.14.65-2.73 1.35-.53.61-.98 1.68-.93 2.7.07 0 .15.01.23.01.83 0 1.81-.44 2.42-1.19z"/></svg>`,
+  android: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4572c.1557-.2699.0634-.6139-.2064-.7696-.2698-.1557-.6138-.0633-.7695.2064l-2.0238 3.5053c-1.3917-.635-2.9298-.9873-4.5778-.9873s-3.1861.3523-4.5778.9873L5.2984 5.3013c-.1557-.2697-.4997-.3621-.7695-.2064-.2698.1557-.3621.4997-.2064.7696l1.996 3.4572C2.7161 11.2933.2721 15.6174 0 20.6725h24c-.2721-5.0551-2.7161-9.3792-6.1185-11.3511"/></svg>`,
+  react: `<svg class="w-8 h-8 flex-shrink-0" viewBox="-11.5 -10.23174 23 20.46348"><circle cx="0" cy="0" r="2.05" fill="#61DAFB"/><g stroke="#61DAFB" stroke-width="1" fill="none"><ellipse rx="11" ry="4.2"/><ellipse rx="11" ry="4.2" transform="rotate(60)"/><ellipse rx="11" ry="4.2" transform="rotate(120)"/></g></svg>`,
+  nodejs: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#339933"><path d="M12 0L1.5 6v12L12 24l10.5-6V6L12 0zm-1.12 18.37c-3.18 0-4.88-1.55-4.88-4.42 0-2.85 1.7-4.42 4.88-4.42 3.16 0 4.86 1.57 4.86 4.42 0 2.87-1.7 4.42-4.86 4.42z"/></svg>`,
+  python: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24"><path d="M11.91 0C5.55 0 5.92 2.76 5.92 2.76l.01 2.86h6.08v.86H3.59S0 6.08 0 12.48c0 6.4 3.13 6.18 3.13 6.18h1.87v-2.62s-.1-3.13 3.08-3.13h5.27s2.96.05 2.96-2.88V3.03S16.78 0 11.91 0zm-3.28 1.9a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1z" fill="#3776AB"/><path d="M12.09 24c6.36 0 5.99-2.76 5.99-2.76l-.01-2.86H12v-.86h8.42s3.59.4 3.59-6c0-6.4-3.13-6.18-3.13-6.18h-1.87v2.62s.1 3.13-3.08 3.13H10.66s-2.96-.05-2.96 2.88v7.02s-.47 3.03 4.39 3.03zm3.28-1.9a1.05 1.05 0 1 1 0-2.1 1.05 1.05 0 0 1 0 2.1z" fill="#FFD43B"/></svg>`,
+  spring: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#6DB33F"><path d="M21.57 14.73c-.92 2.65-2.84 4.79-5.38 6.01-1.3.62-2.71.95-4.14.96-5.84 0-10.59-4.75-10.59-10.59 0-3.32 1.54-6.39 4.14-8.38 1.48-1.13 3.25-1.83 5.12-2.02.47-.05.95-.08 1.43-.08 5.84 0 10.59 4.75 10.59 10.59 0 1.23-.21 2.45-.63 3.61-.17.47-.38.92-.63 1.34l-.01.02c.03-.02.06-.04.1-.06.01 0 .02-.01.03-.01.21-.11.39-.28.51-.48.24-.4.27-.89.09-1.32-.17-.4-.52-.7-.94-.8-.42-.1-.87-.01-1.21.23-.35.25-.56.65-.56 1.08 0 .2.05.4.14.58.18.37.52.63.92.73.4.1.82.02 1.15-.22.34-.24.55-.62.58-1.03.03-.41-.12-.81-.41-1.1-.3-.29-.71-.44-1.13-.41-.41.03-.79.23-1.04.56-.25.33-.33.75-.22 1.16.11.41.39.74.77.92.38.17.81.16 1.18-.04.38-.19.64-.54.71-.96.07-.42-.06-.85-.35-1.16-.29-.31-.7-.47-1.13-.44-.43.03-.82.25-1.07.6-.25.35-.32.79-.19 1.21.13.42.43.75.83.9.4.15.84.11 1.2-.11.36-.22.59-.6.63-1.02.04-.42-.11-.84-.42-1.13-.31-.29-.73-.43-1.15-.38z"/></svg>`,
+  dotnet: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#512BD4"><path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0zm7.84 15.65h-2.11l-3.32-5.46v5.46h-2.22V8.35h2.16l3.27 5.37V8.35h2.22zm-9.36 0H4.16V8.35h6.32v1.94H6.38v1.64h3.69v1.89H6.38v1.83h4.1z"/></svg>`,
+  go: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#00ADD8"><path d="M1.811 10.231c.427 0 .859.102 1.246.331l2.457 1.418a2.531 2.531 0 0 1 1.266 2.193v2.836c0 .907-.484 1.745-1.266 2.197L3.057 20.62a2.536 2.536 0 0 1-2.512 0L.088 20.354A.824.824 0 0 1 0 19.64V11.05c0-.455.368-.824.824-.824l.987.005zm14.12 3.66a2.766 2.766 0 0 1 2.378-1.378c1.536 0 2.78 1.246 2.78 2.78v.22h-5.558v-.22c0-.528.146-1.02.4-1.402zm8.069 1.402c0-3.082-2.5-5.578-5.578-5.578a5.58 5.58 0 0 0-5.578 5.578c0 3.082 2.5 5.578 5.578 5.578a5.55 5.55 0 0 0 4.14-1.848l-1.92-1.532a3.15 3.15 0 0 1-2.22.98 3.19 3.19 0 0 1-3.178-2.778h8.758v-.4z"/></svg>`,
+  js: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#F7DF1E"/><path d="M6.5 17.5c0 1.5 1 2.5 2.5 2.5 1.7 0 2.5-1 2.5-2.5V11H9.8v6.5c0 .6-.3.9-.8.9s-.8-.3-.8-.9V14H6.5v3.5zm7.3 1.2c.8.8 1.9 1.3 3.2 1.3 2 0 3.3-1 3.3-2.7 0-1.6-1-2.2-2.5-2.8l-.5-.2c-.8-.3-1.2-.6-1.2-1.2 0-.6.5-1 1.2-1 .7 0 1.3.3 1.8.8l1.2-1.2c-.8-.8-1.8-1.2-3-1.2-2 0-3.1 1.2-3.1 2.6 0 1.5.9 2.2 2.3 2.8l.5.2c.9.4 1.4.7 1.4 1.3 0 .7-.6 1.1-1.4 1.1-.9 0-1.6-.4-2.2-1.1l-1.1 1.2z" fill="#000"/></svg>`
+};
+
 window.SDK_CATALOG = [
   // =========================================================================
   // 1. SPA - Single Page Applications
@@ -10,6 +23,7 @@ window.SDK_CATALOG = [
   {
     id: 'spa-oidc-client-ts',
     category: 'spa',
+    logoKey: 'react',
     name: 'oidc-client-ts (React / TS / Vue)',
     certified: true,
     certificationName: 'OpenID Certified (JavaScript)',
@@ -122,6 +136,7 @@ export default function App() {
   {
     id: 'spa-vanilla-crypto',
     category: 'spa',
+    logoKey: 'js',
     name: 'Vanilla JS (Zero-Dependency Web Crypto PKCE)',
     certified: true,
     certificationName: 'Pure RFC 7636 Web Standards',
@@ -240,6 +255,7 @@ async function handleCallback() {
   {
     id: 'backend-node-openid-client',
     category: 'non-spa',
+    logoKey: 'nodejs',
     name: 'Node.js / Express (openid-client)',
     certified: true,
     certificationName: 'OpenID Certified (Node.js)',
@@ -354,6 +370,7 @@ app.get('/auth/callback', async (req, res) => {
   {
     id: 'backend-python-authlib',
     category: 'non-spa',
+    logoKey: 'python',
     name: 'Python (Authlib / FastAPI / Flask)',
     certified: true,
     certificationName: 'OpenID Certified (Python)',
@@ -432,6 +449,7 @@ async def profile(request: Request):
   {
     id: 'backend-java-spring',
     category: 'non-spa',
+    logoKey: 'spring',
     name: 'Java (Spring Boot 3 / Spring Security)',
     certified: true,
     certificationName: 'OpenID Certified (Java)',
@@ -535,6 +553,7 @@ public class UserController {
   {
     id: 'backend-dotnet-aspnetcore',
     category: 'non-spa',
+    logoKey: 'dotnet',
     name: 'C# / .NET 8 (Microsoft.AspNetCore.Authentication.OpenIdConnect)',
     certified: true,
     certificationName: 'OpenID Certified (.NET)',
@@ -624,6 +643,7 @@ app.Run();`
   {
     id: 'backend-go-oidc',
     category: 'non-spa',
+    logoKey: 'go',
     name: 'Go (coreos/go-oidc & golang.org/x/oauth2)',
     certified: true,
     certificationName: 'OpenID Certified (Go)',
@@ -745,6 +765,7 @@ func handleLogin(w http.ResponseWriter, r *http.Request) {
   {
     id: 'mobile-ios-appauth',
     category: 'mobile',
+    logoKey: 'ios',
     name: 'iOS (Swift & AppAuth-iOS)',
     certified: true,
     certificationName: 'OpenID Certified Foundation SDK',
@@ -860,6 +881,7 @@ func saveAuthStateToKeychain(_ authState: OIDAuthState) {
   {
     id: 'mobile-android-appauth',
     category: 'mobile',
+    logoKey: 'android',
     name: 'Android (Kotlin & AppAuth-Android)',
     certified: true,
     certificationName: 'OpenID Certified Foundation SDK',
@@ -1002,6 +1024,7 @@ class MainActivity : ComponentActivity() {
   {
     id: 'mobile-react-native-appauth',
     category: 'mobile',
+    logoKey: 'react',
     name: 'React Native (react-native-app-auth)',
     certified: true,
     certificationName: 'AppAuth Native Bridge',
@@ -1062,6 +1085,7 @@ const oidcConfig = {
   {
     id: 'mobile-flutter-appauth',
     category: 'mobile',
+    logoKey: 'flutter',
     name: 'Flutter (flutter_appauth)',
     certified: true,
     certificationName: 'AppAuth Flutter Plugin',

@@ -170,12 +170,18 @@ window.App = {
         <div class="lg:col-span-4 space-y-3">
           <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">${t('availableSdks')}</h4>
           ${mobileSdks.map(sdk => `
-            <div onclick="window.App.selectedMobileSdkId = '${sdk.id}'; document.getElementById('mobile-catalog-cards').innerHTML = window.App.renderMobileSdkCards()" class="p-4 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/30 shadow-md shadow-sky-500/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900'}">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-sm text-slate-900 dark:text-white">${sdk.name}</span>
-                <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold">${sdk.badge}</span>
+            <div onclick="window.App.selectedMobileSdkId = '${sdk.id}'; document.getElementById('mobile-catalog-cards').innerHTML = window.App.renderMobileSdkCards()" class="p-3.5 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-sky-500 bg-sky-50 dark:bg-sky-950/30 shadow-md shadow-sky-500/10 ring-1 ring-sky-500/30' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900'}">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 flex-shrink-0">
+                  ${window.BRAND_LOGOS && sdk.logoKey ? window.BRAND_LOGOS[sdk.logoKey] : ''}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.name}</span>
+                  </div>
+                  <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" dir="ltr">${sdk.framework} &bull; <span class="text-sky-600 dark:text-sky-400 font-mono">${sdk.language}</span></div>
+                </div>
               </div>
-              <div class="text-xs text-slate-500 dark:text-slate-400 mt-1" dir="ltr">${sdk.framework} &bull; <span class="text-sky-600 dark:text-sky-400 font-mono">${sdk.language}</span></div>
             </div>
           `).join('')}
         </div>
@@ -185,12 +191,17 @@ window.App = {
           <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-md dark:shadow-xl space-y-6">
             
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 dark:border-slate-800">
-              <div>
-                <div class="flex items-center gap-2">
-                  <h3 class="text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
-                  <span class="px-2.5 py-0.5 bg-sky-50 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-semibold rounded-full border border-sky-200 dark:border-sky-500/30">${selected.badge}</span>
+              <div class="flex items-center gap-3.5">
+                <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2.5 border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0">
+                  ${window.BRAND_LOGOS && selected.logoKey ? window.BRAND_LOGOS[selected.logoKey] : ''}
                 </div>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${selected.description}</p>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
+                    <span class="px-2.5 py-0.5 bg-sky-50 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 text-xs font-semibold rounded-full border border-sky-200 dark:border-sky-500/30">${selected.badge}</span>
+                  </div>
+                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${selected.description}</p>
+                </div>
               </div>
               <a href="${selected.github}" target="_blank" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-2 self-start transition-all">
                 GitHub Repo
@@ -262,12 +273,19 @@ window.App = {
           <div class="lg:col-span-4 space-y-3">
             <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">${t('availableSdks')}</h3>
             ${filtered.map(sdk => `
-              <div onclick="window.App.selectedSdkId = '${sdk.id}'; window.App.renderSdkCatalogView('${categoryFilter}')" class="p-4 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 shadow-md shadow-indigo-500/10' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900'}">
-                <div class="flex items-center justify-between">
-                  <span class="font-bold text-sm text-slate-900 dark:text-white">${sdk.name}</span>
-                  ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold">${t('certifiedBadge')}</span>` : ''}
+              <div onclick="window.App.selectedSdkId = '${sdk.id}'; window.App.renderSdkCatalogView('${categoryFilter}')" class="p-3.5 rounded-2xl border cursor-pointer transition-all ${sdk.id === selected.id ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950/30 shadow-md shadow-indigo-500/10 ring-1 ring-indigo-500/30' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-900'}">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2 border border-slate-200 dark:border-slate-700 flex-shrink-0">
+                    ${window.BRAND_LOGOS && sdk.logoKey ? window.BRAND_LOGOS[sdk.logoKey] : ''}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-sm text-slate-900 dark:text-white truncate">${sdk.name}</span>
+                      ${sdk.certified ? `<span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold">${t('certifiedBadge')}</span>` : ''}
+                    </div>
+                    <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-600 dark:text-indigo-400 font-mono">${sdk.language}</span></div>
+                  </div>
                 </div>
-                <div class="text-xs text-slate-500 dark:text-slate-400 mt-1" dir="ltr">${sdk.framework} &bull; <span class="text-indigo-600 dark:text-indigo-400 font-mono">${sdk.language}</span></div>
               </div>
             `).join('')}
           </div>
@@ -278,12 +296,17 @@ window.App = {
               
               <!-- Header -->
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 dark:border-slate-800">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <h3 class="text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
-                    <span class="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-full border border-indigo-200 dark:border-indigo-500/30">${selected.badge}</span>
+                <div class="flex items-center gap-3.5">
+                  <div class="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center p-2.5 border border-slate-200 dark:border-slate-700 shadow-sm flex-shrink-0">
+                    ${window.BRAND_LOGOS && selected.logoKey ? window.BRAND_LOGOS[selected.logoKey] : ''}
                   </div>
-                  <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${selected.description}</p>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-lg font-bold text-slate-900 dark:text-white">${selected.name}</h3>
+                      <span class="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 text-xs font-semibold rounded-full border border-indigo-200 dark:border-indigo-500/30">${selected.badge}</span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">${selected.description}</p>
+                  </div>
                 </div>
                 <a href="${selected.github}" target="_blank" class="px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs rounded-xl border border-slate-300 dark:border-slate-700 flex items-center gap-2 self-start transition-all">
                   GitHub Repo
