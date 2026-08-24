@@ -13,7 +13,8 @@ window.BRAND_LOGOS = {
   spring: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#6DB33F"><path d="M21.57 14.73c-.92 2.65-2.84 4.79-5.38 6.01-1.3.62-2.71.95-4.14.96-5.84 0-10.59-4.75-10.59-10.59 0-3.32 1.54-6.39 4.14-8.38 1.48-1.13 3.25-1.83 5.12-2.02.47-.05.95-.08 1.43-.08 5.84 0 10.59 4.75 10.59 10.59 0 1.23-.21 2.45-.63 3.61-.17.47-.38.92-.63 1.34l-.01.02c.03-.02.06-.04.1-.06.01 0 .02-.01.03-.01.21-.11.39-.28.51-.48.24-.4.27-.89.09-1.32-.17-.4-.52-.7-.94-.8-.42-.1-.87-.01-1.21.23-.35.25-.56.65-.56 1.08 0 .2.05.4.14.58.18.37.52.63.92.73.4.1.82.02 1.15-.22.34-.24.55-.62.58-1.03.03-.41-.12-.81-.41-1.1-.3-.29-.71-.44-1.13-.41-.41.03-.79.23-1.04.56-.25.33-.33.75-.22 1.16.11.41.39.74.77.92.38.17.81.16 1.18-.04.38-.19.64-.54.71-.96.07-.42-.06-.85-.35-1.16-.29-.31-.7-.47-1.13-.44-.43.03-.82.25-1.07.6-.25.35-.32.79-.19 1.21.13.42.43.75.83.9.4.15.84.11 1.2-.11.36-.22.59-.6.63-1.02.04-.42-.11-.84-.42-1.13-.31-.29-.73-.43-1.15-.38z"/></svg>`,
   dotnet: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#512BD4"><path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0zm7.84 15.65h-2.11l-3.32-5.46v5.46h-2.22V8.35h2.16l3.27 5.37V8.35h2.22zm-9.36 0H4.16V8.35h6.32v1.94H6.38v1.64h3.69v1.89H6.38v1.83h4.1z"/></svg>`,
   go: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#00ADD8"><path d="M1.811 10.231c.427 0 .859.102 1.246.331l2.457 1.418a2.531 2.531 0 0 1 1.266 2.193v2.836c0 .907-.484 1.745-1.266 2.197L3.057 20.62a2.536 2.536 0 0 1-2.512 0L.088 20.354A.824.824 0 0 1 0 19.64V11.05c0-.455.368-.824.824-.824l.987.005zm14.12 3.66a2.766 2.766 0 0 1 2.378-1.378c1.536 0 2.78 1.246 2.78 2.78v.22h-5.558v-.22c0-.528.146-1.02.4-1.402zm8.069 1.402c0-3.082-2.5-5.578-5.578-5.578a5.58 5.58 0 0 0-5.578 5.578c0 3.082 2.5 5.578 5.578 5.578a5.55 5.55 0 0 0 4.14-1.848l-1.92-1.532a3.15 3.15 0 0 1-2.22.98 3.19 3.19 0 0 1-3.178-2.778h8.758v-.4z"/></svg>`,
-  js: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#F7DF1E"/><path d="M6.5 17.5c0 1.5 1 2.5 2.5 2.5 1.7 0 2.5-1 2.5-2.5V11H9.8v6.5c0 .6-.3.9-.8.9s-.8-.3-.8-.9V14H6.5v3.5zm7.3 1.2c.8.8 1.9 1.3 3.2 1.3 2 0 3.3-1 3.3-2.7 0-1.6-1-2.2-2.5-2.8l-.5-.2c-.8-.3-1.2-.6-1.2-1.2 0-.6.5-1 1.2-1 .7 0 1.3.3 1.8.8l1.2-1.2c-.8-.8-1.8-1.2-3-1.2-2 0-3.1 1.2-3.1 2.6 0 1.5.9 2.2 2.3 2.8l.5.2c.9.4 1.4.7 1.4 1.3 0 .7-.6 1.1-1.4 1.1-.9 0-1.6-.4-2.2-1.1l-1.1 1.2z" fill="#000"/></svg>`
+  js: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#F7DF1E"/><path d="M6.5 17.5c0 1.5 1 2.5 2.5 2.5 1.7 0 2.5-1 2.5-2.5V11H9.8v6.5c0 .6-.3.9-.8.9s-.8-.3-.8-.9V14H6.5v3.5zm7.3 1.2c.8.8 1.9 1.3 3.2 1.3 2 0 3.3-1 3.3-2.7 0-1.6-1-2.2-2.5-2.8l-.5-.2c-.8-.3-1.2-.6-1.2-1.2 0-.6.5-1 1.2-1 .7 0 1.3.3 1.8.8l1.2-1.2c-.8-.8-1.8-1.2-3-1.2-2 0-3.1 1.2-3.1 2.6 0 1.5.9 2.2 2.3 2.8l.5.2c.9.4 1.4.7 1.4 1.3 0 .7-.6 1.1-1.4 1.1-.9 0-1.6-.4-2.2-1.1l-1.1 1.2z" fill="#000"/></svg>`,
+  nextjs: `<svg class="w-8 h-8 flex-shrink-0 text-black dark:text-white" viewBox="0 0 180 180" fill="none"><mask id="mask0_next" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180"><circle cx="90" cy="90" r="90" fill="black"/></mask><g mask="url(#mask0_next)"><circle cx="90" cy="90" r="90" fill="currentColor" fill-opacity="0.1"/><path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.168 149.508 157.52Z" fill="currentColor"/><path d="M115 54H127V126H115V54Z" fill="currentColor"/></g></svg>`
 };
 
 window.SDK_CATALOG = [
@@ -264,6 +265,120 @@ async function handleCallback() {
   // =========================================================================
   // 2. NON-SPA / BACKEND (Traditional Web App / SSR / Confidential Client)
   // =========================================================================
+  {
+    id: 'backend-nextjs-auth',
+    category: 'non-spa',
+    logoKey: 'nextjs',
+    name: 'Next.js 14+ (App Router / Auth.js / NextAuth)',
+    certified: true,
+    certificationName: 'OpenID Certified Standards (Auth.js)',
+    badge: 'Premier React SSR / BFF',
+    badge_ar: 'النمط الرائد لـ React SSR / BFF',
+    language: 'TypeScript / JavaScript',
+    framework: 'Next.js 14+ (App Router & Server Components)',
+    npmPackage: 'next-auth@beta / @auth/core',
+    github: 'https://github.com/nextauthjs/next-auth',
+    description: 'The modern Backend For Frontend (BFF) standard for React & Next.js. Implements OpenID Connect Authorization Code Flow with PKCE S256, encrypts session tokens in HttpOnly cookies, and provides type-safe server actions & Server Components auth.',
+    description_ar: 'المعيار الحديث لنمط BFF (Backend For Frontend) لتطبيقات React و Next.js. يطبق تدفق Authorization Code Flow مع PKCE S256 تلقائياً، ويشفر التوكنات في ملفات كوكيز HttpOnly محمية من ثغرات XSS، مع دعم كامل لـ Server Components.',
+    securityModel: {
+      type: 'Confidential Client / BFF (Backend For Frontend)',
+      type_ar: 'عميل سري / نمط BFF (Backend For Frontend)',
+      clientSecret: 'Stored in server environment (.env.local)',
+      clientSecret_ar: 'يُحفظ بأمان في متغيرات بيئة الخادم (.env.local)',
+      pkceEnforced: 'Mandatory & Default (PKCE S256)',
+      pkceEnforced_ar: 'إلزامي وتلقائي (PKCE S256)',
+      tokenStorage: 'Encrypted HttpOnly SameSite Cookie (Immune to XSS)',
+      tokenStorage_ar: 'ملف كوكيز مشفر HttpOnly و SameSite (محصن ضد ثغرات XSS)',
+      redirectHandler: 'Next.js Route Handler (/api/auth/callback/oidc)'
+    },
+    installCmd: 'npm install next-auth@beta @auth/core',
+    configCode: `// 1. auth.ts (Next.js 14 App Router Root Configuration)
+import NextAuth from 'next-auth';
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [
+    {
+      id: 'oidc-provider',
+      name: 'Corporate OpenID Provider',
+      type: 'oidc',
+      issuer: 'http://localhost:3000/mock-idp', // OIDC Issuer URL
+      clientId: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
+      clientSecret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
+      
+      // Enforce PKCE S256 in Authorization Code Flow
+      checks: ['pkce', 'state', 'nonce'],
+      
+      authorization: {
+        params: {
+          scope: 'openid profile email offline_access',
+          response_type: 'code'
+        }
+      },
+      profile(profile) {
+        return {
+          id: profile.sub,
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture
+        };
+      }
+    }
+  ],
+  session: { strategy: 'jwt' },
+  secret: process.env.AUTH_SECRET || 'random-super-secure-jwt-secret-key'
+});`,
+    loginCode: `// 2. app/api/auth/[...nextauth]/route.ts (Next.js Route Handlers)
+import { handlers } from '@/auth';
+export const { GET, POST } = handlers;
+
+// 3. Triggering Login from Client or Server Component (e.g. app/page.tsx)
+import { signIn, signOut, auth } from '@/auth';
+
+export default async function HomePage() {
+  const session = await auth(); // Server-side session verification!
+
+  if (session?.user) {
+    return (
+      <div className="card">
+        <h2>Welcome, {session.user.name}!</h2>
+        <p>Email: {session.user.email}</p>
+        <form action={async () => { 'use server'; await signOut(); }}>
+          <button type="submit">Sign Out</button>
+        </form>
+      </div>
+    );
+  }
+
+  return (
+    <form action={async () => { 'use server'; await signIn('oidc-provider'); }}>
+      <button type="submit">Sign In with OIDC + PKCE</button>
+    </form>
+  );
+}`,
+    callbackCode: `// 4. Server Component Session Access & API Route Protection (app/dashboard/page.tsx)
+import { auth } from '@/auth';
+import { redirect } from 'next/navigation';
+
+export default async function DashboardPage() {
+  // auth() runs exclusively on the server (Zero JS bundle overhead)
+  // Tokens are read from encrypted HttpOnly cookies - JavaScript cannot access them!
+  const session = await auth();
+
+  if (!session) {
+    redirect('/api/auth/signin');
+  }
+
+  return (
+    <main className="p-6">
+      <h1 className="text-xl font-bold">Secure Dashboard (BFF Pattern)</h1>
+      <pre className="bg-slate-900 text-emerald-400 p-4 rounded-xl">
+        {JSON.stringify(session, null, 2)}
+      </pre>
+    </main>
+  );
+}`
+  },
+
   {
     id: 'backend-node-openid-client',
     category: 'non-spa',
