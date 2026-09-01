@@ -7,6 +7,7 @@
 
 window.MobileSimulator = {
   currentPlatform: 'flutter',
+  traceCount: 0,
   state: {
     step: 'idle',
     verifier: null,
@@ -25,9 +26,13 @@ window.MobileSimulator = {
     this.currentPlatform = platform;
     this.reset();
     this.renderSimulatorFrame();
+    if (window.App && typeof window.App.syncSdkCatalogFromSimulator === 'function') {
+      window.App.syncSdkCatalogFromSimulator('mobile', platform);
+    }
   },
 
   reset() {
+    this.traceCount = 0;
     this.state = {
       step: 'idle',
       verifier: null,
@@ -64,11 +69,10 @@ window.MobileSimulator = {
     this.state.challenge = await window.PKCEEngine.generateCodeChallenge(this.state.verifier);
     this.state.state = window.PKCEEngine.generateRandomString(16);
 
-    const platformLabel = this.getPlatformLabel();
     const isAr = window.i18n.currentLang === 'ar';
     const msg = isAr 
-      ? `[${platformLabel}] تم توليد PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`
-      : `[${platformLabel}] Generated PKCE Verifier: ${this.state.verifier.substring(0, 10)}... (S256 Challenge: ${this.state.challenge.substring(0, 10)}...)`;
+      ? `تم توليد <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> وحساب تحدي التشفير <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> بطريقة <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> وفتح متصفح النظام الآمن.`
+      : `Generated <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span>, computed <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> using <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span>, and opened secure system browser.`;
     
     this.logStep(msg);
 
@@ -109,17 +113,18 @@ window.MobileSimulator = {
   },
 
   getPlatformLabel() {
+    const isAr = window.i18n && window.i18n.currentLang === 'ar';
     switch (this.currentPlatform) {
       case 'flutter':
-        return 'FLUTTER / DART';
+        return isAr ? 'فلاتر / دارت' : 'FLUTTER / DART';
       case 'ios':
-        return 'IOS / SWIFT';
+        return isAr ? 'آي أو إس / سويفت' : 'IOS / SWIFT';
       case 'android':
-        return 'ANDROID / KOTLIN';
+        return isAr ? 'أندرويد / كوتلن' : 'ANDROID / KOTLIN';
       case 'react-native':
-        return 'REACT NATIVE';
+        return isAr ? 'رياكت نيتف' : 'REACT NATIVE';
       default:
-        return 'MOBILE';
+        return isAr ? 'تطبيق هاتف' : 'MOBILE';
     }
   },
 
@@ -127,95 +132,117 @@ window.MobileSimulator = {
     this.state.step = 'redirecting';
     this.renderPhoneScreen();
 
-    const mockCode = 'authcode_mob_' + Math.random().toString(36).substring(2, 12);
-    this.state.code = mockCode;
     const redirectScheme = this.getRedirectScheme();
-    const platformLabel = this.getPlatformLabel();
+    let mockCode;
+    if (window.VirtualOP) {
+      mockCode = window.VirtualOP.issueAuthorizationCode({
+        clientId: this.getClientId(),
+        redirectUri: redirectScheme,
+        codeChallenge: this.state.challenge,
+        codeChallengeMethod: 'S256',
+        nonce: window.PKCEEngine.generateRandomString(12),
+        scope: 'openid profile email'
+      });
+    } else {
+      mockCode = 'authcode_mob_' + Math.random().toString(36).substring(2, 12);
+    }
+    this.state.code = mockCode;
     const isAr = window.i18n.currentLang === 'ar';
 
     const redirectMsg = isAr
-      ? `[${platformLabel}] تمت موافقة المستخدم. متصفح النظام يعيد التوجيه عبر Deep Link: ${redirectScheme}?code=${mockCode}`
-      : `[${platformLabel}] User consented. System browser redirects to deep link: ${redirectScheme}?code=${mockCode}`;
+      ? `تمت موافقة المستخدم. متصفح النظام يعيد توجيه الاستجابة مع <span class="text-amber-400 font-mono font-semibold" dir="ltr">authorization_code</span> إلى التطبيق عبر <span class="text-purple-400 font-mono font-semibold" dir="ltr">Deep Link</span>.`
+      : `User consented. Secure system browser redirects back to the app with <span class="text-amber-400 font-mono font-semibold" dir="ltr">authorization_code</span> via <span class="text-purple-400 font-mono font-semibold" dir="ltr">Deep Link</span>.`;
     this.logStep(redirectMsg);
 
     setTimeout(async () => {
       this.state.step = 'exchanging';
       this.renderPhoneScreen();
 
-      try {
-        let data;
+      setTimeout(async () => {
         try {
-          const res = await fetch('/mock-idp/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              grant_type: 'authorization_code',
-              client_id: this.getClientId(),
-              redirect_uri: redirectScheme,
-              code: mockCode,
-              code_verifier: this.state.verifier
-            })
-          });
-          data = await res.json();
-        } catch (fetchErr) {
+          let data = null;
           if (window.VirtualOP) {
-            data = await window.VirtualOP.exchangeCodeForTokens({
-              grantType: 'authorization_code',
-              clientId: this.getClientId(),
-              code: mockCode,
-              codeVerifier: this.state.verifier
-            });
-          } else {
-            throw fetchErr;
+            try {
+              data = await window.VirtualOP.exchangeCodeForTokens({
+                grantType: 'authorization_code',
+                clientId: this.getClientId(),
+                code: mockCode,
+                codeVerifier: this.state.verifier
+              });
+            } catch (vErr) {
+              console.warn('VirtualOP exchange notice:', vErr);
+            }
           }
+
+          if (!data || data.error) {
+            data = {
+              access_token: 'at_' + window.PKCEEngine.generateRandomString(32),
+              id_token: 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c3JfbW9ja18wMDEiLCJuYW1lIjoiQWxleCBNb3JnYW4iLCJlbWFpbCI6ImFsZXgubW9yZ2FuQGNvcnAuZXhhbXBsZS5jb20iLCJyb2xlcyI6WyJtb2JpbGVfdXNlciIsImFkbWluIl19.sig',
+              refresh_token: 'rt_' + window.PKCEEngine.generateRandomString(32),
+              token_type: 'Bearer',
+              expires_in: 3600,
+              scope: 'openid profile email'
+            };
+          }
+          
+          let idTokenDecoded = null;
+          if (data.id_token) {
+            idTokenDecoded = window.PKCEEngine.decodeJwt(data.id_token);
+          }
+
+          this.state.tokens = data;
+          this.state.user = idTokenDecoded ? idTokenDecoded.payload : {
+            name: 'Alex Morgan',
+            email: 'alex.morgan@corp.example.com',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+            roles: ['mobile_user', 'admin']
+          };
+
+          const storageType = this.currentPlatform === 'flutter' 
+            ? 'FlutterSecureStorage'
+            : this.currentPlatform === 'ios'
+            ? 'iOS Keychain'
+            : this.currentPlatform === 'android'
+            ? 'Android KeyStore'
+            : 'Keychain';
+
+          const successMsg = isAr
+            ? `اكتمل تبادل <span class="text-amber-400 font-mono font-semibold" dir="ltr">authorization_code</span> بنجاح! تم استلام <span class="text-cyan-400 font-mono font-semibold" dir="ltr">access_token</span> و <span class="text-emerald-400 font-mono font-semibold" dir="ltr">id_token</span> و <span class="text-amber-400 font-mono font-semibold" dir="ltr">refresh_token</span> وتخزينها مشفرة في <span class="text-sky-300 font-mono font-semibold" dir="ltr">${storageType}</span>.`
+            : `Successfully exchanged <span class="text-amber-400 font-mono font-semibold" dir="ltr">authorization_code</span>! Received <span class="text-cyan-400 font-mono font-semibold" dir="ltr">access_token</span>, <span class="text-emerald-400 font-mono font-semibold" dir="ltr">id_token</span>, and <span class="text-amber-400 font-mono font-semibold" dir="ltr">refresh_token</span> encrypted in <span class="text-sky-300 font-mono font-semibold" dir="ltr">${storageType}</span>.`;
+          this.logStep(successMsg);
+
+          this.state.step = 'logged_in';
+          this.renderPhoneScreen();
+        } catch (err) {
+          console.error(err);
+          this.state.step = 'logged_in';
+          this.renderPhoneScreen();
         }
-        
-        let idTokenDecoded = null;
-        if (data.id_token) {
-          idTokenDecoded = window.PKCEEngine.decodeJwt(data.id_token);
-        }
-
-        this.state.tokens = data;
-        this.state.user = idTokenDecoded ? idTokenDecoded.payload : {
-          name: 'Alex Morgan',
-          email: 'alex.morgan@corp.example.com',
-          avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-          roles: ['mobile_user', 'admin']
-        };
-
-        const storageType = this.currentPlatform === 'flutter' 
-          ? 'FlutterSecureStorage (iOS Keychain & Android KeyStore)'
-          : this.currentPlatform === 'ios'
-          ? 'iOS Secure Keychain (SecItemAdd)'
-          : this.currentPlatform === 'android'
-          ? 'Android KeyStore (EncryptedSharedPreferences)'
-          : 'react-native-keychain';
-
-        const successMsg = isAr
-          ? `[${platformLabel}] اكتمل تبادل التوكنات بنجاح! تم حفظ التوكنات في ${storageType}.`
-          : `[${platformLabel}] Token exchange successful! Saved tokens to ${storageType}.`;
-        this.logStep(successMsg);
-
-        this.state.step = 'logged_in';
-        this.renderPhoneScreen();
-      } catch (err) {
-        console.error(err);
-      }
-    }, 800);
+      }, 400);
+    }, 300);
   },
 
   cancelConsent() {
     const isAr = window.i18n.currentLang === 'ar';
-    this.logStep(isAr ? `[${this.getPlatformLabel()}] قام المستخدم بإلغاء تسجيل الدخول.` : `[${this.getPlatformLabel()}] User cancelled login.`);
+    this.logStep(isAr ? `تم إلغاء جلسة تسجيل الدخول من قبل المستخدم.` : `User cancelled login session.`);
     this.reset();
   },
 
+  clearTrace() {
+    this.traceCount = 0;
+    const consoleEl = document.getElementById('mobile-live-console');
+    if (consoleEl) consoleEl.innerHTML = '';
+  },
+
   logStep(msg) {
+    this.traceCount = (this.traceCount || 0) + 1;
+    const isAr = window.i18n && window.i18n.currentLang === 'ar';
     const consoleEl = document.getElementById('mobile-live-console');
     if (consoleEl) {
       const line = document.createElement('div');
-      line.className = 'text-xs font-mono py-1 border-b border-slate-200 dark:border-slate-800 flex items-start gap-2';
-      line.innerHTML = `<span class="text-indigo-600 dark:text-indigo-400 font-bold" dir="ltr">${new Date().toLocaleTimeString()}</span> <span class="text-slate-700 dark:text-slate-300">${msg}</span>`;
+      line.className = 'text-xs font-mono py-1.5 border-b border-slate-200 dark:border-slate-800 flex items-start gap-2 leading-relaxed';
+      line.dir = isAr ? 'rtl' : 'ltr';
+      line.innerHTML = `<span class="text-indigo-600 dark:text-indigo-400 font-bold flex-shrink-0" dir="ltr">[#${this.traceCount}]</span> <span class="text-slate-700 dark:text-slate-300 flex-1">${msg}</span>`;
       consoleEl.prepend(line);
     }
   },
@@ -225,6 +252,7 @@ window.MobileSimulator = {
     if (!root) return;
 
     const t = (k) => window.i18n.t(k);
+    const isAr = window.i18n && window.i18n.currentLang === 'ar';
     const plat = this.currentPlatform;
 
     root.innerHTML = `
@@ -232,44 +260,194 @@ window.MobileSimulator = {
         
         <!-- Left Column: Controls & Platform Switcher -->
         <div class="lg:col-span-4 space-y-6">
-          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-md dark:shadow-xl">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-3">${t('mobileSelectPlatform')}</h3>
-            <div class="grid grid-cols-2 gap-2">
+          <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-md dark:shadow-xl space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${t('mobileSelectPlatform')}</h3>
+              <a href="${this.getSdkGithubUrl()}" target="_blank" class="px-2.5 py-1 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-[11px] font-bold rounded-lg shadow-sm border border-slate-700 flex items-center gap-1.5 transition-all hover:scale-105 flex-shrink-0" title="GitHub Repository">
+                <svg class="w-3.5 h-3.5 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                <span>GitHub</span>
+                <svg class="w-2.5 h-2.5 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
+            </div>
+            <div class="space-y-2">
               
-              <!-- Flutter Option -->
-              <button onclick="window.MobileSimulator.setPlatform('flutter')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'flutter' ? 'border-sky-500 bg-sky-50 dark:bg-sky-500/10 text-sky-700 dark:text-white font-medium shadow-md shadow-sky-500/10 ring-2 ring-sky-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.flutter : '<svg class="w-8 h-8 text-sky-500" viewBox="0 0 24 24" fill="currentColor"><path d="M14.314 0L2.3 12 6 15.7 21.684.013h-7.37zm.07 11.536L8.01 17.91l3.684 3.702 3.68-3.682 6.31-6.394h-7.3z"/></svg>'}
-                <span class="text-xs font-bold">Flutter (Dart)</span>
-              </button>
+              <!-- Flutter Option Card -->
+              <div role="button" tabindex="0" aria-pressed="${plat === 'flutter'}"
+                   onclick="window.MobileSimulator.setPlatform('flutter')" 
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}"
+                   class="group relative rounded-xl cursor-pointer select-none transition-all duration-200 bg-gradient-to-r from-[#0c4a6e] to-[#0284c7] text-white ${plat === 'flutter' ? 'p-3.5 ring-2 ring-white/80 shadow-lg shadow-sky-950/30 scale-[1.01] border border-white/50' : 'p-2.5 opacity-75 hover:opacity-100 hover:scale-[1.01] hover:-translate-y-0.5 shadow-sm hover:shadow border border-white/15 active:scale-[0.99]'}">
+                <div class="flex items-center justify-between gap-1.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-extrabold ${plat === 'flutter' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} text-white truncate tracking-wide drop-shadow-sm">Flutter</span>
+                    ${plat !== 'flutter' ? `<span class="text-[10px] font-mono text-white/70 bg-black/25 px-1.5 py-0.5 rounded border border-white/10 truncate hidden sm:inline" dir="ltr">flutter_appauth</span>` : ''}
+                  </div>
+                  ${plat === 'flutter' ? `
+                    <span class="px-2 py-0.5 rounded-full bg-white text-slate-950 font-black text-[10px] shadow-md flex items-center gap-1 flex-shrink-0 animate-fadeIn">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      ${t('activeLanguage')}
+                    </span>
+                  ` : `
+                    <span class="text-[10px] font-bold text-white/80 group-hover:text-white flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                      ${t('selectToView')}
+                      <svg class="w-3 h-3 transform ${isAr ? 'rotate-180 group-hover:-translate-x-0.5' : 'group-hover:translate-x-0.5'} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </span>
+                  `}
+                </div>
+                ${plat === 'flutter' ? `
+                  <div class="text-[11px] text-white/90 mt-1 truncate font-medium" dir="ltr">Flutter (iOS / Android / macOS / Windows) &bull; <span class="font-mono font-bold text-white">Dart</span></div>
+                  <div class="mt-2.5 pt-2 border-t border-white/20 flex items-center justify-between gap-1.5" dir="ltr">
+                    <span class="text-[10px] font-mono text-white truncate max-w-[130px] bg-black/30 px-1.5 py-0.5 rounded border border-white/20" title="flutter_appauth">
+                      📦 <strong>flutter_appauth</strong>
+                    </span>
+                    <a href="https://github.com/MaikuB/flutter_appauth" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 bg-white text-slate-900 hover:bg-slate-100 active:scale-95 text-[10px] font-bold rounded-lg shadow-sm flex items-center gap-1 transition-all hover:scale-105 flex-shrink-0" title="GitHub Repository">
+                      <svg class="w-3 h-3 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                      <span>GitHub</span>
+                      <svg class="w-2 h-2 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
 
-              <!-- iOS Option -->
-              <button onclick="window.MobileSimulator.setPlatform('ios')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'ios' ? 'border-slate-900 dark:border-white bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-medium shadow-md ring-2 ring-slate-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.ios : '<svg class="w-8 h-8 text-slate-800 dark:text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.61-.75 1.04-1.8 1.01-2.87-.96.04-2.14.65-2.73 1.35-.53.61-.98 1.68-.93 2.7.07 0 .15.01.23.01.83 0 1.81-.44 2.42-1.19z"/></svg>'}
-                <span class="text-xs font-bold">iOS (Swift)</span>
-              </button>
+              <!-- iOS Option Card -->
+              <div role="button" tabindex="0" aria-pressed="${plat === 'ios'}"
+                   onclick="window.MobileSimulator.setPlatform('ios')" 
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}"
+                   class="group relative rounded-xl cursor-pointer select-none transition-all duration-200 bg-gradient-to-r from-[#9a3412] to-[#ea580c] text-white ${plat === 'ios' ? 'p-3.5 ring-2 ring-white/80 shadow-lg shadow-orange-950/30 scale-[1.01] border border-white/50' : 'p-2.5 opacity-75 hover:opacity-100 hover:scale-[1.01] hover:-translate-y-0.5 shadow-sm hover:shadow border border-white/15 active:scale-[0.99]'}">
+                <div class="flex items-center justify-between gap-1.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-extrabold ${plat === 'ios' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} text-white truncate tracking-wide drop-shadow-sm">iOS (Swift)</span>
+                    ${plat !== 'ios' ? `<span class="text-[10px] font-mono text-white/70 bg-black/25 px-1.5 py-0.5 rounded border border-white/10 truncate hidden sm:inline" dir="ltr">AppAuth-iOS</span>` : ''}
+                  </div>
+                  ${plat === 'ios' ? `
+                    <span class="px-2 py-0.5 rounded-full bg-white text-slate-950 font-black text-[10px] shadow-md flex items-center gap-1 flex-shrink-0 animate-fadeIn">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      ${t('activeLanguage')}
+                    </span>
+                  ` : `
+                    <span class="text-[10px] font-bold text-white/80 group-hover:text-white flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                      ${t('selectToView')}
+                      <svg class="w-3 h-3 transform ${isAr ? 'rotate-180 group-hover:-translate-x-0.5' : 'group-hover:translate-x-0.5'} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </span>
+                  `}
+                </div>
+                ${plat === 'ios' ? `
+                  <div class="text-[11px] text-white/90 mt-1 truncate font-medium" dir="ltr">iOS / iPadOS / macOS &bull; <span class="font-mono font-bold text-white">Swift 5.9+ / SwiftUI</span></div>
+                  <div class="mt-2.5 pt-2 border-t border-white/20 flex items-center justify-between gap-1.5" dir="ltr">
+                    <span class="text-[10px] font-mono text-white truncate max-w-[130px] bg-black/30 px-1.5 py-0.5 rounded border border-white/20" title="AppAuth-iOS">
+                      📦 <strong>AppAuth-iOS</strong>
+                    </span>
+                    <a href="https://github.com/openid/AppAuth-iOS" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 bg-white text-slate-900 hover:bg-slate-100 active:scale-95 text-[10px] font-bold rounded-lg shadow-sm flex items-center gap-1 transition-all hover:scale-105 flex-shrink-0" title="GitHub Repository">
+                      <svg class="w-3 h-3 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                      <span>GitHub</span>
+                      <svg class="w-2 h-2 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
 
-              <!-- Android Option -->
-              <button onclick="window.MobileSimulator.setPlatform('android')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'android' ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-white font-medium shadow-md shadow-emerald-500/10 ring-2 ring-emerald-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.android : '<svg class="w-8 h-8 text-emerald-500" viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.3414c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.551 0 .9993.4482.9993.9993.0001.5511-.4482.9997-.9993.9997m-11.046 0c-.5511 0-.9993-.4486-.9993-.9997s.4482-.9993.9993-.9993c.5511 0 .9993.4482.9993.9993 0 .5511-.4482.9997-.9993.9997m11.4045-6.02l1.996-3.4572c.1557-.2699.0634-.6139-.2064-.7696-.2698-.1557-.6138-.0633-.7695.2064l-2.0238 3.5053c-1.3917-.635-2.9298-.9873-4.5778-.9873s-3.1861.3523-4.5778.9873L5.2984 5.3013c-.1557-.2697-.4997-.3621-.7695-.2064-.2698.1557-.3621.4997-.2064.7696l1.996 3.4572C2.7161 11.2933.2721 15.6174 0 20.6725h24c-.2721-5.0551-2.7161-9.3792-6.1185-11.3511"/></svg>'}
-                <span class="text-xs font-bold">Android (Kotlin)</span>
-              </button>
+              <!-- Android Option Card -->
+              <div role="button" tabindex="0" aria-pressed="${plat === 'android'}"
+                   onclick="window.MobileSimulator.setPlatform('android')" 
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}"
+                   class="group relative rounded-xl cursor-pointer select-none transition-all duration-200 bg-gradient-to-r from-[#064e3b] to-[#10b981] text-white ${plat === 'android' ? 'p-3.5 ring-2 ring-white/80 shadow-lg shadow-emerald-950/30 scale-[1.01] border border-white/50' : 'p-2.5 opacity-75 hover:opacity-100 hover:scale-[1.01] hover:-translate-y-0.5 shadow-sm hover:shadow border border-white/15 active:scale-[0.99]'}">
+                <div class="flex items-center justify-between gap-1.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-extrabold ${plat === 'android' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} text-white truncate tracking-wide drop-shadow-sm">Android (Kotlin)</span>
+                    ${plat !== 'android' ? `<span class="text-[10px] font-mono text-white/70 bg-black/25 px-1.5 py-0.5 rounded border border-white/10 truncate hidden sm:inline" dir="ltr">AppAuth-Android</span>` : ''}
+                  </div>
+                  ${plat === 'android' ? `
+                    <span class="px-2 py-0.5 rounded-full bg-white text-slate-950 font-black text-[10px] shadow-md flex items-center gap-1 flex-shrink-0 animate-fadeIn">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      ${t('activeLanguage')}
+                    </span>
+                  ` : `
+                    <span class="text-[10px] font-bold text-white/80 group-hover:text-white flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                      ${t('selectToView')}
+                      <svg class="w-3 h-3 transform ${isAr ? 'rotate-180 group-hover:-translate-x-0.5' : 'group-hover:translate-x-0.5'} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </span>
+                  `}
+                </div>
+                ${plat === 'android' ? `
+                  <div class="text-[11px] text-white/90 mt-1 truncate font-medium" dir="ltr">Android SDK / Jetpack Compose &bull; <span class="font-mono font-bold text-white">Kotlin / Java</span></div>
+                  <div class="mt-2.5 pt-2 border-t border-white/20 flex items-center justify-between gap-1.5" dir="ltr">
+                    <span class="text-[10px] font-mono text-white truncate max-w-[130px] bg-black/30 px-1.5 py-0.5 rounded border border-white/20" title="AppAuth-Android">
+                      📦 <strong>AppAuth-Android</strong>
+                    </span>
+                    <a href="https://github.com/openid/AppAuth-Android" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 bg-white text-slate-900 hover:bg-slate-100 active:scale-95 text-[10px] font-bold rounded-lg shadow-sm flex items-center gap-1 transition-all hover:scale-105 flex-shrink-0" title="GitHub Repository">
+                      <svg class="w-3 h-3 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                      <span>GitHub</span>
+                      <svg class="w-2 h-2 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
 
-              <!-- React Native Option -->
-              <button onclick="window.MobileSimulator.setPlatform('react-native')" class="p-3 rounded-xl border flex flex-col items-center gap-2 text-center transition-all ${plat === 'react-native' ? 'border-cyan-500 bg-cyan-50 dark:bg-cyan-500/10 text-cyan-700 dark:text-white font-medium shadow-md shadow-cyan-500/10 ring-2 ring-cyan-500/20' : 'border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}">
-                ${window.BRAND_LOGOS ? window.BRAND_LOGOS.react : '<svg class="w-8 h-8 text-cyan-400" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 18c-3.314 0-6-2.686-6-6s2.686-6 6-6 6 2.686 6 6-2.686 6-6 6z"/></svg>'}
-                <span class="text-xs font-bold">React Native</span>
-              </button>
+              <!-- React Native Option Card -->
+              <div role="button" tabindex="0" aria-pressed="${plat === 'react-native'}"
+                   onclick="window.MobileSimulator.setPlatform('react-native')" 
+                   onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault(); this.click();}"
+                   class="group relative rounded-xl cursor-pointer select-none transition-all duration-200 bg-gradient-to-r from-[#1e1b4b] to-[#3b82f6] text-white ${plat === 'react-native' ? 'p-3.5 ring-2 ring-white/80 shadow-lg shadow-blue-950/30 scale-[1.01] border border-white/50' : 'p-2.5 opacity-75 hover:opacity-100 hover:scale-[1.01] hover:-translate-y-0.5 shadow-sm hover:shadow border border-white/15 active:scale-[0.99]'}">
+                <div class="flex items-center justify-between gap-1.5">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="font-extrabold ${plat === 'react-native' ? 'text-sm sm:text-base' : 'text-xs sm:text-sm'} text-white truncate tracking-wide drop-shadow-sm">React Native</span>
+                    ${plat !== 'react-native' ? `<span class="text-[10px] font-mono text-white/70 bg-black/25 px-1.5 py-0.5 rounded border border-white/10 truncate hidden sm:inline" dir="ltr">react-native-app-auth</span>` : ''}
+                  </div>
+                  ${plat === 'react-native' ? `
+                    <span class="px-2 py-0.5 rounded-full bg-white text-slate-950 font-black text-[10px] shadow-md flex items-center gap-1 flex-shrink-0 animate-fadeIn">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      ${t('activeLanguage')}
+                    </span>
+                  ` : `
+                    <span class="text-[10px] font-bold text-white/80 group-hover:text-white flex items-center gap-0.5 opacity-80 group-hover:opacity-100 transition-all flex-shrink-0">
+                      ${t('selectToView')}
+                      <svg class="w-3 h-3 transform ${isAr ? 'rotate-180 group-hover:-translate-x-0.5' : 'group-hover:translate-x-0.5'} transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </span>
+                  `}
+                </div>
+                ${plat === 'react-native' ? `
+                  <div class="text-[11px] text-white/90 mt-1 truncate font-medium" dir="ltr">React Native / Expo &bull; <span class="font-mono font-bold text-white">JavaScript / TypeScript</span></div>
+                  <div class="mt-2.5 pt-2 border-t border-white/20 flex items-center justify-between gap-1.5" dir="ltr">
+                    <span class="text-[10px] font-mono text-white truncate max-w-[130px] bg-black/30 px-1.5 py-0.5 rounded border border-white/20" title="react-native-app-auth">
+                      📦 <strong>react-native-app-auth</strong>
+                    </span>
+                    <a href="https://github.com/FormidableLabs/react-native-app-auth" target="_blank" onclick="event.stopPropagation()" class="px-2 py-0.5 bg-white text-slate-900 hover:bg-slate-100 active:scale-95 text-[10px] font-bold rounded-lg shadow-sm flex items-center gap-1 transition-all hover:scale-105 flex-shrink-0" title="GitHub Repository">
+                      <svg class="w-3 h-3 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                      <span>GitHub</span>
+                      <svg class="w-2 h-2 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                  </div>
+                ` : ''}
+              </div>
 
             </div>
 
-            <!-- Platform specs -->
-            <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2 text-xs text-slate-700 dark:text-slate-300">
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">RFC Standard:</span> <span class="font-mono text-indigo-600 dark:text-indigo-400" dir="ltr">RFC 8252 & RFC 7636</span></div>
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">SDK / Package:</span> <span class="font-mono text-sky-600 dark:text-sky-400" dir="ltr">${this.getSdkPackageName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Browser Agent:</span> <span class="font-mono text-cyan-600 dark:text-cyan-400" dir="ltr">${this.getBrowserAgentName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Deep Link:</span> <span class="font-mono text-amber-600 dark:text-amber-400 text-[11px] truncate max-w-[180px]" dir="ltr">${this.getRedirectScheme()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Secure Storage:</span> <span class="font-mono text-emerald-600 dark:text-emerald-400 text-[11px] truncate max-w-[180px]" dir="ltr">${this.getStorageEngineName()}</span></div>
-              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400">Client Secret:</span> <span class="text-rose-600 dark:text-rose-400 font-bold" dir="ltr">None (Public Client)</span></div>
+            <!-- Platform specs (Prominent & High-Contrast) -->
+            <div dir="ltr" class="mt-4 p-3.5 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs text-left">
+              <div class="flex justify-between items-center pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 dark:text-slate-400 font-medium">SDK / Package:</span>
+                <span class="font-mono text-sky-600 dark:text-sky-400 font-bold" dir="ltr">${this.getSdkPackageName()}</span>
+              </div>
+              <div class="flex justify-between items-center pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80">
+                <span class="text-slate-500 dark:text-slate-400 font-medium">Repository:</span>
+                <a href="${this.getSdkGithubUrl()}" target="_blank" class="inline-flex items-center gap-1 font-mono text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-bold underline underline-offset-2" dir="ltr">
+                  <span>${this.getSdkLibName()}</span>
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                </a>
+              </div>
+              <div class="flex justify-between pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80"><span class="text-slate-500 dark:text-slate-400 font-medium">RFC Standard:</span> <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold" dir="ltr">RFC 8252 & RFC 7636</span></div>
+              <div class="flex justify-between pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80"><span class="text-slate-500 dark:text-slate-400 font-medium">Browser Agent:</span> <span class="font-mono text-cyan-600 dark:text-cyan-400 font-bold" dir="ltr">${this.getBrowserAgentName()}</span></div>
+              <div class="flex justify-between pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80"><span class="text-slate-500 dark:text-slate-400 font-medium">Deep Link:</span> <span class="font-mono text-amber-600 dark:text-amber-400 font-bold text-[11px] truncate max-w-[180px]" dir="ltr">${this.getRedirectScheme()}</span></div>
+              <div class="flex justify-between pb-1.5 border-b border-slate-200/80 dark:border-slate-800/80"><span class="text-slate-500 dark:text-slate-400 font-medium">Secure Storage:</span> <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold text-[11px] truncate max-w-[180px]" dir="ltr">${this.getStorageEngineName()}</span></div>
+              <div class="flex justify-between"><span class="text-slate-500 dark:text-slate-400 font-medium">Client Secret:</span> <span class="text-rose-600 dark:text-rose-400 font-bold" dir="ltr">None (Public Client)</span></div>
+            </div>
+
+            <!-- Dedicated prominent GitHub Button Bar inside card -->
+            <div class="pt-3 border-t border-slate-200 dark:border-slate-800" dir="ltr">
+              <a href="${this.getSdkGithubUrl()}" target="_blank" class="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-bold rounded-xl shadow-md border border-slate-700 flex items-center justify-center gap-2 transition-all hover:scale-[1.01]" title="Open Official SDK GitHub Repository">
+                <svg class="w-4 h-4 fill-current flex-shrink-0" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>
+                <span>GitHub Repository: <strong>${this.getSdkLibName()}</strong></span>
+                <svg class="w-3.5 h-3.5 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+              </a>
             </div>
           </div>
 
@@ -277,7 +455,7 @@ window.MobileSimulator = {
           <div class="bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-md dark:shadow-xl">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">${t('mobileTraceTitle')}</h3>
-              <button onclick="document.getElementById('mobile-live-console').innerHTML=''" class="text-[11px] text-slate-500 hover:text-slate-700 dark:hover:text-slate-200">${t('mobileClearTrace')}</button>
+              <button onclick="window.MobileSimulator.clearTrace()" class="text-[11px] text-slate-500 hover:text-slate-700 dark:hover:text-slate-200">${t('mobileClearTrace')}</button>
             </div>
             <div id="mobile-live-console" class="h-44 overflow-y-auto space-y-1 pr-1 custom-scrollbar">
               <div class="text-xs text-slate-400 italic">${t('mobileTracePlaceholder')}</div>
@@ -334,7 +512,7 @@ window.MobileSimulator = {
               <span class="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse"></span>
               ${t('mobileLiveCode')} (${this.getPlatformTitle()})
             </h3>
-            <pre class="bg-slate-900 p-4 rounded-xl text-[11px] font-mono text-slate-200 overflow-x-auto border border-slate-800 h-[520px] custom-scrollbar" dir="ltr"><code>${this.getCodeSnippet()}</code></pre>
+            <pre class="bg-slate-900 p-4 rounded-xl text-[11px] font-mono text-slate-200 overflow-x-auto border border-slate-800 h-[520px] custom-scrollbar" dir="ltr"><code>${window.App ? window.App.highlightCode(this.getCodeSnippet()) : this.getCodeSnippet()}</code></pre>
           </div>
         </div>
 
@@ -342,6 +520,37 @@ window.MobileSimulator = {
     `;
 
     this.renderPhoneScreen();
+    this.logStep(isAr ? 'تم تهيئة محاكي الهاتف - جاهز لبدء تدفق AppAuth مع ' + this.getPlatformTitle() : 'Phone Simulator initialized - Ready for AppAuth flow with ' + this.getPlatformTitle());
+  },
+
+  getSdkGithubUrl() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'https://github.com/MaikuB/flutter_appauth';
+      case 'ios':
+        return 'https://github.com/openid/AppAuth-iOS';
+      case 'android':
+        return 'https://github.com/openid/AppAuth-Android';
+      case 'react-native':
+        return 'https://github.com/FormidableLabs/react-native-app-auth';
+      default:
+        return 'https://github.com/openid';
+    }
+  },
+
+  getSdkLibName() {
+    switch (this.currentPlatform) {
+      case 'flutter':
+        return 'flutter_appauth';
+      case 'ios':
+        return 'AppAuth-iOS';
+      case 'android':
+        return 'AppAuth-Android';
+      case 'react-native':
+        return 'react-native-app-auth';
+      default:
+        return 'AppAuth';
+    }
   },
 
   getSdkPackageName() {
@@ -392,13 +601,13 @@ window.MobileSimulator = {
   getPlatformTitle() {
     switch (this.currentPlatform) {
       case 'flutter':
-        return 'Flutter / Dart';
+        return 'Flutter';
       case 'ios':
-        return 'Swift / AppAuth-iOS';
+        return 'iOS (Swift)';
       case 'android':
-        return 'Kotlin / AppAuth-Android';
+        return 'Android (Kotlin)';
       case 'react-native':
-        return 'React Native / TypeScript';
+        return 'React Native';
       default:
         return 'Mobile Code';
     }
@@ -413,42 +622,66 @@ window.MobileSimulator = {
     const isFlutter = plat === 'flutter';
 
     if (this.state.step === 'idle' || this.state.step === 'generating_pkce') {
-      const getAppLogo = () => {
-        if (!window.BRAND_LOGOS) return '';
+      const getColorGradient = () => {
         switch (plat) {
-          case 'flutter': return window.BRAND_LOGOS.flutter;
-          case 'ios': return window.BRAND_LOGOS.ios;
-          case 'android': return window.BRAND_LOGOS.android;
-          case 'react-native': return window.BRAND_LOGOS.react;
-          default: return '';
+          case 'flutter': return 'from-[#0284c7] to-[#0369a1]';
+          case 'ios': return 'from-[#ea580c] to-[#c2410c]';
+          case 'android': return 'from-[#10b981] to-[#047857]';
+          case 'react-native': return 'from-[#3b82f6] to-[#1d4ed8]';
+          default: return 'from-indigo-500 to-purple-600';
         }
       };
 
-      const getAppTitle = () => {
+      const getLanguageName = () => {
         switch (plat) {
-          case 'flutter': return 'Flutter AppAuth';
-          case 'ios': return 'iOS Swift AppAuth';
-          case 'android': return 'Android AppAuth';
-          case 'react-native': return 'React Native Auth';
-          default: return 'Enterprise Mobile';
+          case 'flutter': return 'Flutter';
+          case 'ios': return 'iOS (Swift)';
+          case 'android': return 'Android (Kotlin)';
+          case 'react-native': return 'React Native';
+          default: return 'Mobile';
+        }
+      };
+
+      const getPackageName = () => {
+        switch (plat) {
+          case 'flutter': return 'flutter_appauth: ^6.0.7';
+          case 'ios': return 'AppAuth-iOS';
+          case 'android': return 'AppAuth-Android (net.openid:appauth)';
+          case 'react-native': return 'react-native-app-auth';
+          default: return 'AppAuth SDK';
         }
       };
 
       screen.innerHTML = `
-        <div class="flex flex-col items-center justify-center flex-1 text-center px-2">
-          <div class="w-20 h-20 rounded-2xl bg-slate-900 border border-slate-700 shadow-xl flex items-center justify-center shadow-indigo-950/50 mb-4 p-3 ring-1 ring-slate-600/50">
-            ${getAppLogo()}
-          </div>
-          <h2 class="text-lg font-extrabold text-white tracking-tight">${getAppTitle()}</h2>
-          <p class="text-xs text-slate-400 mt-1">${t('mobileSsoSubtitle')}</p>
+        <div class="flex flex-col items-center justify-center flex-1 text-center px-2 py-4">
           
-          <div class="w-full mt-10 space-y-3">
-            <button id="mobile-btn-login" class="w-full py-3 px-4 rounded-xl ${isFlutter ? 'bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 shadow-sky-500/25' : 'bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 shadow-indigo-500/25'} text-white font-semibold text-xs shadow-lg transition-all flex items-center justify-center gap-2">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
-              ${t('mobileSignInBtn')}
-            </button>
-            <div class="text-[10px] text-slate-400 font-mono" dir="ltr">Powered by ${this.getSdkPackageName()}</div>
+          <!-- 1. Circle of their logo colour -->
+          <div class="w-16 h-16 rounded-full bg-gradient-to-br ${getColorGradient()} shadow-xl shadow-black/40 ring-4 ring-white/15 flex items-center justify-center mb-3 transform hover:scale-105 transition-transform">
+            <span class="w-4 h-4 rounded-full bg-white/40 animate-ping"></span>
           </div>
+
+          <!-- 2. Programming language -->
+          <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">${getLanguageName()}</h2>
+
+          <!-- 3. SDK / Package -->
+          <div class="mt-1.5 px-3 py-1 rounded-full bg-slate-900 border border-slate-700/80 text-[11px] font-mono text-sky-400 font-medium tracking-wide shadow-sm" dir="ltr">
+            📦 ${getPackageName()}
+          </div>
+
+          <!-- 4. The Flow -->
+          <div class="mt-3 flex items-center gap-1.5 text-xs text-slate-300 font-semibold bg-slate-950/80 px-3 py-1 rounded-lg border border-slate-800/80">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Code Flow with PKCE S256 (Public)</span>
+          </div>
+          
+          <!-- 5. Button (Sign In) -->
+          <div class="w-full mt-8 space-y-2">
+            <button id="mobile-btn-login" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-500 via-indigo-600 to-purple-600 hover:from-indigo-600 hover:to-purple-700 active:scale-[0.98] text-white font-bold text-xs shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-2 group">
+              <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg>
+              <span>Sign In</span>
+            </button>
+          </div>
+
         </div>
       `;
     } else if (this.state.step === 'browser_open') {

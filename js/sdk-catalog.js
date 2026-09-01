@@ -13,8 +13,11 @@ window.BRAND_LOGOS = {
   spring: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#6DB33F"><path d="M21.57 14.73c-.92 2.65-2.84 4.79-5.38 6.01-1.3.62-2.71.95-4.14.96-5.84 0-10.59-4.75-10.59-10.59 0-3.32 1.54-6.39 4.14-8.38 1.48-1.13 3.25-1.83 5.12-2.02.47-.05.95-.08 1.43-.08 5.84 0 10.59 4.75 10.59 10.59 0 1.23-.21 2.45-.63 3.61-.17.47-.38.92-.63 1.34l-.01.02c.03-.02.06-.04.1-.06.01 0 .02-.01.03-.01.21-.11.39-.28.51-.48.24-.4.27-.89.09-1.32-.17-.4-.52-.7-.94-.8-.42-.1-.87-.01-1.21.23-.35.25-.56.65-.56 1.08 0 .2.05.4.14.58.18.37.52.63.92.73.4.1.82.02 1.15-.22.34-.24.55-.62.58-1.03.03-.41-.12-.81-.41-1.1-.3-.29-.71-.44-1.13-.41-.41.03-.79.23-1.04.56-.25.33-.33.75-.22 1.16.11.41.39.74.77.92.38.17.81.16 1.18-.04.38-.19.64-.54.71-.96.07-.42-.06-.85-.35-1.16-.29-.31-.7-.47-1.13-.44-.43.03-.82.25-1.07.6-.25.35-.32.79-.19 1.21.13.42.43.75.83.9.4.15.84.11 1.2-.11.36-.22.59-.6.63-1.02.04-.42-.11-.84-.42-1.13-.31-.29-.73-.43-1.15-.38z"/></svg>`,
   dotnet: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#512BD4"><path d="M12 0a12 12 0 1 0 12 12A12.013 12.013 0 0 0 12 0zm7.84 15.65h-2.11l-3.32-5.46v5.46h-2.22V8.35h2.16l3.27 5.37V8.35h2.22zm-9.36 0H4.16V8.35h6.32v1.94H6.38v1.64h3.69v1.89H6.38v1.83h4.1z"/></svg>`,
   go: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#00ADD8"><path d="M1.811 10.231c.427 0 .859.102 1.246.331l2.457 1.418a2.531 2.531 0 0 1 1.266 2.193v2.836c0 .907-.484 1.745-1.266 2.197L3.057 20.62a2.536 2.536 0 0 1-2.512 0L.088 20.354A.824.824 0 0 1 0 19.64V11.05c0-.455.368-.824.824-.824l.987.005zm14.12 3.66a2.766 2.766 0 0 1 2.378-1.378c1.536 0 2.78 1.246 2.78 2.78v.22h-5.558v-.22c0-.528.146-1.02.4-1.402zm8.069 1.402c0-3.082-2.5-5.578-5.578-5.578a5.58 5.58 0 0 0-5.578 5.578c0 3.082 2.5 5.578 5.578 5.578a5.55 5.55 0 0 0 4.14-1.848l-1.92-1.532a3.15 3.15 0 0 1-2.22.98 3.19 3.19 0 0 1-3.178-2.778h8.758v-.4z"/></svg>`,
+  angular: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="none"><path d="M12 2.5L2.5 5.86L3.95 17.5L12 21.5L20.05 17.5L21.5 5.86L12 2.5Z" fill="#DD0031"/><path d="M12 2.5V21.5L20.05 17.5L21.5 5.86L12 2.5Z" fill="#C3002F"/><path d="M12 6.5L6.85 17.5H8.95L10.05 14.8H13.95L15.05 17.5H17.15L12 6.5ZM13.3 13.1H10.7L12 9.5L13.3 13.1Z" fill="white"/></svg>`,
   js: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#F7DF1E"/><path d="M6.5 17.5c0 1.5 1 2.5 2.5 2.5 1.7 0 2.5-1 2.5-2.5V11H9.8v6.5c0 .6-.3.9-.8.9s-.8-.3-.8-.9V14H6.5v3.5zm7.3 1.2c.8.8 1.9 1.3 3.2 1.3 2 0 3.3-1 3.3-2.7 0-1.6-1-2.2-2.5-2.8l-.5-.2c-.8-.3-1.2-.6-1.2-1.2 0-.6.5-1 1.2-1 .7 0 1.3.3 1.8.8l1.2-1.2c-.8-.8-1.8-1.2-3-1.2-2 0-3.1 1.2-3.1 2.6 0 1.5.9 2.2 2.3 2.8l.5.2c.9.4 1.4.7 1.4 1.3 0 .7-.6 1.1-1.4 1.1-.9 0-1.6-.4-2.2-1.1l-1.1 1.2z" fill="#000"/></svg>`,
-  nextjs: `<svg class="w-8 h-8 flex-shrink-0 text-black dark:text-white" viewBox="0 0 180 180" fill="none"><mask id="mask0_next" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180"><circle cx="90" cy="90" r="90" fill="black"/></mask><g mask="url(#mask0_next)"><circle cx="90" cy="90" r="90" fill="currentColor" fill-opacity="0.1"/><path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.168 149.508 157.52Z" fill="currentColor"/><path d="M115 54H127V126H115V54Z" fill="currentColor"/></g></svg>`
+  java: `<svg class="w-8 h-8 flex-shrink-0" viewBox="0 0 24 24" fill="#EA2D2E"><path d="M8.85 16.34s-.42.23-.23.36c.8 1.05 3.32.74 4.54.51 1.48-.28 3.52-.96 4.79-.19 0 0 .34-.41-.21-.61-1.39-.51-3.69-.17-5.06-.06-1.57.13-3.13-.01-3.83-.01zm-.72 2.65s-.57.34-.14.48c1.36.45 3.57.39 5.48.24 1.94-.15 4.39-.77 5.37.38 0 0 .26-.41-.33-.66-1.31-.55-3.32-.47-5.01-.39-1.92.1-4.04.14-5.37-.05zm8.93 2.72c-.89.58-2.61.85-4.03.9-1.7.07-3.61-.06-5.11-.64-.26-.1-.45.02-.45.02s-.16.19.12.33c1.78.88 4.29.98 6.39.75 2.1-.23 3.99-.96 4.14-1.28.16-.36-.06-.5-.06-.5s-.45.1-.99.42zM12.9 6.22c.98.98.47 2.06.47 2.06s1.61-1.12.82-2.3c-.83-1.24-2.14-1.9-2.14-1.9s.61.91.85 2.14zm4.27 4.29s.89-.92-.51-2.17c-1.74-1.57-2.67-2.02-4.02-3.33-1.1-1.07-.63-2.6-.63-2.6s-.39.46-.22 1.54c.21 1.34 1.45 2.45 2.53 3.34 1.42 1.18 2.85 2.22 2.85 3.22zm-7.66 4.41s-1.85-.35-2.65.68c-.68.87-.22 1.77.29 2.5 0 0-.15-.22-.05-.48.16-.43.76-.84 1.14-.99.58-.23 1.49-.3 1.89-.55.51-.31.38-.86.38-.86s-.34.02-1-.3zm4.61-3.13s1.77-1.15.52-2.91c-.88-1.24-1.63-1.68-2.58-2.58-1.03-.98-1.08-1.93-1.08-1.93s-.36.79.44 1.94c.82 1.18 1.63 1.73 2.39 2.76 1.02 1.39.31 2.72.31 2.72z"/></svg>`,
+  nextjs: `<svg class="w-8 h-8 flex-shrink-0 text-black dark:text-white" viewBox="0 0 180 180" fill="none"><mask id="mask0_next" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="180" height="180"><circle cx="90" cy="90" r="90" fill="black"/></mask><g mask="url(#mask0_next)"><circle cx="90" cy="90" r="90" fill="currentColor" fill-opacity="0.1"/><path d="M149.508 157.52L69.142 54H54V125.97H66.1136V69.3836L139.999 164.845C143.333 162.614 146.509 160.168 149.508 157.52Z" fill="currentColor"/><path d="M115 54H127V126H115V54Z" fill="currentColor"/></g></svg>`,
+  github: `<svg class="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg>`
 };
 
 window.SDK_CATALOG = [
@@ -26,11 +29,13 @@ window.SDK_CATALOG = [
     category: 'spa',
     logoKey: 'react',
     shortName: 'React / TypeScript',
+    libName: 'oidc-client-ts',
+    brandGradient: 'from-[#0369a1] to-[#0284c7]',
     name: 'oidc-client-ts (React / TS / Vue)',
     certified: true,
     certificationName: 'OpenID Certified (JavaScript)',
-    badge: 'Most Popular SPA SDK',
-    badge_ar: 'الأكثر استخداماً في SPA',
+    badge: 'React / TypeScript',
+    badge_ar: 'React / TypeScript',
     language: 'TypeScript / JavaScript',
     framework: 'React / Vue / Angular / Vanilla',
     npmPackage: 'oidc-client-ts / react-oidc-context',
@@ -113,15 +118,159 @@ export async function handleCallback() {
   },
 
   {
+    id: 'spa-angular-auth-oidc',
+    category: 'spa',
+    logoKey: 'angular',
+    shortName: 'Angular',
+    libName: 'angular-auth-oidc-client',
+    brandGradient: 'from-[#be123c] to-[#e11d48]',
+    name: 'angular-auth-oidc-client (Angular 17/18/19+)',
+    certified: true,
+    certificationName: 'OpenID Certified (Angular)',
+    badge: 'Angular (Standalone)',
+    badge_ar: 'Angular (Standalone)',
+    language: 'TypeScript',
+    framework: 'Angular 17+ / 18+ / 19+ (Standalone)',
+    npmPackage: 'angular-auth-oidc-client',
+    github: 'https://github.com/damienbod/angular-auth-oidc-client',
+    description: 'The official OpenID Certified, modern Angular standalone library supporting Angular 17, 18, and 19. Features provideAuth(), standalone components, PKCE S256, auto silent token renewal, Auth Guards, and interceptors.',
+    description_ar: 'المكتبة المعتمدة رسمياً من OpenID Foundation لتطبيقات Angular الحديثة (إصدارات 17 و 18 و 19). تدعم مزودات standalone عبر provideAuth()، والتحقق التلقائي مع PKCE S256، والتجديد الصامت للتوكنات وحراس التوجيه (Auth Guards).',
+    securityModel: {
+      type: 'Public Client',
+      type_ar: 'عميل عام (Public Client)',
+      clientSecret: 'Forbidden / Never exposed in SPA',
+      clientSecret_ar: 'محظور / لا يُستخدم أبداً في تطبيقات SPA العامة',
+      pkceEnforced: 'Mandatory (S256)',
+      pkceEnforced_ar: 'إلزامي (Mandatory S256)',
+      tokenStorage: 'In-Memory / SessionStorage (Auto-managed with refresh rotation)',
+      tokenStorage_ar: 'في الذاكرة (In-Memory) / SessionStorage مع تجديد تلقائي',
+      redirectHandler: 'Angular Router + OidcSecurityService.checkAuth()'
+    },
+    installCmd: 'npm install angular-auth-oidc-client',
+    configCode: `// 1. app.config.ts (Angular 17/18/19 Standalone Configuration)
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideAuth, LogLevel } from 'angular-auth-oidc-client';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    
+    // Modern Standalone OpenID Connect Provider with PKCE
+    provideAuth({
+      config: {
+        authority: 'http://localhost:3000/mock-idp', // OIDC Issuer Discovery
+        redirectUrl: window.location.origin,
+        postLogoutRedirectUri: window.location.origin,
+        clientId: 'angular-pkce-client',
+        scope: 'openid profile email offline_access',
+        responseType: 'code', // Authorization Code Flow
+        
+        // PKCE Enforced by default (S256)
+        silentRenew: true,
+        useRefreshToken: true,
+        autoUserInfo: true,
+        logLevel: LogLevel.Warn,
+      },
+    }),
+  ],
+};`,
+    loginCode: `// 2. app.component.ts (Angular Component with Signal/Observable Support)
+import { Component, inject, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule],
+  template: \`
+    <div class="auth-box">
+      <h2>Angular OIDC Standalone</h2>
+      @if ((auth$ | async)?.isAuthenticated) {
+        <button (click)="logout()">Sign Out</button>
+      } @else {
+        <button (click)="login()">Sign In with Angular PKCE</button>
+      }
+    </div>
+  \`
+})
+export class AppComponent implements OnInit {
+  private readonly oidcSecurityService = inject(OidcSecurityService);
+  
+  // Observable tracking authentication state and ID Token claims
+  readonly auth$ = this.oidcSecurityService.checkAuth();
+
+  ngOnInit() {
+    // Automatically handles PKCE token exchange upon redirect callback
+    this.oidcSecurityService.checkAuth().subscribe(({ isAuthenticated, userData, accessToken }) => {
+      console.log('Angular Auth Status:', isAuthenticated, userData);
+    });
+  }
+
+  login() {
+    // Generates S256 code_challenge and redirects to Issuer
+    this.oidcSecurityService.authorize();
+  }
+
+  logout() {
+    // Revokes tokens and initiates RP-Initiated Logout
+    this.oidcSecurityService.logoff().subscribe();
+  }
+}`,
+    userinfoCode: `// 3. User Claims Query (Angular Service)
+import { inject, Injectable } from '@angular/core';
+import { OidcSecurityService } from 'angular-auth-oidc-client';
+import { map } from 'rxjs/operators';
+
+@Injectable({ providedIn: 'root' })
+export class UserService {
+  private readonly oidc = inject(OidcSecurityService);
+
+  // Observable of normalized UserInfo Claims (sub, name, email, roles)
+  readonly userData$ = this.oidc.userData$;
+  readonly idTokenClaims$ = this.oidc.getPayloadFromIdToken();
+}`,
+    refreshCode: `// 4. Manual / Silent Token Refresh (Angular)
+export function triggerSilentRefresh(oidcSecurityService: OidcSecurityService) {
+  // Silent renewal via Refresh Token Rotation or Iframe
+  return oidcSecurityService.forceMachineToServer().subscribe((result) => {
+    console.log('Rotated Access Token:', result.accessToken);
+  });
+}`,
+    logoutCode: `// 5. RP-Initiated Logout & Revocation (Angular)
+export function performLogout(oidcSecurityService: OidcSecurityService) {
+  // Revokes tokens in sessionStorage and redirects to IdP End Session Endpoint
+  oidcSecurityService.logoffAndRevokeTokens().subscribe();
+}`,
+    callbackCode: `// 6. Auth Guard Protection (app.routes.ts)
+import { Routes } from '@angular/router';
+import { autoLoginPartialRoutesGuard } from 'angular-auth-oidc-client';
+import { DashboardComponent } from './dashboard.component';
+
+export const routes: Routes = [
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [autoLoginPartialRoutesGuard] // Automatically redirects unauthenticated users to OIDC login
+  }
+];`
+  },
+
+  {
     id: 'spa-vanilla-crypto',
     category: 'spa',
     logoKey: 'js',
     shortName: 'Vanilla JS',
+    libName: 'Web Crypto API',
+    brandGradient: 'from-[#b45309] to-[#d97706]',
     name: 'Vanilla JS (Zero-Dependency Web Crypto PKCE)',
     certified: true,
     certificationName: 'Pure RFC 7636 Web Standards',
-    badge: 'Zero Dependencies',
-    badge_ar: 'بدون مكتبات خارجية',
+    badge: 'Vanilla JavaScript',
+    badge_ar: 'Vanilla JavaScript',
     language: 'JavaScript / TypeScript',
     framework: 'Any / Framework-Agnostic',
     npmPackage: 'None (Built into modern browsers)',
@@ -256,19 +405,18 @@ async function handleCallback() {
 }`
   },
 
-  // =========================================================================
-  // 2. NON-SPA / BACKEND (Traditional Web App / SSR / Confidential Client)
-  // =========================================================================
   {
     id: 'backend-nextjs-auth',
     category: 'non-spa',
     logoKey: 'nextjs',
     shortName: 'Next.js',
+    libName: 'next-auth (Auth.js)',
+    brandGradient: 'from-[#09090b] to-[#27272a]',
     name: 'Next.js 14+ (App Router / Auth.js / NextAuth)',
     certified: true,
     certificationName: 'OpenID Certified Standards (Auth.js)',
-    badge: 'Premier React SSR / BFF',
-    badge_ar: 'النمط الرائد لـ React SSR / BFF',
+    badge: 'Next.js 14+ / Auth.js',
+    badge_ar: 'Next.js 14+ / Auth.js',
     language: 'TypeScript / JavaScript',
     framework: 'Next.js 14+ (App Router & Server Components)',
     npmPackage: 'next-auth@beta / @auth/core',
@@ -290,18 +438,24 @@ async function handleCallback() {
     configCode: `// 1. auth.ts (Next.js 14 App Router Root Configuration)
 import NextAuth from 'next-auth';
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     {
-      id: 'oidc-provider',
-      name: 'Corporate OpenID Provider',
+      id: 'mock-idp',
+      name: 'OIDC Mock IdP',
       type: 'oidc',
       issuer: 'http://localhost:3000/mock-idp',
-      clientId: process.env.AUTH_OIDC_ID || 'nextjs-bff-client',
-      clientSecret: process.env.AUTH_OIDC_SECRET || 'nextjs-super-secret',
-      checks: ['pkce', 'state', 'nonce'],
+      clientId: process.env.AUTH_CLIENT_ID,
+      clientSecret: process.env.AUTH_CLIENT_SECRET,
+      
+      // Enforce PKCE S256 (Default in Auth.js)
+      checks: ['pkce', 'state'],
+      
       authorization: {
-        params: { scope: 'openid profile email offline_access', response_type: 'code' }
+        params: {
+          scope: 'openid profile email offline_access',
+          response_type: 'code'
+        }
       }
     }
   ],
@@ -407,11 +561,13 @@ export default async function DashboardPage() {
     category: 'non-spa',
     logoKey: 'nodejs',
     shortName: 'Node.js',
+    libName: 'openid-client',
+    brandGradient: 'from-[#14532d] to-[#16a34a]',
     name: 'Node.js / Express (openid-client)',
     certified: true,
     certificationName: 'OpenID Certified (Node.js)',
-    badge: 'OpenID Certified Backend',
-    badge_ar: 'معتمد رسمياً لـ Node.js',
+    badge: 'Node.js',
+    badge_ar: 'Node.js',
     language: 'Node.js (JavaScript / TypeScript)',
     framework: 'Express / NestJS / Fastify',
     npmPackage: 'openid-client',
@@ -435,126 +591,91 @@ const session = require('express-session');
 const { Issuer, generators } = require('openid-client');
 
 const app = express();
-
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'secret-key-must-be-random',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' }
-}));
+app.use(session({ secret: 'some-secret-key', resave: false, saveUninitialized: false }));
 
 let client;
-
-// 1. Auto-discover OIDC endpoints via Discovery URL
-async function initOidcClient() {
-  const oidcIssuer = await Issuer.discover('http://localhost:3000/mock-idp');
-  console.log('Discovered OIDC Endpoints:', oidcIssuer.metadata.authorization_endpoint);
-
-  client = new oidcIssuer.Client({
-    client_id: 'my-node-backend-client',
-    client_secret: 'my-backend-super-secret', // Confidential client secret
-    redirect_uris: ['http://localhost:4000/auth/callback'],
+async function initOidc() {
+  // 1. Auto-discover endpoints from OIDC Issuer
+  const issuer = await Issuer.discover('http://localhost:3000/mock-idp');
+  
+  // 2. Initialize Relying Party client with PKCE
+  client = new issuer.Client({
+    client_id: 'node-backend-client',
+    client_secret: 'node-super-secret',
+    redirect_uris: ['http://localhost:3000/auth/callback'],
     response_types: ['code'],
-    token_endpoint_auth_method: 'client_secret_post'
+    token_endpoint_auth_method: 'client_secret_basic'
   });
-}`,
-    loginCode: `// 2. Login Route: Generate PKCE & Redirect
+}
+initOidc();`,
+    loginCode: `// 2. Initiate Login Route (/login)
 app.get('/login', (req, res) => {
-  // Generate PKCE code_verifier and S256 code_challenge
+  // Generate PKCE code_verifier and code_challenge (S256)
   const code_verifier = generators.codeVerifier();
   const code_challenge = generators.codeChallenge(code_verifier);
-  const state = generators.state();
   const nonce = generators.nonce();
+  const state = generators.state();
 
-  // Store verifier, state, and nonce in server-side session
+  // Store verifier and state in server session (immune to client tampering)
   req.session.code_verifier = code_verifier;
   req.session.state = state;
   req.session.nonce = nonce;
 
-  // Build authorization URL with PKCE parameters
-  const authorizationUrl = client.authorizationUrl({
-    scope: 'openid profile email',
-    state: state,
-    nonce: nonce,
-    code_challenge: code_challenge,
-    code_challenge_method: 'S256'
+  const authUrl = client.authorizationUrl({
+    scope: 'openid profile email offline_access',
+    code_challenge,
+    code_challenge_method: 'S256',
+    state,
+    nonce
   });
 
-  res.redirect(authorizationUrl);
+  res.redirect(authUrl);
 });`,
-    userinfoCode: `// 3. UserInfo Claims Endpoint (Node.js)
+    userinfoCode: `// 3. UserInfo Claims Resolution (/api/userinfo)
 app.get('/api/userinfo', async (req, res) => {
-  if (!req.session.accessToken) return res.status(401).json({ error: 'Unauthorized' });
-  try {
-    // Queries /userinfo using the Bearer access_token
-    const userinfo = await client.userinfo(req.session.accessToken);
-    res.json(userinfo);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  if (!req.session.tokenSet) return res.status(401).json({ error: 'Unauthorized' });
+
+  // Query UserInfo endpoint using Bearer Access Token
+  const userinfo = await client.userinfo(req.session.tokenSet.access_token);
+  console.log('UserInfo claims:', userinfo);
+  res.json(userinfo);
 });`,
-    refreshCode: `// 4. Refresh Token Rotation (Node.js openid-client)
+    refreshCode: `// 4. Token Refresh Route (/api/refresh)
 app.post('/api/refresh', async (req, res) => {
-  if (!req.session.refreshToken) return res.status(401).json({ error: 'No refresh token' });
-  try {
-    // Sends POST /token (grant_type=refresh_token) and gets rotated tokens
-    const tokenSet = await client.refresh(req.session.refreshToken);
-    req.session.accessToken = tokenSet.access_token;
-    req.session.refreshToken = tokenSet.refresh_token; // Store new rotated refresh token
-    res.json({ status: 'Tokens Rotated Successfully', expires_in: tokenSet.expires_in });
-  } catch (err) {
-    res.status(500).json({ error: 'Refresh Failed: ' + err.message });
-  }
+  if (!req.session.tokenSet?.refresh_token) return res.status(401).send('No refresh token');
+
+  // Exchange Refresh Token for fresh Access Token & rotated Refresh Token
+  const refreshedTokenSet = await client.refresh(req.session.tokenSet.refresh_token);
+  req.session.tokenSet = refreshedTokenSet;
+  res.json({ access_token: refreshedTokenSet.access_token, expires_in: refreshedTokenSet.expires_in });
 });`,
-    logoutCode: `// 5. Logout with Token Revocation (RFC 7009) & SSO End Session
+    logoutCode: `// 5. Logout & Revoke Route (/logout)
 app.get('/logout', async (req, res) => {
-  const refreshToken = req.session.refreshToken;
-  const idToken = req.session.user;
-
-  // Step 1: Revoke token at IdP
-  if (refreshToken) {
-    try {
-      await client.revoke(refreshToken, 'refresh_token');
-    } catch (e) {
-      console.error('Revocation warning:', e);
-    }
+  if (req.session.tokenSet?.refresh_token) {
+    // Revoke token at authorization server
+    await client.revoke(req.session.tokenSet.refresh_token);
   }
-
-  // Step 2: Destroy local session & redirect to IdP End Session Endpoint
+  
+  // Destroy local server session and redirect to IdP End Session Endpoint
+  const endSessionUrl = client.endSessionUrl({ id_token_hint: req.session.tokenSet?.id_token, post_logout_redirect_uri: 'http://localhost:3000/' });
   req.session.destroy(() => {
-    const endSessionUrl = client.endSessionUrl({
-      id_token_hint: idToken,
-      post_logout_redirect_uri: 'http://localhost:4000/'
-    });
     res.redirect(endSessionUrl);
   });
 });`,
-    callbackCode: `// 6. Callback Route: Exchange Code + Verifier for Tokens
+    callbackCode: `// 6. Callback Route (/auth/callback)
 app.get('/auth/callback', async (req, res) => {
-  try {
-    const params = client.callbackParams(req);
-    const code_verifier = req.session.code_verifier;
-    const state = req.session.state;
-    const nonce = req.session.nonce;
+  const params = client.callbackParams(req);
+  
+  // Validate state and exchange authorization_code + code_verifier for tokens
+  const tokenSet = await client.callback('http://localhost:3000/auth/callback', params, {
+    code_verifier: req.session.code_verifier,
+    state: req.session.state,
+    nonce: req.session.nonce
+  });
 
-    const tokenSet = await client.callback('http://localhost:4000/auth/callback', params, {
-      code_verifier,
-      state,
-      nonce
-    });
-
-    req.session.user = tokenSet.claims();
-    req.session.accessToken = tokenSet.access_token;
-    req.session.refreshToken = tokenSet.refresh_token;
-
-    delete req.session.code_verifier;
-    delete req.session.state;
-    delete req.session.nonce;
-
-    res.redirect('/dashboard');
-  } catch (err) {
-    res.status(500).send('Authentication Failed: ' + err.message);
-  }
+  req.session.tokenSet = tokenSet;
+  console.log('ID Token Claims:', tokenSet.claims());
+  res.redirect('/dashboard');
 });`
   },
 
@@ -563,11 +684,13 @@ app.get('/auth/callback', async (req, res) => {
     category: 'non-spa',
     logoKey: 'python',
     shortName: 'Python',
+    libName: 'authlib',
+    brandGradient: 'from-[#1e3a8a] to-[#2563eb]',
     name: 'Python (Authlib / FastAPI / Flask)',
     certified: true,
     certificationName: 'OpenID Certified (Python)',
-    badge: 'Python Standard',
-    badge_ar: 'المعيار القياسي لـ Python',
+    badge: 'Python / FastAPI',
+    badge_ar: 'Python / FastAPI',
     language: 'Python 3.9+',
     framework: 'FastAPI / Flask / Django',
     npmPackage: 'authlib, requests, httpx',
@@ -586,102 +709,80 @@ app.get('/auth/callback', async (req, res) => {
       redirectHandler: 'FastAPI / Flask route with request.session'
     },
     installCmd: 'pip install authlib httpx uvicorn fastapi itsdangerous',
-    configCode: `# 1. FastAPI + Authlib OIDC Configuration with PKCE
-from fastapi import FastAPI, Request, Depends
-from fastapi.responses import RedirectResponse, JSONResponse
-from starlette.middleware.sessions import SessionMiddleware
+    configCode: `# 1. main.py (FastAPI + Authlib OIDC Configuration)
+from fastapi import FastAPI, Request
 from authlib.integrations.starlette_client import OAuth
-import httpx
-import os
+from starlette.middleware.sessions import SessionMiddleware
 
-app = FastAPI(title="Python OIDC PKCE Demo")
-app.add_middleware(SessionMiddleware, secret_key="super-secure-random-key")
+app = FastAPI()
+app.add_middleware(SessionMiddleware, secret_key="super-secret-session-key")
 
 oauth = OAuth()
 oauth.register(
-    name='oidc_provider',
+    name='oidc',
     server_metadata_url='http://localhost:3000/mock-idp/.well-known/openid-configuration',
     client_id='python-backend-client',
-    client_secret='python-backend-secret',
+    client_secret='python-super-secret',
     client_kwargs={
         'scope': 'openid profile email offline_access',
-        'code_challenge_method': 'S256'  # Enforce PKCE S256!
+        'code_challenge_method': 'S256' # ENFORCE PKCE S256
     }
 )`,
-    loginCode: `# 2. Login Route: Automatically generates PKCE & redirects
-@app.get("/login")
+    loginCode: `# 2. FastAPI Login Endpoint
+@app.get('/login')
 async def login(request: Request):
     redirect_uri = request.url_for('auth_callback')
-    return await oauth.oidc_provider.authorize_redirect(request, redirect_uri)`,
-    userinfoCode: `# 3. UserInfo Endpoint Claims Fetching (Python)
-@app.get("/api/userinfo")
+    # Automatically generates code_verifier and S256 code_challenge
+    return await oauth.oidc.authorize_redirect(request, redirect_uri)`,
+    userinfoCode: `# 3. UserInfo Claims in Python
+@app.get('/api/userinfo')
 async def get_userinfo(request: Request):
+    user = request.session.get('user')
+    if not user:
+        return {"error": "Not authenticated"}
+    return user`,
+    refreshCode: `# 4. Token Refresh in Python (FastAPI)
+@app.post('/api/refresh')
+async def refresh_token(request: Request):
     token = request.session.get('token')
-    if not token: return JSONResponse({"error": "Unauthorized"}, status_code=401)
-    
-    # Fetch profile claims from /userinfo endpoint
-    userinfo = await oauth.oidc_provider.userinfo(token=token)
-    return {"userinfo_claims": userinfo}`,
-    refreshCode: `# 4. Refresh Token Rotation (Python)
-@app.post("/api/refresh")
-async def refresh_token_endpoint(request: Request):
-    token = request.session.get('token', {})
-    refresh_token = token.get('refresh_token')
-    if not refresh_token: return JSONResponse({"error": "No refresh token"}, status_code=400)
+    if not token or 'refresh_token' not in token:
+        return {"error": "No refresh token available"}
 
-    # POST to /token endpoint with grant_type=refresh_token
-    async with httpx.AsyncClient() as client:
-        resp = await client.post("http://localhost:3000/mock-idp/token", data={
-            "grant_type": "refresh_token",
-            "client_id": "python-backend-client",
-            "client_secret": "python-backend-secret",
-            "refresh_token": refresh_token
-        })
-        new_tokens = resp.json()
-        request.session['token'] = new_tokens # Store rotated refresh token
-        return {"status": "Refreshed & Rotated", "tokens": new_tokens}`,
-    logoutCode: `# 5. Logout with Token Revocation (RFC 7009) & SSO End Session
-@app.get("/logout")
+    new_token = await oauth.oidc.fetch_access_token(
+        grant_type='refresh_token',
+        refresh_token=token['refresh_token']
+    )
+    request.session['token'] = new_token
+    return {"status": "refreshed", "access_token": new_token['access_token']}`,
+    logoutCode: `# 5. Logout & Session Clearing
+@app.get('/logout')
 async def logout(request: Request):
-    token = request.session.get('token', {})
-    refresh_token = token.get('refresh_token')
-    id_token = token.get('id_token')
-
-    # Step 1: Revoke token on IdP
-    if refresh_token:
-        async with httpx.AsyncClient() as client:
-            await client.post("http://localhost:3000/mock-idp/revoke", data={
-                "token": refresh_token,
-                "token_type_hint": "refresh_token",
-                "client_id": "python-backend-client",
-                "client_secret": "python-backend-secret"
-            })
-
-    # Step 2: Clear local session & redirect to IdP logout
     request.session.clear()
-    return RedirectResponse(f"http://localhost:3000/mock-idp/session/end?id_token_hint={id_token}&post_logout_redirect_uri=http://localhost:8000/")`,
-    callbackCode: `# 6. Callback Route: Exchanges Code + Verifier & Validates JWT
-@app.get("/auth/callback")
+    end_session_endpoint = "http://localhost:3000/mock-idp/session/end"
+    return {"message": "Logged out successfully", "redirect": end_session_endpoint}`,
+    callbackCode: `# 6. Auth Callback Handler
+@app.get('/auth/callback')
 async def auth_callback(request: Request):
-    try:
-        token = await oauth.oidc_provider.authorize_access_token(request)
-        request.session['token'] = token
-        request.session['user'] = token.get('userinfo')
-        return RedirectResponse("/dashboard")
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)`
+    # Exchanges code + code_verifier and verifies ID token signature via JWKS
+    token = await oauth.oidc.authorize_access_token(request)
+    user = token.get('userinfo')
+    request.session['user'] = user
+    request.session['token'] = token
+    return {"status": "authenticated", "user": user}`
   },
 
   {
     id: 'backend-java-spring',
     category: 'non-spa',
     logoKey: 'spring',
-    shortName: 'Java',
+    shortName: 'Java (Spring)',
+    libName: 'spring-security-oauth2',
+    brandGradient: 'from-[#065f46] to-[#059669]',
     name: 'Java (Spring Boot 3 / Spring Security)',
     certified: true,
     certificationName: 'OpenID Certified (Java)',
-    badge: 'Enterprise Standard',
-    badge_ar: 'معيار المؤسسات لـ Java',
+    badge: 'Java (Spring)',
+    badge_ar: 'Java (Spring)',
     language: 'Java 17 / 21',
     framework: 'Spring Boot 3.x + Spring Security 6',
     npmPackage: 'org.springframework.boot:spring-boot-starter-oauth2-client',
@@ -699,7 +800,7 @@ async def auth_callback(request: Request):
       tokenStorage_ar: 'جلسات HttpSession / مخزن Redis الموزع / SecurityContextHolder',
       redirectHandler: 'Spring Security Filter Chain (/login/oauth2/code/*)'
     },
-    installCmd: `<!-- pom.xml -->
+    installCmd: `<!-- Maven pom.xml -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -776,40 +877,235 @@ public OAuth2AccessToken refreshAccessToken(OAuth2AuthorizedClient client) {
     OAuth2AuthorizedClient refreshedClient = this.authorizedClientManager.authorize(authorizeRequest);
     return refreshedClient.getAccessToken();
 }`,
-    logoutCode: `// 5. OidcClientInitiatedLogoutSuccessHandler (Java Spring Boot 3)
-@Bean
-public SecurityFilterChain filterChain(HttpSecurity http, ClientRegistrationRepository clientRepo) throws Exception {
-    OidcClientInitiatedLogoutSuccessHandler oidcLogoutHandler = 
-        new OidcClientInitiatedLogoutSuccessHandler(clientRepo);
-    oidcLogoutHandler.setPostLogoutRedirectUri("{baseUrl}/");
+    id: 'backend-java-nimbusds',
+    category: 'non-spa',
+    logoKey: 'java',
+    shortName: 'Java',
+    libName: 'oauth2-oidc-sdk',
+    brandGradient: 'from-[#991b1b] to-[#dc2626]',
+    name: 'Java (Nimbus OAuth 2.0 / OIDC SDK)',
+    certified: true,
+    certificationName: 'OpenID Certified (Java - Connect2id / Nimbus)',
+    badge: 'Java (NimbusDS)',
+    badge_ar: 'Java (NimbusDS)',
+    language: 'Java 11 / 17 / 21',
+    framework: 'Java SE / Jakarta EE / Spring / Micronaut / Quarkus',
+    npmPackage: 'com.nimbusds:oauth2-oidc-sdk:11.10.1',
+    github: 'https://bitbucket.org/connect2id/oauth-2.0-sdk-with-openid-connect-extensions',
+    description: 'The industry-standard OpenID Foundation Certified Java library for OAuth 2.0 and OpenID Connect by Connect2id / NimbusDS. Provides comprehensive protocol support including PKCE (S256 / RFC 7636), OIDC Discovery (RFC 8414), token requests, ID token verification via JWKS (Nimbus JOSE+JWT), UserInfo resolution, and Refresh Token Rotation.',
+    description_ar: 'المكتبة المعتمدة رسمياً من مؤسسة OpenID Foundation للغة Java لتطوير بروتوكولات OAuth 2.0 و OpenID Connect من تطوير Connect2id و NimbusDS. توفر دعماً شاملاً لـ PKCE (S256)، واكتشاف نقاط Discovery، وطلب التوكنات، والتحقق من تواقيع ID Token عبر JWKS، واستعلام UserInfo وتدوير Refresh Token.',
+    securityModel: {
+      type: 'Confidential Client (or Public Backend)',
+      type_ar: 'عميل سري (أو عميل عام مدعوم)',
+      clientSecret: 'ClientSecretBasic / ClientSecretPost / PrivateKeyJWT (Server-side)',
+      clientSecret_ar: 'يُدعم ClientSecretBasic و ClientSecretPost و PrivateKeyJWT في بيئة الخادم الآمنة',
+      pkceEnforced: 'CodeChallengeMethod.S256 (RFC 7636 Mandatory)',
+      pkceEnforced_ar: 'CodeChallengeMethod.S256 (RFC 7636 مدعوم وموصى به)',
+      tokenStorage: 'Server-side HttpSession / Redis / Encrypted Cookie',
+      tokenStorage_ar: 'جلسة خادم HttpSession / مخزن Redis الموزع / ملفات كوكيز مشفرة',
+      redirectHandler: 'Servlet / Spring Controller / JAX-RS / Undertow'
+    },
+    installCmd: `<!-- Maven pom.xml -->
+<dependency>
+    <groupId>com.nimbusds</groupId>
+    <artifactId>oauth2-oidc-sdk</artifactId>
+    <version>11.10.1</version>
+</dependency>
+<dependency>
+    <groupId>com.nimbusds</groupId>
+    <artifactId>nimbus-jose-jwt</artifactId>
+    <version>9.37.3</version>
+</dependency>
 
-    http.logout(logout -> logout
-        // Clears session & redirects to IdP End Session Endpoint with id_token_hint
-        .logoutSuccessHandler(oidcLogoutHandler)
-    );
-    return http.build();
+// Gradle build.gradle
+implementation 'com.nimbusds:oauth2-oidc-sdk:11.10.1'
+implementation 'com.nimbusds:nimbus-jose-jwt:9.37.3'`,
+    configCode: `// 1. OIDC Provider Discovery & Client Setup (Nimbus OAuth 2.0 / OIDC SDK)
+import com.nimbusds.oauth2.sdk.id.ClientID;
+import com.nimbusds.oauth2.sdk.id.Issuer;
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.openid.connect.sdk.op.OIDCProviderMetadata;
+import java.net.URI;
+
+// 1. Auto-discover OIDC Provider Endpoints dynamically (RFC 8414)
+Issuer issuer = new Issuer("http://localhost:3000/mock-idp");
+OIDCProviderMetadata opMetadata = OIDCProviderMetadata.resolve(issuer);
+
+// 2. Setup Client Credentials & Redirect URI
+ClientID clientID = new ClientID("nimbus-java-client");
+Secret clientSecret = new Secret("nimbus-super-secret");
+ClientSecretBasic clientAuth = new ClientSecretBasic(clientID, clientSecret);
+URI redirectURI = new URI("http://localhost:8080/oidc/callback");`,
+    loginCode: `// 2. PKCE S256 Generation & Authorization Request (NimbusDS)
+import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
+import com.nimbusds.oauth2.sdk.Scope;
+import com.nimbusds.oauth2.sdk.ResponseType;
+import com.nimbusds.oauth2.sdk.State;
+import com.nimbusds.openid.connect.sdk.Nonce;
+import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
+import jakarta.servlet.http.HttpSession;
+
+public void initiateLogin(HttpSession session, HttpServletResponse response) throws Exception {
+    // Generate PKCE Code Verifier (256-bit entropy) & S256 Challenge (RFC 7636)
+    CodeVerifier codeVerifier = new CodeVerifier();
+    State state = new State(); // Anti-CSRF token
+    Nonce nonce = new Nonce(); // Anti-replay token
+    Scope scope = Scope.parse("openid profile email offline_access");
+
+    // Store verifier, state, and nonce in secure server session
+    session.setAttribute("pkce_verifier", codeVerifier);
+    session.setAttribute("auth_state", state);
+    session.setAttribute("auth_nonce", nonce);
+
+    // Build OIDC Authentication Request with S256 PKCE Challenge
+    AuthenticationRequest authRequest = new AuthenticationRequest.Builder(
+        new ResponseType(ResponseType.Value.CODE),
+        scope,
+        clientID,
+        redirectURI)
+        .endpointURI(opMetadata.getAuthorizationEndpointURI())
+        .state(state)
+        .nonce(nonce)
+        .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
+        .build();
+
+    // Redirect user to IdP Authorization Endpoint
+    response.sendRedirect(authRequest.toURI().toString());
 }`,
-    callbackCode: `// 6. Accessing Authenticated User Claims (UserController.java)
-package com.example.oidcdemo.controller;
+    userinfoCode: `// 3. UserInfo Claims Resolution (NimbusDS)
+import com.nimbusds.oauth2.sdk.token.BearerAccessToken;
+import com.nimbusds.openid.connect.sdk.UserInfoRequest;
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
+import com.nimbusds.openid.connect.sdk.UserInfoSuccessResponse;
+import com.nimbusds.openid.connect.sdk.claims.UserInfo;
 
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.Map;
+public UserInfo fetchUserInfo(String accessTokenString) throws Exception {
+    BearerAccessToken token = new BearerAccessToken(accessTokenString);
+    UserInfoRequest userInfoReq = new UserInfoRequest(
+        opMetadata.getUserInfoEndpointURI(),
+        token
+    );
 
-@RestController
-public class UserController {
-
-    @GetMapping("/api/me")
-    public Map<String, Object> getCurrentUser(@AuthenticationPrincipal OidcUser principal) {
-        return Map.of(
-            "subject", principal.getSubject(),
-            "name", principal.getFullName(),
-            "email", principal.getEmail(),
-            "claims", principal.getClaims()
-        );
+    UserInfoResponse userInfoResp = UserInfoResponse.parse(userInfoReq.toHTTPRequest().send());
+    if (!userInfoResp.indicatesSuccess()) {
+        throw new RuntimeException("UserInfo query failed: " + userInfoResp.toErrorResponse().getErrorObject());
     }
+
+    UserInfoSuccessResponse success = (UserInfoSuccessResponse) userInfoResp;
+    UserInfo claims = success.getUserInfo();
+    System.out.println("User Sub: " + claims.getSubject().getValue());
+    System.out.println("User Name: " + claims.getName());
+    System.out.println("User Email: " + claims.getEmailAddress());
+    return claims;
+}`,
+    refreshCode: `// 4. Refresh Token Rotation (RTR) with NimbusDS
+import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
+import com.nimbusds.oauth2.sdk.token.RefreshToken;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
+
+public OIDCTokenResponse refreshTokens(String refreshTokenString) throws Exception {
+    RefreshToken currentRefreshToken = new RefreshToken(refreshTokenString);
+
+    // Build Token Request with RefreshTokenGrant
+    TokenRequest refreshReq = new TokenRequest(
+        opMetadata.getTokenEndpointURI(),
+        clientAuth,
+        new RefreshTokenGrant(currentRefreshToken)
+    );
+
+    TokenResponse tokenResponse = OIDCTokenResponseParser.parse(refreshReq.toHTTPRequest().send());
+    if (!tokenResponse.indicatesSuccess()) {
+        throw new RuntimeException("Token refresh failed: " + tokenResponse.toErrorResponse().getErrorObject());
+    }
+
+    OIDCTokenResponse oidcTokens = (OIDCTokenResponse) tokenResponse.toSuccessResponse();
+    // Rotated new tokens
+    String newAccessToken = oidcTokens.getOIDCTokens().getAccessToken().getValue();
+    RefreshToken rotatedRefreshToken = oidcTokens.getOIDCTokens().getRefreshToken();
+    System.out.println("New Rotated Refresh Token: " + rotatedRefreshToken.getValue());
+    return oidcTokens;
+}`,
+    logoutCode: `// 5. OIDC RP-Initiated Logout (RFC / OpenID Frontchannel & Backchannel)
+import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import jakarta.servlet.http.HttpSession;
+
+public void logout(HttpSession session, String idTokenRawString, HttpServletResponse response) throws Exception {
+    // 1. Invalidate local application session
+    session.invalidate();
+
+    // 2. Redirect to IdP End Session Endpoint with id_token_hint
+    URI endSessionEndpoint = opMetadata.getEndSessionEndpointURI();
+    String postLogoutRedirect = URLEncoder.encode("http://localhost:8080/", StandardCharsets.UTF_8);
+
+    String logoutRedirectUrl = endSessionEndpoint.toString() + 
+        "?id_token_hint=" + URLEncoder.encode(idTokenRawString, StandardCharsets.UTF_8) +
+        "&post_logout_redirect_uri=" + postLogoutRedirect;
+
+    response.sendRedirect(logoutRedirectUrl);
+}`,
+    callbackCode: `// 6. Callback Route: Exchange Code + Verifier & Validate ID Token via JWKS
+import com.nimbusds.oauth2.sdk.AuthorizationCode;
+import com.nimbusds.oauth2.sdk.AuthorizationCodeGrant;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+import com.nimbusds.oauth2.sdk.TokenResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
+import com.nimbusds.openid.connect.sdk.AuthenticationResponseParser;
+import com.nimbusds.openid.connect.sdk.AuthenticationSuccessResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponse;
+import com.nimbusds.openid.connect.sdk.OIDCTokenResponseParser;
+import com.nimbusds.openid.connect.sdk.validators.IDTokenValidator;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+
+public void handleCallback(HttpServletRequest req, HttpSession session) throws Exception {
+    // 1. Parse authentication response from callback URL
+    AuthenticationResponse authResp = AuthenticationResponseParser.parse(new URI(req.getRequestURL() + "?" + req.getQueryString()));
+    if (!authResp.indicatesSuccess()) {
+        throw new SecurityException("Auth failed: " + authResp.toErrorResponse().getErrorObject());
+    }
+
+    AuthenticationSuccessResponse success = (AuthenticationSuccessResponse) authResp;
+
+    // 2. Validate State parameter against session (Anti-CSRF)
+    State savedState = (State) session.getAttribute("auth_state");
+    if (savedState == null || !savedState.equals(success.getState())) {
+        throw new SecurityException("Invalid state parameter - Possible CSRF attack!");
+    }
+
+    AuthorizationCode code = success.getAuthorizationCode();
+    CodeVerifier codeVerifier = (CodeVerifier) session.getAttribute("pkce_verifier");
+
+    // 3. Exchange Authorization Code + PKCE Code Verifier for Tokens (Backchannel POST /token)
+    TokenRequest tokenRequest = new TokenRequest(
+        opMetadata.getTokenEndpointURI(),
+        clientAuth,
+        new AuthorizationCodeGrant(code, redirectURI, codeVerifier)
+    );
+
+    TokenResponse tokenResponse = OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
+    if (!tokenResponse.indicatesSuccess()) {
+        throw new RuntimeException("Token exchange failed: " + tokenResponse.toErrorResponse().getErrorObject());
+    }
+
+    OIDCTokenResponse oidcTokens = (OIDCTokenResponse) tokenResponse.toSuccessResponse();
+    JWT idToken = oidcTokens.getOIDCTokens().getIDToken();
+    Nonce savedNonce = (Nonce) session.getAttribute("auth_nonce");
+
+    // 4. Cryptographically Validate ID Token signature via JWKS and claims (iss, aud, exp, nonce)
+    IDTokenValidator validator = IDTokenValidator.create(opMetadata, clientID, null);
+    JWTClaimsSet claimsSet = validator.validate(idToken, savedNonce);
+
+    // 5. Establish authenticated server session
+    session.setAttribute("user_claims", claimsSet.toJSONObject());
+    session.setAttribute("access_token", oidcTokens.getOIDCTokens().getAccessToken().getValue());
+    session.removeAttribute("pkce_verifier");
 }`
   },
 
@@ -818,11 +1114,13 @@ public class UserController {
     category: 'non-spa',
     logoKey: 'dotnet',
     shortName: 'C# / .NET',
+    libName: 'Microsoft.AspNetCore.OpenIdConnect',
+    brandGradient: 'from-[#581c87] to-[#7c3aed]',
     name: 'C# / .NET 8 (Microsoft.AspNetCore.Authentication.OpenIdConnect)',
     certified: true,
     certificationName: 'OpenID Certified (.NET)',
-    badge: 'Microsoft Certified',
-    badge_ar: 'معتمد رسمياً من Microsoft',
+    badge: 'C# / .NET',
+    badge_ar: 'C# / .NET',
     language: 'C# 12 / .NET 8',
     framework: 'ASP.NET Core / Blazor Server / Razor Pages',
     npmPackage: 'Microsoft.AspNetCore.Authentication.OpenIdConnect',
@@ -952,11 +1250,13 @@ app.Run();`
     category: 'non-spa',
     logoKey: 'go',
     shortName: 'Go',
+    libName: 'coreos/go-oidc',
+    brandGradient: 'from-[#075985] to-[#0284c7]',
     name: 'Go (coreos/go-oidc & golang.org/x/oauth2)',
     certified: true,
     certificationName: 'OpenID Certified (Go)',
-    badge: 'High Performance Go',
-    badge_ar: 'أداء عالي لـ Go',
+    badge: 'Go',
+    badge_ar: 'Go',
     language: 'Go 1.21+',
     framework: 'net/http / Gin / Fiber / Echo',
     npmPackage: 'github.com/coreos/go-oidc/v3/oidc',
@@ -1098,12 +1398,14 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
     id: 'mobile-ios-appauth',
     category: 'mobile',
     logoKey: 'ios',
-    shortName: 'iOS',
+    shortName: 'iOS (Swift)',
+    libName: 'AppAuth-iOS',
+    brandGradient: 'from-[#9a3412] to-[#ea580c]',
     name: 'iOS (Swift & AppAuth-iOS)',
     certified: true,
     certificationName: 'OpenID Certified Foundation SDK',
-    badge: 'Native iOS Standard',
-    badge_ar: 'المعيار القياسي لـ iOS الأصلي',
+    badge: 'iOS (Swift)',
+    badge_ar: 'iOS (Swift)',
     language: 'Swift 5.9+ / SwiftUI',
     framework: 'iOS / iPadOS / macOS',
     npmPackage: 'AppAuth (CocoaPods / SPM)',
@@ -1260,12 +1562,14 @@ func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>)
     id: 'mobile-android-appauth',
     category: 'mobile',
     logoKey: 'android',
-    shortName: 'Android',
+    shortName: 'Android (Kotlin)',
+    libName: 'AppAuth-Android',
+    brandGradient: 'from-[#064e3b] to-[#10b981]',
     name: 'Android (Kotlin & AppAuth-Android)',
     certified: true,
     certificationName: 'OpenID Certified Foundation SDK',
-    badge: 'Native Android Standard',
-    badge_ar: 'المعيار القياسي لـ Android الأصلي',
+    badge: 'Android (Kotlin)',
+    badge_ar: 'Android (Kotlin)',
     language: 'Kotlin / Java',
     framework: 'Android SDK / Jetpack Compose',
     npmPackage: 'net.openid:appauth (Gradle)',
@@ -1382,11 +1686,13 @@ private fun exchangeAuthorizationCode(response: AuthorizationResponse) {
     category: 'mobile',
     logoKey: 'react',
     shortName: 'React Native',
+    libName: 'react-native-app-auth',
+    brandGradient: 'from-[#1e1b4b] to-[#3b82f6]',
     name: 'React Native (react-native-app-auth)',
     certified: true,
     certificationName: 'AppAuth Native Bridge',
-    badge: 'Cross-Platform Mobile',
-    badge_ar: 'تطبيقات الهواتف المتقاطعة',
+    badge: 'React Native',
+    badge_ar: 'React Native',
     language: 'JavaScript / TypeScript',
     framework: 'React Native / Expo',
     npmPackage: 'react-native-app-auth',
@@ -1457,12 +1763,14 @@ export async function logoutAndRevoke(refreshToken) {
     id: 'mobile-flutter-appauth',
     category: 'mobile',
     logoKey: 'flutter',
-    shortName: 'Flutter',
+    shortName: 'Flutter (Dart)',
+    libName: 'flutter_appauth',
+    brandGradient: 'from-[#0c4a6e] to-[#0284c7]',
     name: 'Flutter (flutter_appauth)',
     certified: true,
     certificationName: 'AppAuth Flutter Plugin',
-    badge: 'Flutter Standard',
-    badge_ar: 'المعيار الرسمي لـ Flutter',
+    badge: 'Flutter (Dart)',
+    badge_ar: 'Flutter (Dart)',
     language: 'Dart',
     framework: 'Flutter (iOS / Android / macOS / Windows)',
     npmPackage: 'flutter_appauth',

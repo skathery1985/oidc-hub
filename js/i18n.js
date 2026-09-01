@@ -17,6 +17,7 @@ window.i18n = {
       langToggle: 'English',
       themeToggleLight: '☀️ نهاري',
       themeToggleDark: '🌙 ليلي',
+      scrollDownHint: 'المزيد من التفاصيل بالأسفل',
       
       // Tabs
       tabLiveLab: '🚀 مختبر PKCE التفاعلي',
@@ -99,12 +100,27 @@ window.i18n = {
       mobileBlueprintsTitle: '📦 أدلة الإعداد والتكوين لتطبيقات الهواتف المعتمدة',
       mobileBlueprintsDesc: 'طريقة إعداد الحزم، أذونات Manifest، روابط Deep Linking، وحفظ التوكنات في المفاتيح الآمنة.',
 
-      // SPA & Backend Catalogs
+      // SPA Simulator & Catalog
+      spaSimTitle: '🌐 محاكي تطبيقات الصفحة الواحدة وحزم SDK المعتمدة (SPA)',
+      spaSimSubtitle: 'تطبيق معيار RFC 7636 و OpenID Connect للعملاء العموميين في المتصفح بحفظ التوكنات الآمن في الذاكرة In-Memory.',
       spaTitle: '🌐 حزم SDK المعتمدة لتطبيقات الصفحة الواحدة (SPA)',
       spaSubtitle: 'عملاء عموميون في المتصفح دون أسرار خادم. تطبيق PKCE S256 إلزامي لمنع اعتراض رمز التفويض.',
+      spaBlueprintsTitle: '📦 أدلة الإعداد والتكوين لتطبيقات SPA المعتمدة',
+      spaBlueprintsDesc: 'طريقة إعداد حزم TypeScript/React و Web Crypto API وإدارة التوكنات في الذاكرة مع التجديد الصامت.',
+
+      // Backend Simulator & Catalog
+      backendSimTitle: '🖥️ محاكي خوادم الواجهة الخلفية ونمط BFF المعتمد (Backend & BFF)',
+      backendSimSubtitle: 'تطبيق نمط Backend For Frontend (BFF) والعملاء السريين مع أسرار الخادم وملفات تعريف ارتباط HttpOnly المشفرة.',
       backendTitle: '🖥️ حزم SDK المعتمدة لتطبيقات الواجهة الخلفية (Non-SPA)',
       backendSubtitle: 'عملاء سريون وخوادم SSR. استخدام PKCE S256 مع ملفات تعريف ارتباط مشفرة HttpOnly والتحقق من JWKS.',
+      backendBlueprintsTitle: '📦 أدلة الإعداد والتكوين لتطبيقات الواجهة الخلفية والخوادم',
+      backendBlueprintsDesc: 'تكوين متغيرات البيئة .env، أسرار العميل، التحقق من JWKS، وملفات تعريف الارتباط المشفرة HttpOnly.',
       availableSdks: 'حزم SDK المتاحة:',
+      activeLanguage: 'مفعّل',
+      selectToView: 'اختر للعرض',
+      authModeTitle: 'نوع حماية العميل (Client Security):',
+      authModePkce: 'PKCE S256 (Public)',
+      authModeSecret: 'Client Secret (Confidential)',
       certifiedBadge: 'معتمد رسمياً',
       copyCmd: 'نسخ الأمر',
       secSpecsTitle: 'المواصفات الأمنية:',
@@ -164,6 +180,7 @@ window.i18n = {
       langToggle: 'العربية',
       themeToggleLight: '☀️ Light',
       themeToggleDark: '🌙 Dark',
+      scrollDownHint: 'Scroll for Details',
 
       // Tabs
       tabLiveLab: '🚀 Live PKCE Lab',
@@ -246,12 +263,27 @@ window.i18n = {
       mobileBlueprintsTitle: '📦 Mobile & Cross-Platform SDK Configuration Blueprints',
       mobileBlueprintsDesc: 'Complete setup, manifest permissions, deep linking, and secure keyrings for mobile platforms.',
 
-      // SPA & Backend Catalogs
+      // SPA Simulator & Catalog
+      spaSimTitle: '🌐 Single Page Application (SPA) Interactive Simulators & SDKs',
+      spaSimSubtitle: 'RFC 7636 & OIDC implementation for public browser clients with in-memory tokens and PKCE S256.',
       spaTitle: '🌐 Certified Single Page Application (SPA) SDKs',
       spaSubtitle: 'Public browser clients without server secrets. Enforces S256 PKCE to prevent authorization code interception.',
+      spaBlueprintsTitle: '📦 Certified SPA SDK Configuration & Setup Guides',
+      spaBlueprintsDesc: 'Package installation, in-memory session management, and silent token renewal via Web Worker or iframe.',
+
+      // Backend Simulator & Catalog
+      backendSimTitle: '🖥️ Backend & BFF Server-Side Interactive Simulators & SDKs',
+      backendSimSubtitle: 'Backend For Frontend (BFF) and confidential clients with client secrets and encrypted HttpOnly cookies.',
       backendTitle: '🖥️ Certified Non-SPA / Traditional Backend SDKs',
       backendSubtitle: 'Confidential & SSR server-side clients. Uses PKCE S256 with HttpOnly secure sessions and JWKS signature verification.',
+      backendBlueprintsTitle: '📦 Certified Backend & BFF Server Configuration Guides',
+      backendBlueprintsDesc: 'Configuring .env secrets, JWKS validation, and encrypted HttpOnly session cookies.',
       availableSdks: 'Available Certified SDKs:',
+      activeLanguage: 'Active',
+      selectToView: 'Select to view',
+      authModeTitle: 'Client Security Mode:',
+      authModePkce: 'PKCE S256 (Public)',
+      authModeSecret: 'Client Secret (Confidential)',
       certifiedBadge: 'Certified',
       copyCmd: 'Copy Command',
       secSpecsTitle: 'Security Specifications:',
@@ -389,5 +421,190 @@ window.i18n = {
 
     const footerSpecs = document.getElementById('footer-specs-text');
     if (footerSpecs) footerSpecs.textContent = this.t('footerSpecs');
+  },
+
+  commentTranslationsAr: [
+    // 1. SPA / Pure Web Crypto
+    [/\/\/\s*1\.\s*Pure Web Crypto PKCE Helpers \(RFC 7636\)/gi, '// 1. دوال مساعدة لـ PKCE بواسطة Web Crypto API (معيار RFC 7636)'],
+    [/\/\/\s*2\.\s*Start Authorization Flow/gi, '// 2. بدء تدفق التفويض (Authorization Flow)'],
+    [/\/\/\s*3\.\s*Fetch UserInfo with Access Token/gi, '// 3. استعلام بيانات المستخدم (UserInfo) بواسطة Access Token'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation \(Vanilla JS Fetch\)/gi, '// 4. تدوير رمز التحديث Refresh Token Rotation عبر Fetch'],
+    [/\/\/\s*5\.\s*Logout & Token Revocation \(RFC 7009\) & SSO/gi, '// 5. تسجيل الخروج وإبطال التوكنات وإنهاء الجلسة SSO'],
+    [/\/\/\s*6\.\s*Callback Handler \(e\.g\. callback\.html or \/callback route\)/gi, '// 6. معالج صفحة Callback وتخزين التوكنات'],
+    [/\/\/\s*6\.\s*Process Callback on \/callback\.html/gi, '// 6. معالجة Callback في صفحة callback.html'],
+    [/^#\s*No installation required - 100% native Web Crypto API/gmi, '# لا يتطلب أي تثبيت - يعتمد 100% على Web Crypto API القياسية'],
+
+    // oidc-client-ts
+    [/\/\/\s*1\.\s*Configure the OIDC Client with PKCE enabled/gi, '// 1. تهيئة عميل OIDC مع تفعيل PKCE S256'],
+    [/\/\/\s*1\.\s*Initialize OpenID Certified Client with PKCE S256/gi, '// 1. تهيئة عميل OpenID المعتمد مع تطبيق PKCE S256'],
+    [/\/\/\s*PKCE Settings \(Enabled by default in oidc-client-ts\)/gi, '// إعدادات PKCE (مفعلة افتراضياً في oidc-client-ts)'],
+    [/\/\/\s*Generates S256 code_challenge and stores code_verifier in sessionStorage/gi, '// يولد S256 code_challenge ويحفظ code_verifier في sessionStorage'],
+    [/\/\/\s*Automatic Silent Token Renewal/gi, '// التجديد الصامت التلقائي للتوكنات'],
+    [/\/\/\s*Security checks/gi, '// الفحوصات الأمنية'],
+    [/\/\/\s*2\.\s*Trigger Login \(Redirects with PKCE parameters\)/gi, '// 2. بدء تسجيل الدخول (إعادة التوجيه مع معاملات PKCE)'],
+    [/\/\/\s*2\.\s*Trigger Login Redirect/gi, '// 2. إطلاق إعادة التوجيه لتسجيل الدخول'],
+    [/\/\/\s*3\.\s*UserInfo Claims Query \(oidc-client-ts\)/gi, '// 3. استعلام مطالب المستخدم UserInfo (مكتبة oidc-client-ts)'],
+    [/\/\/\s*Queries \/userinfo using in-memory access token/gi, '// يستعلم نقطة /userinfo باستخدام Access Token المحفوظ في الذاكرة'],
+    [/\/\/\s*4\.\s*Silent Token Refresh & Rotation \(oidc-client-ts\)/gi, '// 4. تجديد التوكنات وتدويرها صامتاً (oidc-client-ts)'],
+    [/\/\/\s*Executes token refresh in background via Refresh Token Rotation or hidden iframe/gi, '// ينفذ تجديد التوكنات في الخلفية عبر RTR أو iframe مخفي'],
+    [/\/\/\s*5\.\s*Logout & Revoke \(oidc-client-ts\)/gi, '// 5. تسجيل الخروج وإبطال التوكنات (oidc-client-ts)'],
+    [/\/\/\s*Automatically revokes tokens and redirects to IdP End Session Endpoint/gi, '// يبطل التوكنات تلقائياً ويعيد التوجيه لنقطة إنهاء الجلسة لدى IdP'],
+    [/\/\/\s*PKCE is enforced automatically by oidc-client-ts/gi, '// يتم تطبيق PKCE S256 تلقائياً بواسطة oidc-client-ts'],
+    [/\/\/\s*Tokens are securely held In-Memory/gi, '// تُحفظ التوكنات بأمان في الذاكرة (In-Memory)'],
+
+    // Next.js (BFF / Auth.js)
+    [/\/\/\s*1\.\s*auth\.ts \(Next\.js 14 App Router Root Configuration\)/gi, '// 1. ملف auth.ts (تهيئة الجذر لـ Next.js 14 App Router)'],
+    [/\/\/\s*Next\.js 14 App Router Auth\.js Configuration/gi, '// تهيئة Auth.js في تطبيق Next.js 14 App Router'],
+    [/\/\/\s*2\.\s*app\/page\.tsx \(Server Action Login with PKCE S256\)/gi, '// 2. ملف app/page.tsx (تسجيل الدخول عبر Server Action مع PKCE)'],
+    [/\/\/\s*3\.\s*UserInfo Claims Resolution & Profile Extraction/gi, '// 3. استخراج بيانات ومطالب المستخدم من UserInfo'],
+    [/\/\/\s*In auth\.ts provider config:/gi, '// داخل إعدادات المزود في auth.ts:'],
+    [/\/\/\s*profile contains claims fetched with the Access Token from \/userinfo/gi, '// يحتوي كائن profile على المطالب المستلمة من /userinfo'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation \(RTR\) in NextAuth JWT Callback/gi, '// 4. تدوير رمز التحديث (RTR) في كولباك JWT لـ NextAuth'],
+    [/\/\/\s*In callbacks\.jwt:/gi, '// داخل دالة callbacks.jwt:'],
+    [/\/\/\s*5\.\s*Logout with Token Revocation \(RFC 7009\) & SSO End Session/gi, '// 5. تسجيل الخروج وإبطال التوكنات (RFC 7009) وإنهاء الجلسة SSO'],
+    [/\/\/\s*Step A:\s*Revoke refresh token on IdP server/gi, '// الخطوة أ: إبطال رمز التحديث على خادم IdP'],
+    [/\/\/\s*Step B:\s*Clear local session & redirect to IdP End Session Endpoint/gi, '// الخطوة ب: مسح الجلسة المحلية وإعادة التوجيه لنقطة إنهاء الجلسة'],
+    [/\/\/\s*6\.\s*Server Component Session Protection \(app\/dashboard\/page\.tsx\)/gi, '// 6. حماية جلسة Server Component في (app/dashboard/page.tsx)'],
+    [/\/\/\s*Enforce PKCE S256/gi, '// تطبيق PKCE S256 الإلزامي'],
+    [/\/\/\s*Encrypted HttpOnly SameSite cookie/gi, '// ملف كوكيز مشفر HttpOnly و SameSite'],
+
+    // Node.js (openid-client)
+    [/\/\/\s*1\.\s*Auto-discover OIDC endpoints via Discovery URL/gi, '// 1. اكتشاف نقاط OIDC تلقائياً عبر Discovery URL'],
+    [/\/\/\s*Node\.js openid-client Configuration/gi, '// تهيئة مكتبة openid-client في Node.js'],
+    [/\/\/\s*Confidential client secret/gi, '// السر المشفر للعميل السري (Client Secret)'],
+    [/\/\/\s*2\.\s*Login Route:\s*Generate PKCE & Redirect/gi, '// 2. مسار تسجيل الدخول: توليد PKCE وإعادة التوجيه'],
+    [/\/\/\s*Generate PKCE code_verifier and S256 code_challenge/gi, '// توليد PKCE code_verifier وحساب code_challenge بطريقة S256'],
+    [/\/\/\s*Generate PKCE parameters and store in session/gi, '// توليد معاملات PKCE وحفظها في الجلسة'],
+    [/\/\/\s*Store verifier, state, and nonce in server-side session/gi, '// حفظ verifier و state و nonce في جلسة الخادم'],
+    [/\/\/\s*Build authorization URL with PKCE parameters/gi, '// بناء رابط التفويض مع معاملات PKCE'],
+    [/\/\/\s*3\.\s*UserInfo Claims Endpoint \(Node\.js\)/gi, '// 3. نقطة مطالب المستخدم UserInfo (في Node.js)'],
+    [/\/\/\s*Queries \/userinfo using the Bearer access_token/gi, '// يستعلم نقطة /userinfo باستخدام Bearer access_token'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation \(Node\.js openid-client\)/gi, '// 4. تدوير رمز التحديث (Node.js openid-client)'],
+    [/\/\/\s*Sends POST \/token \(grant_type=refresh_token\) and gets rotated tokens/gi, '// يرسل طلب POST /token (grant_type=refresh_token) ويستلم توكنات مجددة'],
+    [/\/\/\s*Store new rotated refresh token/gi, '// حفظ رمز التحديث الجديد المدوّر'],
+    [/\/\/\s*Step 1:\s*Revoke token at IdP/gi, '// الخطوة 1: إبطال التوكن لدى مزود الهوية IdP'],
+    [/\/\/\s*Step 2:\s*Destroy local session & redirect to IdP End Session Endpoint/gi, '// الخطوة 2: تدمير الجلسة المحلية والتحويل لنقطة إنهاء الجلسة'],
+    [/\/\/\s*6\.\s*Callback Route:\s*Exchange Code \+ Verifier for Tokens/gi, '// 6. مسار Callback: تبادل الرمز مع Verifier لاستلام التوكنات'],
+
+    // Python (FastAPI / Authlib)
+    [/^#\s*1\.\s*FastAPI \+ Authlib OIDC Configuration with PKCE/gmi, '# 1. تهيئة FastAPI + Authlib مع PKCE S256'],
+    [/^#\s*Python FastAPI \/ Authlib/gmi, '# كود Python FastAPI مع مكتبة Authlib'],
+    [/^#\s*Enforce PKCE S256!/gmi, '# تطبيق PKCE S256 الإلزامي!'],
+    [/^#\s*2\.\s*Login Route:\s*Automatically generates PKCE & redirects/gmi, '# 2. مسار تسجيل الدخول: يولد PKCE تلقائياً ويعيد التوجيه'],
+    [/^#\s*3\.\s*UserInfo Endpoint Claims Fetching \(Python\)/gmi, '# 3. جلب مطالب نقطة UserInfo (بايثون)'],
+    [/^#\s*Fetch profile claims from \/userinfo endpoint/gmi, '# جلب بيانات الملف الشخصي من نقطة /userinfo'],
+    [/^#\s*4\.\s*Refresh Token Rotation \(Python\)/gmi, '# 4. تدوير رمز التحديث Refresh Token Rotation (بايثون)'],
+    [/^#\s*POST to \/token endpoint with grant_type=refresh_token/gmi, '# إرسال POST لنقطة /token مع grant_type=refresh_token'],
+    [/^#\s*Store rotated refresh token/gmi, '# حفظ رمز التحديث الجديد'],
+    [/^#\s*5\.\s*Logout with Token Revocation \(RFC 7009\) & SSO End Session/gmi, '# 5. تسجيل الخروج وإبطال التوكنات وإنهاء الجلسة SSO'],
+    [/^#\s*Step 1:\s*Revoke token on IdP/gmi, '# الخطوة 1: إبطال التوكن على مزود الهوية IdP'],
+    [/^#\s*Step 2:\s*Clear local session & redirect to IdP logout/gmi, '# الخطوة 2: مسح الجلسة المحلية والتحويل لصفحة تسجيل خروج IdP'],
+    [/^#\s*6\.\s*Callback Route:\s*Exchanges Code \+ Verifier & Validates JWT/gmi, '# 6. مسار Callback: تبادل الرمز والتحقق من صحة JWT'],
+
+    // Java Spring Boot 3
+    [/<!--\s*pom\.xml\s*-->/gi, '<!-- ملف pom.xml لتضمين مكتبات Maven -->'],
+    [/^#\s*1\.\s*application\.yml Configuration/gmi, '# 1. ملف إعدادات application.yml'],
+    [/^#\s*Spring Boot automatically queries \/\.well-known\/openid-configuration/gmi, '# يستعلم Spring Boot نقطة openid-configuration تلقائياً'],
+    [/^#\s*and automatically enforces PKCE S256 for code exchanges!/gmi, '# ويطبق PKCE S256 تلقائياً عند تبادل الرموز!'],
+    [/\/\/\s*2\.\s*Security Configuration Class \(SecurityConfig\.java\)/gi, '// 2. فئة إعدادات الأمان (SecurityConfig.java)'],
+    [/\/\/\s*Automatically registers OIDC Login endpoints with PKCE S256/gi, '// يسجل نقاط تسجيل الدخول لـ OIDC مع PKCE S256 تلقائياً'],
+    [/\/\/\s*3\.\s*UserInfo Claims Extraction \(Java Spring Security\)/gi, '// 3. استخراج مطالب UserInfo (في Spring Security)'],
+    [/\/\/\s*Spring Security automatically fetches claims from \/userinfo when configured/gi, '// يجلب Spring Security المطالب من /userinfo تلقائياً عند تهيئته'],
+    [/\/\/\s*4\.\s*Token Refresh via OAuth2AuthorizedClientManager \(Java\)/gi, '// 4. تجديد التوكنات عبر OAuth2AuthorizedClientManager'],
+    [/\/\/\s*Spring Security automatically triggers POST \/token grant_type=refresh_token/gi, '// يطلق Spring Security طلب POST /token لتجديد التوكنات تلقائياً'],
+    [/\/\/\s*5\.\s*OidcClientInitiatedLogoutSuccessHandler \(Java Spring Boot 3\)/gi, '// 5. معالج تسجيل الخروج OidcClientInitiatedLogoutSuccessHandler'],
+    [/\/\/\s*Clears session & redirects to IdP End Session Endpoint with id_token_hint/gi, '// يمسح الجلسة ويعيد التوجيه لنقطة إنهاء الجلسة مع id_token_hint'],
+    [/\/\/\s*6\.\s*Accessing Authenticated User Claims \(UserController\.java\)/gi, '// 6. الوصول لمطالب المستخدم المصادق عليه (UserController.java)'],
+
+    // C# ASP.NET Core 8
+    [/\/\/\s*1\.\s*Program\.cs in ASP\.NET Core 8/gi, '// 1. ملف Program.cs في ASP.NET Core 8'],
+    [/\/\/\s*C# ASP\.NET Core 8 Program\.cs/gi, '// ملف C# ASP.NET Core 8 Program.cs'],
+    [/\/\/\s*ENFORCE PKCE S256/gi, '// تطبيق PKCE S256 الإلزامي'],
+    [/\/\/\s*Mandatory PKCE S256/gi, '// تطبيق PKCE S256 الإلزامي'],
+    [/\/\/\s*Stores tokens in encrypted cookie/gi, '// حفظ التوكنات في ملفات تعريف ارتباط مشفرة'],
+    [/\/\/\s*Auto-fetches \/userinfo/gi, '// جلب بيانات /userinfo تلقائياً'],
+    [/\/\/\s*2\.\s*Challenge endpoint to trigger OIDC PKCE flow/gi, '// 2. نقطة Challenge لبدء تدفق OIDC مع PKCE'],
+    [/\/\/\s*3\.\s*UserInfo Claims in \.NET 8/gi, '// 3. مطالب UserInfo في .NET 8'],
+    [/\/\/\s*Since options\.GetClaimsFromUserInfoEndpoint = true:/gi, '// بما أن GetClaimsFromUserInfoEndpoint مفعلة:'],
+    [/\/\/\s*4\.\s*Token Refresh in ASP\.NET Core \(\.NET 8\)/gi, '// 4. تجديد التوكنات في ASP.NET Core (.NET 8)'],
+    [/\/\/\s*5\.\s*Logout & SignOutAsync \(\.NET 8\)/gi, '// 5. تسجيل الخروج عبر SignOutAsync في (.NET 8)'],
+    [/\/\/\s*Destroys local auth cookie and redirects to IdP End Session Endpoint/gi, '// يحذف كوكيز المصادقة المحلية ويعيد التوجيه لنقطة إنهاء الجلسة'],
+    [/\/\/\s*6\.\s*Protected Dashboard Endpoint/gi, '// 6. نقطة لوحة التحكم المحمية'],
+
+    // Go (coreos/go-oidc)
+    [/\/\/\s*PKCE Helper:\s*generates 43-128 char verifier and S256 challenge/gi, '// دالة مساعدة لـ PKCE: تولد verifier و S256 challenge'],
+    [/\/\/\s*Store codeVerifier in secure session cookie/gi, '// حفظ codeVerifier في كوكيز جلسة آمنة'],
+    [/\/\/\s*Generate authorization URL with S256 PKCE challenge/gi, '// توليد رابط التفويض مع S256 PKCE challenge'],
+    [/\/\/\s*Generate code_verifier & S256 challenge/gi, '// توليد code_verifier وحساب تحدي S256'],
+    [/\/\/\s*3\.\s*UserInfo Claims Extraction \(Go coreos\/go-oidc\)/gi, '// 3. استخراج مطالب UserInfo (Go coreos/go-oidc)'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation \(Go oauth2\)/gi, '// 4. تدوير رمز التحديث (Go oauth2)'],
+    [/\/\/\s*TokenSource automatically sends POST \/token with refresh_token if expired/gi, '// يرسل TokenSource طلب POST /token تلقائياً عند انتهاء صلاحية التوكن'],
+    [/\/\/\s*5\.\s*Logout & IdP End Session \(Go\)/gi, '// 5. تسجيل الخروج وإنهاء الجلسة لدى IdP (Go)'],
+    [/\/\/\s*1\.\s*Clear session cookies/gi, '// 1. مسح ملفات تعريف ارتباط الجلسة'],
+    [/\/\/\s*2\.\s*Redirect to IdP End Session Endpoint/gi, '// 2. إعادة التوجيه لنقطة إنهاء الجلسة لدى IdP'],
+    [/\/\/\s*6\.\s*Callback Handler:\s*Verify RS256 Signature/gi, '// 6. معالج Callback: التحقق من توقيع RS256'],
+
+    // Mobile (iOS Swift, Android Kotlin, Flutter, React Native)
+    [/\/\/\s*Swift Package Manager \(SPM\):/gi, '// مدير حزم Swift (SPM):'],
+    [/\/\/\s*Or CocoaPods Podfile:/gi, '// أو عبر CocoaPods Podfile:'],
+    [/\/\/\s*OIDC Configuration/gi, '// إعدادات OpenID Connect'],
+    [/\/\/\s*AppAuth State & Session holder/gi, '// كائن إدارة حالة وجلسة AppAuth'],
+    [/\/\/\s*1\.\s*Discover Endpoints & Start PKCE Login with ASWebAuthenticationSession/gi, '// 1. اكتشاف النقاط وبدء تسجيل الدخول مع ASWebAuthenticationSession'],
+    [/\/\/\s*A\.\s*Discover OpenID Provider configuration/gi, '// أ. اكتشاف إعدادات مزود OpenID'],
+    [/\/\/\s*B\.\s*Generate PKCE S256 Code Verifier & Challenge automatically!/gi, '// ب. توليد PKCE S256 Code Verifier و Challenge تلقائياً!'],
+    [/\/\/\s*AppAuth-iOS automatically creates 128-byte cryptographic verifier/gi, '// تنشئ AppAuth-iOS مفتاح verifier تشفيري عشوائي بطول 128 بايت'],
+    [/\/\/\s*and S256 challenge under the hood\./gi, '// وحساب تحدي S256 تلقائياً تحت الغطاء.'],
+    [/\/\/\s*Public client:\s*NO secret!/gi, '// عميل عمومي: بدون سر خادم (No Secret)!'],
+    [/\/\/\s*C\.\s*Launch secure system browser \(ASWebAuthenticationSession\)/gi, '// ج. إطلاق متصفح النظام الآمن (ASWebAuthenticationSession)'],
+    [/\/\/\s*Save tokens in iOS Secure Keychain/gi, '// حفظ التوكنات في سلسلة المفاتيح الآمنة iOS Keychain'],
+    [/\/\/\s*3\.\s*Fetch UserInfo Claims in Swift/gi, '// 3. جلب مطالب UserInfo بلغة Swift'],
+    [/\/\/\s*4\.\s*Automatic Token Refresh & Rotation in Swift/gi, '// 4. التجديد والتدوير التلقائي للتوكنات في Swift'],
+    [/\/\/\s*AppAuth automatically checks expiration and sends POST \/token with grant_type=refresh_token/gi, '// تتحقق AppAuth تلقائياً من الصلاحية وترسل POST /token'],
+    [/\/\/\s*Save new rotated tokens/gi, '// حفظ التوكنات المدوّرة الجديدة'],
+    [/\/\/\s*5\.\s*Logout & Revoke in iOS/gi, '// 5. تسجيل الخروج والإبطال في iOS'],
+    [/\/\/\s*A\.\s*Revoke token on IdP/gi, '// أ. إبطال التوكن على مزود الهوية IdP'],
+    [/\/\/\s*POST to \/revoke/gi, '// إرسال طلب POST لنقطة /revoke'],
+    [/\/\/\s*B\.\s*Launch End Session Request/gi, '// ب. إطلاق طلب إنهاء الجلسة End Session'],
+    [/\/\/\s*Clear Keychain/gi, '// مسح التوكنات من Keychain'],
+    [/\/\/\s*6\.\s*AppDelegate \/ SceneDelegate Deep Link Handler/gi, '// 6. معالج الروابط العميقة Deep Link في AppDelegate'],
+    [/\/\/\s*build\.gradle\.kts \(Module:\s*app\)/gi, '// ملف build.gradle.kts (Module: app)'],
+    [/<!--\s*AndroidManifest\.xml Configuration\s*-->/gi, '<!-- إعدادات ملف AndroidManifest.xml -->'],
+    [/<!--\s*AppAuth Redirect Receiver Activity\s*-->/gi, '<!-- نشاط استقبال إعادة التوجيه لـ AppAuth -->'],
+    [/\/\/\s*1\.\s*Initiate PKCE Login in MainActivity\.kt/gi, '// 1. بدء تسجيل الدخول بـ PKCE في MainActivity.kt'],
+    [/\/\/\s*3\.\s*UserInfo Claims Request in Kotlin/gi, '// 3. طلب مطالب UserInfo بلغة Kotlin'],
+    [/\/\/\s*4\.\s*Token Refresh with Rotation in Android Kotlin/gi, '// 4. تجديد التوكنات وتدويرها في Android Kotlin'],
+    [/\/\/\s*AppAuth automatically executes POST \/token \(grant_type=refresh_token\)/gi, '// تنفذ AppAuth طلب POST /token تلقائياً لتجديد التوكنات'],
+    [/\/\/\s*Save newly rotated refresh token to EncryptedSharedPreferences/gi, '// حفظ رمز التحديث المدوّر في EncryptedSharedPreferences'],
+    [/\/\/\s*5\.\s*Logout & End Session in Kotlin/gi, '// 5. تسجيل الخروج وإنهاء الجلسة في Kotlin'],
+    [/\/\/\s*Clear EncryptedSharedPreferences/gi, '// مسح التخزين المشفر EncryptedSharedPreferences'],
+    [/\/\/\s*6\.\s*Token Exchange & Encrypted Storage/gi, '// 6. تبادل التوكنات والتخزين المشفر في KeyStore'],
+    [/\/\/\s*3\.\s*UserInfo in React Native/gi, '// 3. جلب بيانات UserInfo في React Native'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation in React Native/gi, '// 4. تدوير رمز التحديث في React Native'],
+    [/\/\/\s*Update secure Keychain storage with rotated refresh token/gi, '// تحديث Keychain برمز التحديث الجديد المدوّر'],
+    [/\/\/\s*5\.\s*Logout & Revoke in React Native/gi, '// 5. تسجيل الخروج والإبطال في React Native'],
+    [/\/\/\s*pubspec\.yaml/gi, '// ملف pubspec.yaml'],
+    [/\/\/\s*3\.\s*UserInfo Claims in Flutter/gi, '// 3. مطالب UserInfo في Flutter'],
+    [/\/\/\s*4\.\s*Refresh Token Rotation in Flutter/gi, '// 4. تدوير رمز التحديث في Flutter'],
+    [/\/\/\s*5\.\s*Logout & Revoke in Flutter/gi, '// 5. تسجيل الخروج والإبطال في Flutter'],
+    [/\/\/\s*Revoke Refresh Token on IdP/gi, '// إبطال رمز التحديث على مزود الهوية IdP'],
+    [/\/\/\s*End Session SSO/gi, '// إنهاء جلسة تسجيل الدخول الموحد SSO'],
+    [/\/\/\s*1\.\s*Generate high-entropy code_verifier/gi, '// 1. توليد code_verifier عالي الإنتروبيا'],
+    [/\/\/\s*2\.\s*Compute SHA-256 code_challenge/gi, '// 2. حساب بصمة SHA-256 لـ code_challenge'],
+    [/\/\/\s*3\.\s*Launch Authorization Request/gi, '// 3. إطلاق طلب التفويض (Authorization Request)']
+  ],
+
+  /**
+   * Localizes comments within source code blocks based on active language
+   */
+  localizeCodeComments(codeStr) {
+    if (!codeStr || typeof codeStr !== 'string') return codeStr;
+    const isAr = (this.currentLang || 'ar') === 'ar';
+    if (!isAr) return codeStr;
+
+    let localized = codeStr;
+    for (const [pattern, replacement] of this.commentTranslationsAr) {
+      localized = localized.replace(pattern, replacement);
+    }
+    return localized;
   }
 };
