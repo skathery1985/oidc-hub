@@ -10,7 +10,7 @@ window.i18n = {
   translations: {
     ar: {
       // Header & Navigation
-      appTitle: 'منصة OIDC PKCE Hub',
+      appTitle: 'منصة OIDC Hub',
       appSubtitle: 'مختبر تفاعلي لتطبيق OpenID Connect Code Flow with PKCE عبر مختلف اللغات وحزم SDK المعتمدة',
       mockOpReady: 'خادم Mock OP جاهز',
       discoveryJson: 'ملف Discovery JSON',
@@ -20,7 +20,7 @@ window.i18n = {
       scrollDownHint: 'المزيد من التفاصيل بالأسفل',
       
       // Tabs
-      tabLiveLab: '🚀 مختبر PKCE التفاعلي',
+      tabLiveLab: '🚀 مختبر OIDC التفاعلي',
       tabMobile: '📱 تطبيقات الهواتف و Flutter',
       tabSpa: '🌐 تطبيقات الصفحة الواحدة (SPA)',
       tabBackend: '🖥️ تطبيقات الواجهة الخلفية (Non-SPA)',
@@ -119,12 +119,18 @@ window.i18n = {
       activeLanguage: 'مفعّل',
       selectToView: 'اختر للعرض',
       authModeTitle: 'نوع حماية العميل (Client Security):',
-      authModePkce: 'PKCE S256 (Public)',
-      authModeSecret: 'Client Secret (Confidential)',
+      authModePkce: 'PKCE Public',
+      authModePkcePublic: 'PKCE Public',
+      authModePkceConfidential: 'PKCE + Secret',
+      authModeSecret: 'Secret Only',
+      authModePkcePublicTooltip: 'توليد code_verifier و code_challenge S256 بدون سر عميل (Public Client).',
+      authModePkceConfidentialTooltip: 'توليد code_verifier و code_challenge S256 مع سر الخادم (OAuth 2.1).',
+      authModeSecretTooltip: 'تجاوز توليد PKCE وتبادل التوكنات مباشرة عبر سر العميل.',
       certifiedBadge: 'معتمد رسمياً',
       copyCmd: 'نسخ الأمر',
       secSpecsTitle: 'المواصفات الأمنية:',
       secClientType: 'نوع العميل:',
+      secClientSecret: 'سر العميل (Client Secret):',
       secPkceEnforcement: 'تطبيق PKCE:',
       secStorage: 'تخزين التوكنات الموصى به:',
       sectionInstall: '1. أمر تثبيت الحزم (Dependencies)',
@@ -166,14 +172,15 @@ window.i18n = {
 
       // Footer
       footerSpecs: 'OpenID Connect Core 1.0 • RFC 7636 (PKCE) • RFC 8252 (OAuth for Apps) • OAuth 2.1',
-      footerJwks: 'نقطة JWKS',
-      footerUserInfo: 'نقطة UserInfo',
-      footerMetadata: 'بيانات OpenID Metadata'
+      footerJwks: 'نقطة نهاية JWKS',
+      footerUserInfo: 'نقطة نهاية UserInfo',
+      footerUserinfo: 'نقطة نهاية UserInfo',
+      footerMetadata: 'بيانات تكوين OpenID Metadata'
     },
 
     en: {
       // Header & Navigation
-      appTitle: 'OIDC PKCE Hub',
+      appTitle: 'OIDC Hub',
       appSubtitle: 'Interactive OpenID Connect Code Flow with PKCE Lab & Multi-Language Certified SDK Showcase',
       mockOpReady: 'Mock OP Ready',
       discoveryJson: 'Discovery JSON',
@@ -183,7 +190,7 @@ window.i18n = {
       scrollDownHint: 'Scroll for Details',
 
       // Tabs
-      tabLiveLab: '🚀 Live PKCE Lab',
+      tabLiveLab: '🚀 Live OIDC Lab',
       tabMobile: '📱 Mobile & Flutter',
       tabSpa: '🌐 Single Page Apps (SPA)',
       tabBackend: '🖥️ Non-SPA / Backend',
@@ -282,12 +289,18 @@ window.i18n = {
       activeLanguage: 'Active',
       selectToView: 'Select to view',
       authModeTitle: 'Client Security Mode:',
-      authModePkce: 'PKCE S256 (Public)',
-      authModeSecret: 'Client Secret (Confidential)',
+      authModePkce: 'PKCE Public',
+      authModePkcePublic: 'PKCE Public',
+      authModePkceConfidential: 'PKCE + Secret',
+      authModeSecret: 'Secret Only',
+      authModePkcePublicTooltip: 'Generates code_verifier & code_challenge S256 with zero client secret.',
+      authModePkceConfidentialTooltip: 'Generates code_verifier & code_challenge S256 and passes server credentials.',
+      authModeSecretTooltip: 'Bypasses PKCE generation and executes direct secret-based token exchange.',
       certifiedBadge: 'Certified',
       copyCmd: 'Copy Command',
       secSpecsTitle: 'Security Specifications:',
       secClientType: 'Client Type:',
+      secClientSecret: 'Client Secret:',
       secPkceEnforcement: 'PKCE Enforcement:',
       secStorage: 'Recommended Token Storage:',
       sectionInstall: '1. Dependencies & Package Installation',
@@ -331,6 +344,7 @@ window.i18n = {
       footerSpecs: 'OpenID Connect Core 1.0 • RFC 7636 (PKCE) • RFC 8252 (OAuth for Apps) • OAuth 2.1',
       footerJwks: 'JWKS Endpoint',
       footerUserInfo: 'UserInfo Endpoint',
+      footerUserinfo: 'UserInfo Endpoint',
       footerMetadata: 'OpenID Metadata'
     }
   },
@@ -421,6 +435,15 @@ window.i18n = {
 
     const footerSpecs = document.getElementById('footer-specs-text');
     if (footerSpecs) footerSpecs.textContent = this.t('footerSpecs');
+
+    const footerJwks = document.getElementById('footer-jwks-link');
+    if (footerJwks) footerJwks.textContent = this.t('footerJwks');
+
+    const footerUserInfo = document.getElementById('footer-userinfo-link');
+    if (footerUserInfo) footerUserInfo.textContent = this.t('footerUserInfo');
+
+    const footerMetadata = document.getElementById('footer-metadata-link');
+    if (footerMetadata) footerMetadata.textContent = this.t('footerMetadata');
   },
 
   commentTranslationsAr: [

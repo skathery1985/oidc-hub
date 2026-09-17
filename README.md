@@ -1,4 +1,4 @@
-# 🔐 OIDC PKCE Master Hub
+# 🔐 OIDC Master Hub
 
 An interactive playground and developer guide for **OpenID Connect (OIDC) Authorization Code Flow with PKCE (RFC 7636 / RFC 8252 / OAuth 2.1)** across Mobile, SPA, and Backend architectures.
 

@@ -263,17 +263,18 @@ window.App = {
   renderSdkCatalogCards(categoryFilter) {
     const t = (k) => window.i18n.t(k);
     const isAr = window.i18n.currentLang === 'ar';
-    const filtered = window.SDK_CATALOG.filter(s => s.category === categoryFilter);
+    const normalizedCategory = (categoryFilter === 'backend') ? 'non-spa' : categoryFilter;
+    const filtered = (window.SDK_CATALOG || []).filter(s => s.category === normalizedCategory || s.category === categoryFilter);
     
     let containerId = 'backend-catalog-cards';
     let propName = 'selectedBackendSdkId';
     let defaultId = 'backend-nextjs-auth';
     
-    if (categoryFilter === 'mobile') {
+    if (normalizedCategory === 'mobile') {
       containerId = 'mobile-catalog-cards';
       propName = 'selectedMobileSdkId';
       defaultId = 'mobile-flutter-appauth';
-    } else if (categoryFilter === 'spa') {
+    } else if (normalizedCategory === 'spa') {
       containerId = 'spa-catalog-cards';
       propName = 'selectedSpaSdkId';
       defaultId = 'spa-oidc-client-ts';
@@ -281,12 +282,33 @@ window.App = {
 
     const currentSelectedId = this[propName] || defaultId;
     const selected = filtered.find(s => s.id === currentSelectedId) || filtered[0];
+    if (!selected) return '';
     this[propName] = selected.id;
 
     const badgeText = isAr && selected.badge_ar ? selected.badge_ar : selected.badge;
-    const secType = isAr && selected.securityModel.type_ar ? selected.securityModel.type_ar : selected.securityModel.type;
-    const secPkce = isAr && selected.securityModel.pkceEnforced_ar ? selected.securityModel.pkceEnforced_ar : selected.securityModel.pkceEnforced;
-    const secStorage = isAr && selected.securityModel.tokenStorage_ar ? selected.securityModel.tokenStorage_ar : selected.securityModel.tokenStorage;
+    let secType = isAr && selected.securityModel.type_ar ? selected.securityModel.type_ar : selected.securityModel.type;
+    let secPkce = isAr && selected.securityModel.pkceEnforced_ar ? selected.securityModel.pkceEnforced_ar : selected.securityModel.pkceEnforced;
+    let secStorage = isAr && selected.securityModel.tokenStorage_ar ? selected.securityModel.tokenStorage_ar : selected.securityModel.tokenStorage;
+    let secSecret = isAr && selected.securityModel.clientSecret_ar ? selected.securityModel.clientSecret_ar : selected.securityModel.clientSecret;
+    let configCode = selected.configCode;
+
+    if (normalizedCategory === 'non-spa' && window.BackendSimulator) {
+      const mode = window.BackendSimulator.authMode || 'pkce_public';
+      configCode = window.BackendSimulator.getCodeSnippet(selected.id, mode);
+      if (mode === 'pkce_public') {
+        secType = isAr ? 'عميل عام (Public Client - بدون سري)' : 'Public Client (No Client Secret)';
+        secPkce = isAr ? 'إلزامي (Mandatory S256)' : 'Mandatory (S256)';
+        secSecret = isAr ? 'محظور / غير مستخدم (عميل عام)' : 'Forbidden / None (Public Client)';
+      } else if (mode === 'client_secret') {
+        secType = isAr ? 'عميل سري (Confidential Client - Legacy)' : 'Confidential Client (Legacy OAuth 2.0)';
+        secPkce = isAr ? 'معطل / غير مستخدم' : 'Disabled (No PKCE)';
+        secSecret = isAr ? 'محفوظ بأمان في متغيرات بيئة الخادم (.env)' : 'Protected in server environment variables (.env)';
+      } else {
+        secType = isAr ? 'عميل سري / نمط BFF (OAuth 2.1)' : 'Confidential Client / BFF (OAuth 2.1)';
+        secPkce = isAr ? 'إلزامي وتلقائي (PKCE S256 + Secret)' : 'Mandatory (PKCE S256 + Secret)';
+        secSecret = isAr ? 'محفوظ بأمان في متغيرات بيئة الخادم (.env)' : 'Protected in server environment variables (.env)';
+      }
+    }
 
     return `
       <div class="w-full">
@@ -317,6 +339,7 @@ window.App = {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
             <div><span class="text-slate-500 dark:text-slate-400">${t('secClientType')}</span> <span class="font-mono text-sky-600 dark:text-sky-400 font-bold">${secType}</span></div>
             <div><span class="text-slate-500 dark:text-slate-400">${t('secPkceEnforcement')}</span> <span class="font-mono text-emerald-600 dark:text-emerald-400 font-bold">${secPkce}</span></div>
+            <div class="col-span-1 md:col-span-2"><span class="text-slate-500 dark:text-slate-400">${t('secClientSecret')}</span> <span class="font-mono text-indigo-600 dark:text-indigo-400 font-bold">${secSecret}</span></div>
             <div class="col-span-1 md:col-span-2"><span class="text-slate-500 dark:text-slate-400">${t('secStorage')}</span> <span class="font-mono text-amber-700 dark:text-amber-300">${secStorage}</span></div>
           </div>
 
@@ -329,7 +352,7 @@ window.App = {
           <!-- Configuration / Manifest -->
           <div class="space-y-2">
             <label class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">${t('sectionConfig')}</label>
-            <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(selected.configCode)}</code></pre>
+            <pre class="bg-slate-900 p-4 rounded-xl text-xs font-mono text-slate-200 border border-slate-800 overflow-x-auto max-h-72 custom-scrollbar" dir="ltr"><code>${this.highlightCode(configCode)}</code></pre>
           </div>
 
           <!-- Login Code -->
@@ -394,7 +417,7 @@ window.App = {
       this.selectedSpaSdkId = targetId;
       const el = document.getElementById('spa-catalog-cards');
       if (el) el.innerHTML = this.renderSdkCatalogCards('spa');
-    } else if (category === 'backend') {
+    } else if (category === 'backend' || category === 'non-spa') {
       if (platform === 'nextjs') targetId = 'backend-nextjs-auth';
       else if (platform === 'node') targetId = 'backend-node-openid-client';
       else if (platform === 'python') targetId = 'backend-python-authlib';
@@ -404,7 +427,7 @@ window.App = {
       else if (platform === 'go') targetId = 'backend-go-oidc';
       this.selectedBackendSdkId = targetId;
       const el = document.getElementById('backend-catalog-cards');
-      if (el) el.innerHTML = this.renderSdkCatalogCards('backend');
+      if (el) el.innerHTML = this.renderSdkCatalogCards('non-spa');
     }
   },
 

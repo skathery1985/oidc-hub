@@ -29,6 +29,9 @@ window.BackendSimulator = {
     this.authMode = mode;
     this.reset();
     this.renderSimulatorFrame();
+    if (window.App && typeof window.App.syncSdkCatalogFromSimulator === 'function') {
+      window.App.syncSdkCatalogFromSimulator('backend', this.currentPlatform);
+    }
   },
 
   setPlatform(platform) {
@@ -79,16 +82,25 @@ window.BackendSimulator = {
     this.renderScreen();
 
     const isAr = window.i18n.currentLang === 'ar';
-    const isPkce = this.authMode === 'pkce_public';
+    const isPkcePublic = this.authMode === 'pkce_public';
+    const isPkceConfidential = this.authMode === 'pkce_confidential';
+    const isPkce = isPkcePublic || isPkceConfidential;
 
     if (isPkce) {
       this.state.verifier = window.PKCEEngine.generateCodeVerifier(64);
       this.state.challenge = await window.PKCEEngine.generateCodeChallenge(this.state.verifier);
       this.state.state = window.PKCEEngine.generateRandomString(16);
 
-      const msg = isAr 
-        ? `تم إنشاء <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> وتوليد تحدي التشفير <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> بطريقة <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> (نمط PKCE Public).`
-        : `Generated <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> and computed <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> (PKCE Public mode).`;
+      let msg = '';
+      if (isPkcePublic) {
+        msg = isAr 
+          ? `تم إنشاء <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> وتوليد تحدي التشفير <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> بطريقة <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> (نمط عميل عام PKCE Public - بدون سر).`
+          : `Generated <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> and computed <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> <span class="text-emerald-400 font-mono font-semibold" dir="ltr">code_challenge</span> (PKCE Public mode - No Client Secret).`;
+      } else {
+        msg = isAr 
+          ? `تم إنشاء <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> وتوليد تحدي <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> مع حماية سر العميل في الخادم <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (نمط عميل سري PKCE Confidential / معيار OAuth 2.1).`
+          : `Generated <span class="text-sky-400 font-mono font-semibold" dir="ltr">code_verifier</span> and computed <span class="text-emerald-400 font-mono font-bold" dir="ltr">S256</span> challenge alongside protected server <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (PKCE Confidential mode / OAuth 2.1).`;
+      }
       this.logStep(msg);
     } else {
       this.state.verifier = null;
@@ -96,8 +108,8 @@ window.BackendSimulator = {
       this.state.state = window.PKCEEngine.generateRandomString(16);
 
       const msg = isAr
-        ? `بدء جلسة المصادقة المباشرة باستخدام <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> المحمي في الخادم السري (نمط العميل السري / بدون PKCE).`
-        : `Initiated direct authentication session using secure server <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (Confidential Client mode, No PKCE).`;
+        ? `بدء جلسة المصادقة المباشرة باستخدام <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> المحمي في الخادم السري (نمط العميل السري فقط / بدون PKCE).`
+        : `Initiated direct authentication session using secure server <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (Client Secret only, No PKCE).`;
       this.logStep(msg);
     }
 
@@ -121,15 +133,16 @@ window.BackendSimulator = {
   },
 
   getClientId() {
+    const isPublic = this.authMode === 'pkce_public';
     switch (this.currentPlatform) {
-      case 'nextjs': return 'nextjs-bff-client';
-      case 'node': return 'node-backend-client';
-      case 'python': return 'fastapi-authlib-client';
-      case 'spring': return 'spring-boot-client';
-      case 'nimbus': return 'nimbus-java-client';
-      case 'dotnet': return 'dotnet-core-client';
-      case 'go': return 'go-gin-client';
-      default: return 'confidential-client';
+      case 'nextjs': return isPublic ? 'nextjs-pkce-client' : 'nextjs-bff-client';
+      case 'node': return isPublic ? 'node-pkce-client' : 'node-backend-client';
+      case 'python': return isPublic ? 'fastapi-pkce-client' : 'fastapi-authlib-client';
+      case 'spring': return isPublic ? 'spring-boot-pkce-client' : 'spring-boot-client';
+      case 'nimbus': return isPublic ? 'nimbus-pkce-client' : 'nimbus-java-client';
+      case 'dotnet': return isPublic ? 'dotnet-pkce-client' : 'dotnet-core-client';
+      case 'go': return isPublic ? 'go-gin-pkce-client' : 'go-gin-client';
+      default: return isPublic ? 'public-client' : 'confidential-client';
     }
   },
 
@@ -152,7 +165,7 @@ window.BackendSimulator = {
     this.renderScreen();
 
     const redirectUri = this.getRedirectUri();
-    const isPkce = this.authMode === 'pkce_public';
+    const isPkce = this.authMode === 'pkce_public' || this.authMode === 'pkce_confidential';
     let mockCode;
     if (window.VirtualOP) {
       mockCode = window.VirtualOP.issueAuthorizationCode({
@@ -187,7 +200,7 @@ window.BackendSimulator = {
                 grantType: 'authorization_code',
                 clientId: this.getClientId(),
                 code: mockCode,
-                codeVerifier: this.state.verifier
+                codeVerifier: isPkce ? this.state.verifier : null
               });
             } catch (vErr) {
               console.warn('VirtualOP exchange notice:', vErr);
@@ -217,9 +230,20 @@ window.BackendSimulator = {
           };
           this.state.step = 'logged_in';
 
-          const successMsg = isAr
-            ? `اكتمل التحقق عبر <span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> بنجاح! تم التحقق من توقيعات <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> باستخدام <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> وإنشاء ملف <span class="text-purple-400 font-mono font-bold" dir="ltr">HttpOnly SameSite Cookie</span> مشفر للجلسة.`
-            : `<span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> validation passed! Verified <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> signatures using <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> and created an encrypted <span class="text-purple-400 font-mono font-bold" dir="ltr">HttpOnly SameSite Cookie</span> session.`;
+          let successMsg = '';
+          if (this.authMode === 'pkce_public') {
+            successMsg = isAr
+              ? `اكتمل التحقق عبر <span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> بنجاح! تم التحقق من تحدي <span class="text-emerald-400 font-mono font-semibold" dir="ltr">PKCE S256</span> (بدون سر عميل) وإنشاء ملف <span class="text-purple-400 font-mono font-bold" dir="ltr">HttpOnly SameSite Cookie</span> مشفر للجلسة.`
+              : `<span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> validation passed! Verified <span class="text-emerald-400 font-mono font-semibold" dir="ltr">PKCE S256</span> challenge (No Secret) and created an encrypted <span class="text-purple-400 font-mono font-bold" dir="ltr">HttpOnly SameSite Cookie</span> session.`;
+          } else if (this.authMode === 'pkce_confidential') {
+            successMsg = isAr
+              ? `اكتمل التحقق عبر <span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> بنجاح! تم التحقق المزدوج من <span class="text-emerald-400 font-mono font-semibold" dir="ltr">PKCE S256</span> وسر العميل <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> وتوقيعات <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> (معيار OAuth 2.1).`
+              : `<span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> validation passed! Verified dual-layer <span class="text-emerald-400 font-mono font-semibold" dir="ltr">PKCE S256</span> and server <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> with <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> (OAuth 2.1).`;
+          } else {
+            successMsg = isAr
+              ? `اكتمل التحقق عبر <span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> بنجاح! تم التحقق من توقيعات <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> باستخدام <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (العميل السري بدون PKCE).`
+              : `<span class="text-cyan-400 font-mono font-bold" dir="ltr">Backchannel</span> validation passed! Verified <span class="text-indigo-400 font-mono font-semibold" dir="ltr">JWKS</span> signatures using server <span class="text-emerald-400 font-mono font-semibold" dir="ltr">client_secret</span> (Confidential Client without PKCE).`;
+          }
           this.logStep(successMsg);
 
           this.renderScreen();
@@ -291,15 +315,19 @@ window.BackendSimulator = {
               </a>
             </div>
             
-            <!-- Client Security Mode Toggle: PKCE S256 (Public) vs Client Secret (Confidential) -->
-            <div class="mb-3 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 grid grid-cols-2 gap-1 text-[11px] font-semibold select-none">
-              <button onclick="window.BackendSimulator.setAuthMode('pkce_public')" class="py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${isPkce ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                <span class="truncate">PKCE S256 (Public)</span>
+            <!-- Client Security Mode Toggle: PKCE Public vs PKCE Confidential vs Client Secret Only -->
+            <div class="mb-3 p-1 bg-slate-100 dark:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-700/60 grid grid-cols-3 gap-1 text-[10px] sm:text-[11px] font-semibold select-none">
+              <button onclick="window.BackendSimulator.setAuthMode('pkce_public')" title="${t('authModePkcePublicTooltip') || 'Generates code_verifier & code_challenge S256 with zero client secret.'}" class="py-1.5 px-1 rounded-lg transition-all flex items-center justify-center gap-1 ${this.authMode === 'pkce_public' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <span class="truncate">${t('authModePkcePublic')}</span>
               </button>
-              <button onclick="window.BackendSimulator.setAuthMode('client_secret')" class="py-1.5 px-2 rounded-lg transition-all flex items-center justify-center gap-1.5 ${!isPkce ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
-                <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
-                <span class="truncate">Client Secret</span>
+              <button onclick="window.BackendSimulator.setAuthMode('pkce_confidential')" title="${t('authModePkceConfidentialTooltip') || 'Generates code_verifier & code_challenge S256 and passes server credentials.'}" class="py-1.5 px-1 rounded-lg transition-all flex items-center justify-center gap-1 ${this.authMode === 'pkce_confidential' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                <span class="truncate">${t('authModePkceConfidential')}</span>
+              </button>
+              <button onclick="window.BackendSimulator.setAuthMode('client_secret')" title="${t('authModeSecretTooltip') || 'Bypasses PKCE generation and executes direct secret-based token exchange.'}" class="py-1.5 px-1 rounded-lg transition-all flex items-center justify-center gap-1 ${this.authMode === 'client_secret' ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'}">
+                <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                <span class="truncate">${t('authModeSecret')}</span>
               </button>
             </div>
 
@@ -708,7 +736,9 @@ window.BackendSimulator = {
 
     const t = (k) => window.i18n.t(k);
     const plat = this.currentPlatform;
-    const isPkce = this.authMode === 'pkce_public';
+    const isPkcePublic = this.authMode === 'pkce_public';
+    const isPkceConfidential = this.authMode === 'pkce_confidential';
+    const isClientSecret = this.authMode === 'client_secret';
 
     if (this.state.step === 'idle' || this.state.step === 'generating_pkce') {
       const getColorGradient = () => {
@@ -768,8 +798,8 @@ window.BackendSimulator = {
 
           <!-- 4. The Flow -->
           <div class="mt-3 flex items-center gap-1.5 text-xs text-slate-300 font-semibold bg-slate-950/80 px-3 py-1 rounded-lg border border-slate-800/80">
-            <span class="w-2 h-2 rounded-full ${isPkce ? 'bg-emerald-400' : 'bg-indigo-400'} animate-pulse"></span>
-            <span>${isPkce ? 'Code Flow with PKCE S256 (Public)' : 'Code Flow with Client Secret (Confidential)'}</span>
+            <span class="w-2 h-2 rounded-full ${isPkcePublic ? 'bg-emerald-400' : isPkceConfidential ? 'bg-sky-400' : 'bg-indigo-400'} animate-pulse"></span>
+            <span>${isPkcePublic ? 'Code Flow with PKCE S256 (Public - No Secret)' : isPkceConfidential ? 'Code Flow with PKCE S256 + Secret (Confidential - OAuth 2.1)' : 'Code Flow with Client Secret (Confidential - No PKCE)'}</span>
           </div>
           
           <!-- 5. Button (Sign In) -->
@@ -793,9 +823,9 @@ window.BackendSimulator = {
             <p class="text-[11px] text-slate-400 mt-1">Client: <strong class="text-sky-300 font-mono" dir="ltr">${this.getClientId()}</strong></p>
             
             <div class="mt-4 p-2.5 bg-slate-950 rounded-lg border border-slate-800 text-[10px] text-left text-indigo-300 font-mono space-y-1" dir="ltr">
-              <div>&bull; Client Type: <span class="text-emerald-400">${isPkce ? 'Public (PKCE S256)' : 'Confidential (Secret)'}</span></div>
-              <div>&bull; PKCE S256: <span class="${isPkce ? 'text-emerald-400 font-bold' : 'text-slate-500'}">${isPkce ? 'Active (code_challenge)' : 'Disabled'}</span></div>
-              <div>&bull; Client Secret: <span class="${isPkce ? 'text-slate-500' : 'text-emerald-400 font-bold'}">${isPkce ? 'None (Public)' : 'Protected in .env'}</span></div>
+              <div>&bull; Client Type: <span class="text-emerald-400 font-bold">${isPkcePublic ? 'Public Client (No Secret)' : isPkceConfidential ? 'Confidential (BFF / OAuth 2.1)' : 'Confidential (Legacy OAuth 2.0)'}</span></div>
+              <div>&bull; PKCE S256: <span class="${!isClientSecret ? 'text-emerald-400 font-bold' : 'text-slate-500'}">${!isClientSecret ? 'Active (code_challenge S256)' : 'Disabled'}</span></div>
+              <div>&bull; Client Secret: <span class="${!isPkcePublic ? 'text-emerald-400 font-bold' : 'text-slate-500'}">${!isPkcePublic ? 'Protected in .env' : 'None (Public Client)'}</span></div>
             </div>
           </div>
 
@@ -813,7 +843,7 @@ window.BackendSimulator = {
       screen.innerHTML = `
         <div class="flex flex-col items-center justify-center flex-1 text-center">
           <div class="w-10 h-10 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-          <h3 class="text-sm font-bold text-white">${isPkce ? 'Verifying PKCE S256 Challenge...' : 'Backchannel Client Secret Exchange...'}</h3>
+          <h3 class="text-sm font-bold text-white">${isPkcePublic ? 'Verifying PKCE S256 Challenge (Public)...' : isPkceConfidential ? 'Verifying PKCE S256 & Client Secret (OAuth 2.1)...' : 'Backchannel Client Secret Exchange (No PKCE)...'}</h3>
           <p class="text-[10px] text-slate-400 mt-1 font-mono break-all" dir="ltr">POST /mock-idp/token (Server-to-Server)</p>
         </div>
       `;
@@ -841,7 +871,7 @@ window.BackendSimulator = {
             </div>
             <div class="flex justify-between text-slate-300">
               <span>Auth Mode:</span>
-              <span class="${isPkce ? 'text-sky-400' : 'text-amber-400'}">${isPkce ? 'PKCE S256 (Public)' : 'Client Secret (Confidential)'}</span>
+              <span class="${isPkcePublic ? 'text-emerald-400 font-bold' : isPkceConfidential ? 'text-sky-400 font-bold' : 'text-amber-400 font-bold'}">${isPkcePublic ? 'PKCE S256 (Public)' : isPkceConfidential ? 'PKCE S256 (Confidential)' : 'Client Secret Only'}</span>
             </div>
             <div class="flex justify-between text-slate-300">
               <span>Backchannel RTR:</span>
@@ -865,29 +895,43 @@ window.BackendSimulator = {
     }
   },
 
-  getCodeSnippet() {
-    const isPkce = this.authMode === 'pkce_public';
-    switch (this.currentPlatform) {
+  getCodeSnippet(platformParam, modeParam) {
+    let plat = platformParam || this.currentPlatform;
+    if (plat.startsWith('backend-')) {
+      if (plat.includes('nextjs')) plat = 'nextjs';
+      else if (plat.includes('node')) plat = 'node';
+      else if (plat.includes('python')) plat = 'python';
+      else if (plat.includes('spring')) plat = 'spring';
+      else if (plat.includes('nimbus')) plat = 'nimbus';
+      else if (plat.includes('dotnet')) plat = 'dotnet';
+      else if (plat.includes('go')) plat = 'go';
+    }
+    const mode = modeParam || this.authMode || 'pkce_public';
+    const isPublic = mode === 'pkce_public';
+    const isConfidential = mode === 'pkce_confidential';
+
+    switch (plat) {
       case 'nextjs':
-        return isPkce 
-          ? `// Next.js 14 App Router (PKCE S256 Public Client)
+        if (isPublic) {
+          return `// Next.js 14 App Router (PKCE S256 Public Client - No Secret)
 import NextAuth from 'next-auth';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     {
       id: 'oidc-provider',
-      name: 'OpenID Provider (PKCE)',
+      name: 'OpenID Provider (PKCE Public)',
       type: 'oidc',
       issuer: 'http://localhost:3000/mock-idp',
       clientId: 'nextjs-pkce-client',
-      clientSecret: null, // Public Client (No Secret)
-      checks: ['pkce', 'state'] // Enforce PKCE S256
+      clientSecret: null, // Public Client: NO Secret
+      checks: ['pkce', 'state'] // Mandatory PKCE S256
     }
   ],
   session: { strategy: 'jwt' }
-});`
-          : `// Next.js 14 App Router (Client Secret Confidential Client)
+});`;
+        } else if (isConfidential) {
+          return `// Next.js 14 App Router (PKCE S256 Confidential Client / BFF - OAuth 2.1)
 import NextAuth from 'next-auth';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -899,15 +943,34 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       issuer: 'http://localhost:3000/mock-idp',
       clientId: process.env.AUTH_OIDC_ID,
       clientSecret: process.env.AUTH_OIDC_SECRET, // Protected Server Secret
-      checks: ['state'] // Standard State Check
+      checks: ['pkce', 'state'] // Defense-in-Depth: Both PKCE S256 & Secret
     }
   ],
   session: { strategy: 'jwt' }
 });`;
+        } else {
+          return `// Next.js 14 App Router (Client Secret Only - Legacy Confidential)
+import NextAuth from 'next-auth';
+
+export const { handlers, signIn, signOut, auth } = NextAuth({
+  providers: [
+    {
+      id: 'oidc-provider',
+      name: 'Corporate OpenID Provider',
+      type: 'oidc',
+      issuer: 'http://localhost:3000/mock-idp',
+      clientId: process.env.AUTH_OIDC_ID,
+      clientSecret: process.env.AUTH_OIDC_SECRET, // Protected Server Secret
+      checks: ['state'] // Standard State Check (No PKCE)
+    }
+  ],
+  session: { strategy: 'jwt' }
+});`;
+        }
 
       case 'node':
-        return isPkce 
-          ? `// Node.js openid-client (PKCE S256 Public Client)
+        if (isPublic) {
+          return `// Node.js openid-client (PKCE S256 Public Client - No Secret)
 import { Issuer, generators } from 'openid-client';
 
 const opIssuer = await Issuer.discover('http://localhost:3000/mock-idp');
@@ -915,14 +978,32 @@ const client = new opIssuer.Client({
   client_id: 'node-pkce-client',
   redirect_uris: ['http://localhost:3000/auth/callback'],
   response_types: ['code'],
-  token_endpoint_auth_method: 'none' // Public Client
+  token_endpoint_auth_method: 'none' // Public Client: NO Secret
 });
 
 // Generate PKCE S256
 const code_verifier = generators.codeVerifier();
 const code_challenge = generators.codeChallenge(code_verifier);
-req.session.code_verifier = code_verifier;`
-          : `// Node.js openid-client (Client Secret Confidential Client)
+req.session.code_verifier = code_verifier;`;
+        } else if (isConfidential) {
+          return `// Node.js openid-client (PKCE S256 Confidential Client - OAuth 2.1)
+import { Issuer, generators } from 'openid-client';
+
+const opIssuer = await Issuer.discover('http://localhost:3000/mock-idp');
+const client = new opIssuer.Client({
+  client_id: 'node-backend-client',
+  client_secret: process.env.OIDC_CLIENT_SECRET, // Protected Secret
+  redirect_uris: ['http://localhost:3000/auth/callback'],
+  response_types: ['code'],
+  token_endpoint_auth_method: 'client_secret_post'
+});
+
+// Generate PKCE S256 (Defense-in-Depth)
+const code_verifier = generators.codeVerifier();
+const code_challenge = generators.codeChallenge(code_verifier);
+req.session.code_verifier = code_verifier;`;
+        } else {
+          return `// Node.js openid-client (Client Secret Only - Legacy Confidential)
 import { Issuer } from 'openid-client';
 
 const opIssuer = await Issuer.discover('http://localhost:3000/mock-idp');
@@ -933,24 +1014,27 @@ const client = new opIssuer.Client({
   response_types: ['code'],
   token_endpoint_auth_method: 'client_secret_post'
 });`;
+        }
 
       case 'python':
-        return isPkce 
-          ? `# Python FastAPI / Authlib (PKCE S256 Public Client)
+        if (isPublic) {
+          return `# Python FastAPI / Authlib (PKCE S256 Public Client - No Secret)
 from authlib.integrations.starlette_client import OAuth
 
 oauth = OAuth()
 oauth.register(
     name='oidc',
     client_id='fastapi-pkce-client',
-    client_secret=None, # Public Client
+    client_secret=None, # Public Client: NO Secret
     server_metadata_url='http://localhost:3000/mock-idp/.well-known/openid-configuration',
     client_kwargs={
         'scope': 'openid profile email',
         'code_challenge_method': 'S256' # Enforce PKCE S256
     }
-)`
-          : `# Python FastAPI / Authlib (Client Secret Confidential Client)
+)`;
+        } else if (isConfidential) {
+          return `# Python FastAPI / Authlib (PKCE S256 Confidential Client - OAuth 2.1)
+import os
 from authlib.integrations.starlette_client import OAuth
 
 oauth = OAuth()
@@ -960,13 +1044,30 @@ oauth.register(
     client_secret=os.getenv('OIDC_CLIENT_SECRET'), # Protected Secret
     server_metadata_url='http://localhost:3000/mock-idp/.well-known/openid-configuration',
     client_kwargs={
-        'scope': 'openid profile email'
+        'scope': 'openid profile email',
+        'code_challenge_method': 'S256' # Defense-in-Depth: Both PKCE & Secret
     }
 )`;
+        } else {
+          return `# Python FastAPI / Authlib (Client Secret Only - Legacy Confidential)
+import os
+from authlib.integrations.starlette_client import OAuth
+
+oauth = OAuth()
+oauth.register(
+    name='oidc',
+    client_id='fastapi-authlib-client',
+    client_secret=os.getenv('OIDC_CLIENT_SECRET'), # Protected Secret
+    server_metadata_url='http://localhost:3000/mock-idp/.well-known/openid-configuration',
+    client_kwargs={
+        'scope': 'openid profile email' # Legacy without PKCE
+    }
+)`;
+        }
 
       case 'spring':
-        return isPkce 
-          ? `// Java Spring Boot 3 / application.yml (PKCE S256 Public Client)
+        if (isPublic) {
+          return `# Java Spring Boot 3 / application.yml (PKCE S256 Public Client - No Secret)
 spring:
   security:
     oauth2:
@@ -974,13 +1075,31 @@ spring:
         registration:
           oidc-hub:
             client-id: spring-boot-pkce-client
-            client-authentication-method: none
+            client-authentication-method: none # Public Client: NO Secret
             authorization-grant-type: authorization_code
             scope: openid, profile, email
         provider:
           oidc-hub:
-            issuer-uri: http://localhost:3000/mock-idp`
-          : `// Java Spring Boot 3 / application.yml (Client Secret Confidential Client)
+            issuer-uri: http://localhost:3000/mock-idp`;
+        } else if (isConfidential) {
+          return `# Java Spring Boot 3 / application.yml (PKCE S256 Confidential Client - OAuth 2.1)
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          oidc-hub:
+            client-id: spring-boot-client
+            client-secret: \${OIDC_CLIENT_SECRET} # Protected Secret
+            client-authentication-method: client_secret_basic
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            # Enforces PKCE S256 automatically with Authorization Code Grant
+        provider:
+          oidc-hub:
+            issuer-uri: http://localhost:3000/mock-idp`;
+        } else {
+          return `# Java Spring Boot 3 / application.yml (Client Secret Only - Legacy Confidential)
 spring:
   security:
     oauth2:
@@ -995,15 +1114,16 @@ spring:
         provider:
           oidc-hub:
             issuer-uri: http://localhost:3000/mock-idp`;
+        }
 
       case 'nimbus':
-        return isPkce 
-          ? `// Java / Nimbus OAuth 2.0 SDK (PKCE S256 Public Client)
+        if (isPublic) {
+          return `// Java / Nimbus OAuth 2.0 SDK (PKCE S256 Public Client - No Secret)
 import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
 import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
 import com.nimbusds.openid.connect.sdk.AuthenticationRequest;
 
-// Generate 256-bit Code Verifier & S256 Challenge
+// 1. Generate 256-bit Code Verifier & S256 Challenge
 CodeVerifier codeVerifier = new CodeVerifier();
 AuthenticationRequest req = new AuthenticationRequest.Builder(
     new ResponseType("code"), scope, clientID, redirectURI)
@@ -1011,12 +1131,44 @@ AuthenticationRequest req = new AuthenticationRequest.Builder(
     .state(state)
     .nonce(nonce)
     .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
-    .build();`
-          : `// Java / Nimbus OAuth 2.0 SDK (Client Secret Confidential Client)
+    .build();
+
+// 2. Token Exchange (Public Client: No Client Secret)
+TokenRequest tokenReq = new TokenRequest(
+    opMetadata.getTokenEndpointURI(),
+    clientID,
+    new AuthorizationCodeGrant(authCode, redirectURI, codeVerifier));`;
+        } else if (isConfidential) {
+          return `// Java / Nimbus OAuth 2.0 SDK (PKCE S256 Confidential Client - OAuth 2.1)
+import com.nimbusds.oauth2.sdk.pkce.CodeVerifier;
+import com.nimbusds.oauth2.sdk.pkce.CodeChallengeMethod;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 
+// 1. Generate PKCE Verifier & Challenge
+CodeVerifier codeVerifier = new CodeVerifier();
+AuthenticationRequest req = new AuthenticationRequest.Builder(
+    new ResponseType("code"), scope, clientID, redirectURI)
+    .endpointURI(opMetadata.getAuthorizationEndpointURI())
+    .state(state)
+    .codeChallenge(codeVerifier, CodeChallengeMethod.S256)
+    .build();
+
+// 2. Token Exchange: Both Secret AND PKCE Verifier
+Secret secret = new Secret(System.getenv("OIDC_CLIENT_SECRET"));
+ClientSecretBasic clientAuth = new ClientSecretBasic(clientID, secret);
+TokenRequest tokenReq = new TokenRequest(
+    opMetadata.getTokenEndpointURI(),
+    clientAuth,
+    new AuthorizationCodeGrant(authCode, redirectURI, codeVerifier));`;
+        } else {
+          return `// Java / Nimbus OAuth 2.0 SDK (Client Secret Only - Legacy Confidential)
+import com.nimbusds.oauth2.sdk.auth.Secret;
+import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
+import com.nimbusds.oauth2.sdk.TokenRequest;
+
+// Token Exchange with Client Secret (No PKCE)
 ClientID clientID = new ClientID("nimbus-java-client");
 Secret secret = new Secret(System.getenv("OIDC_CLIENT_SECRET"));
 ClientSecretBasic clientAuth = new ClientSecretBasic(clientID, secret);
@@ -1025,10 +1177,11 @@ TokenRequest tokenReq = new TokenRequest(
     opMetadata.getTokenEndpointURI(),
     clientAuth,
     new AuthorizationCodeGrant(authCode, redirectURI));`;
+        }
 
       case 'dotnet':
-        return isPkce 
-          ? `// C# ASP.NET Core 8 Program.cs (PKCE S256 Public Client)
+        if (isPublic) {
+          return `// C# ASP.NET Core 8 Program.cs (PKCE S256 Public Client - No Secret)
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -1038,9 +1191,10 @@ builder.Services.AddAuthentication(options => {
     options.Authority = "http://localhost:3000/mock-idp";
     options.ClientId = "dotnet-pkce-client";
     options.ResponseType = "code";
-    options.UsePkce = true; // Mandatory PKCE S256
-});`
-          : `// C# ASP.NET Core 8 Program.cs (Client Secret Confidential Client)
+    options.UsePkce = true; // Mandatory PKCE S256 (No ClientSecret)
+});`;
+        } else if (isConfidential) {
+          return `// C# ASP.NET Core 8 Program.cs (PKCE S256 Confidential Client - OAuth 2.1)
 builder.Services.AddAuthentication(options => {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -1049,34 +1203,69 @@ builder.Services.AddAuthentication(options => {
 .AddOpenIdConnect(options => {
     options.Authority = "http://localhost:3000/mock-idp";
     options.ClientId = "dotnet-core-client";
-    options.ClientSecret = builder.Configuration["Oidc:Secret"]; // Secret
+    options.ClientSecret = builder.Configuration["Oidc:Secret"]; // Protected Secret
     options.ResponseType = "code";
-    options.UsePkce = false;
+    options.UsePkce = true; // Defense-in-Depth: Both PKCE S256 & Secret
 });`;
+        } else {
+          return `// C# ASP.NET Core 8 Program.cs (Client Secret Only - Legacy Confidential)
+builder.Services.AddAuthentication(options => {
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+})
+.AddCookie()
+.AddOpenIdConnect(options => {
+    options.Authority = "http://localhost:3000/mock-idp";
+    options.ClientId = "dotnet-core-client";
+    options.ClientSecret = builder.Configuration["Oidc:Secret"]; // Protected Secret
+    options.ResponseType = "code";
+    options.UsePkce = false; // Legacy without PKCE
+});`;
+        }
 
       case 'go':
-        return isPkce 
-          ? `// Go / coreos/go-oidc (PKCE S256 Public Client)
+        if (isPublic) {
+          return `// Go / coreos/go-oidc (PKCE S256 Public Client - No Secret)
 provider, err := oidc.NewProvider(ctx, "http://localhost:3000/mock-idp")
 oauth2Config := oauth2.Config{
     ClientID:     "go-gin-pkce-client",
     Endpoint:     provider.Endpoint(),
     RedirectURL:  "http://localhost:3000/auth/callback",
     Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
+    // Public Client: No ClientSecret
 }
 
 // Generate code_verifier & S256 challenge
 verifier := oauth2.GenerateVerifier()
-authURL := oauth2Config.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))`
-          : `// Go / coreos/go-oidc (Client Secret Confidential Client)
+authURL := oauth2Config.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))`;
+        } else if (isConfidential) {
+          return `// Go / coreos/go-oidc (PKCE S256 Confidential Client - OAuth 2.1)
 provider, err := oidc.NewProvider(ctx, "http://localhost:3000/mock-idp")
 oauth2Config := oauth2.Config{
     ClientID:     "go-gin-client",
-    ClientSecret: os.Getenv("OIDC_CLIENT_SECRET"), // Secret
+    ClientSecret: os.Getenv("OIDC_CLIENT_SECRET"), // Protected Secret
     Endpoint:     provider.Endpoint(),
     RedirectURL:  "http://localhost:3000/auth/callback",
     Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
-}`;
+}
+
+// Defense-in-Depth: Both ClientSecret AND PKCE S256
+verifier := oauth2.GenerateVerifier()
+authURL := oauth2Config.AuthCodeURL(state, oauth2.S256ChallengeOption(verifier))`;
+        } else {
+          return `// Go / coreos/go-oidc (Client Secret Only - Legacy Confidential)
+provider, err := oidc.NewProvider(ctx, "http://localhost:3000/mock-idp")
+oauth2Config := oauth2.Config{
+    ClientID:     "go-gin-client",
+    ClientSecret: os.Getenv("OIDC_CLIENT_SECRET"), // Protected Secret
+    Endpoint:     provider.Endpoint(),
+    RedirectURL:  "http://localhost:3000/auth/callback",
+    Scopes:       []string{oidc.ScopeOpenID, "profile", "email"},
+}
+
+// Standard authorization URL without PKCE
+authURL := oauth2Config.AuthCodeURL(state)`;
+        }
 
       default:
         return '// Backend Code';
